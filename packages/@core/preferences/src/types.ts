@@ -16,7 +16,7 @@ import type {
   ThemeModeType,
 } from '@vben-core/typings';
 
-type SupportedLanguagesType = 'en-US' | 'zh-CN';
+type SupportedLanguagesType = 'en-US' | 'zh-CN' | 'vi-VN';
 type CustomPreferencesValue = boolean | number | string;
 
 interface CustomPreferencesOption<TValue extends string = string> {
@@ -70,16 +70,11 @@ type AnyCustomPreferencesField =
   | CustomPreferencesSelectField
   | CustomPreferencesSwitchField;
 
-type CustomPreferencesField<
-  TCustomPreferences extends object = CustomPreferencesRecord,
-> =
+type CustomPreferencesField<TCustomPreferences extends object = CustomPreferencesRecord> =
   string extends Extract<keyof TCustomPreferences, string>
     ? AnyCustomPreferencesField
     : {
-        [K in Extract<
-          keyof TCustomPreferences,
-          string
-        >]: TCustomPreferences[K] extends boolean
+        [K in Extract<keyof TCustomPreferences, string>]: TCustomPreferences[K] extends boolean
           ? CustomPreferencesSwitchField<K>
           : TCustomPreferences[K] extends number
             ? CustomPreferencesNumberField<K>
@@ -88,9 +83,7 @@ type CustomPreferencesField<
               : never;
       }[Extract<keyof TCustomPreferences, string>];
 
-interface PreferencesExtension<
-  TCustomPreferences extends object = CustomPreferencesRecord,
-> {
+interface PreferencesExtension<TCustomPreferences extends object = CustomPreferencesRecord> {
   fields: Array<CustomPreferencesField<TCustomPreferences>>;
   tabLabel: string;
   title?: string;
@@ -402,9 +395,7 @@ interface Preferences {
 
 type PreferencesKeys = keyof Preferences;
 
-interface InitialOptions<
-  TCustomPreferences extends object = CustomPreferencesRecord,
-> {
+interface InitialOptions<TCustomPreferences extends object = CustomPreferencesRecord> {
   extension?: PreferencesExtension<TCustomPreferences>;
   namespace: string;
   overrides?: DeepPartial<Preferences>;

@@ -11,5 +11,76 @@
     "title": "Dashboard",
     "analytics": "Analytics",
     "workspace": "Workspace"
+  },
+  "hr": {
+    "title": "Human Resources",
+    "attendance": "Attendance",
+    "employees": "Employees",
+    "payroll": "Payroll",
+    "contracts": "Contracts",
+    "contractTypes": "Contract Types",
+    "workShifts": "Work Shifts",
+    "workSchedules": "Work Schedules",
+    "dayOffs": "Days Off",
+    "sampleDescription": "Sample page for {0} management.",
+    "sampleTable": {
+      "code": "Code",
+      "name": "Name",
+      "status": "Status",
+      "active": "Active",
+      "draft": "Draft",
+      "sampleDataOne": "Sample Data 1",
+      "sampleDataTwo": "Sample Data 2"
+    }
+  },
+  "identity": {
+    "title": "Identity Management",
+    "users": "Users",
+    "roles": "Roles",
+    "organizations": "Organizations",
+    "sampleDescription": "Sample page for {0} management.",
+    "sampleTable": {
+      "code": "Code",
+      "name": "Name",
+      "status": "Status",
+      "active": "Active",
+      "draft": "Draft",
+      "sampleDataOne": "Sample Data 1",
+      "sampleDataTwo": "Sample Data 2"
+    }
+  },
+  "sms": {
+    "title": "Sms",
+    "messages": "Messages",
+    "providers": "Providers",
+    "templates": "Message Templates",
+    "adminNotifications": "Notifications (Admin)",
+    "personalNotifications": "Notifications (Personal)",
+    "sampleDescription": "Sample page for {0} management.",
+    "sampleTable": {
+      "code": "Code",
+      "name": "Name",
+      "status": "Status",
+      "active": "Active",
+      "draft": "Draft",
+      "sampleDataOne": "Sample Data 1",
+      "sampleDataTwo": "Sample Data 2"
+    }
+  },
+  "system": {
+    "title": "System",
+    "settings": "Settings",
+    "tenants": "Tenants",
+    "authentication": "Authentication",
+    "sampleDescription": "Sample page for {0} management.",
+    "sampleTable": {
+      "code": "Code",
+      "name": "Name",
+      "status": "Status",
+      "active": "Active",
+      "draft": "Draft",
+      "sampleDataOne": "Sample Data 1",
+      "sampleDataTwo": "Sample Data 2"
+    }
   }
 }

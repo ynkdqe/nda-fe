@@ -11,5 +11,76 @@
     "title": "概览",
     "analytics": "分析页",
     "workspace": "工作台"
+  },
+  "hr": {
+    "title": "人力资源",
+    "attendance": "考勤",
+    "employees": "员工",
+    "payroll": "工资表",
+    "contracts": "合同",
+    "contractTypes": "合同类型",
+    "workShifts": "班次",
+    "workSchedules": "工作日程",
+    "dayOffs": "休假日",
+    "sampleDescription": "{0}管理示例页面。",
+    "sampleTable": {
+      "code": "编码",
+      "name": "名称",
+      "status": "状态",
+      "active": "启用",
+      "draft": "草稿",
+      "sampleDataOne": "示例数据 1",
+      "sampleDataTwo": "示例数据 2"
+    }
+  },
+  "identity": {
+    "title": "身份管理",
+    "users": "用户",
+    "roles": "角色",
+    "organizations": "组织",
+    "sampleDescription": "{0}管理示例页面。",
+    "sampleTable": {
+      "code": "编码",
+      "name": "名称",
+      "status": "状态",
+      "active": "启用",
+      "draft": "草稿",
+      "sampleDataOne": "示例数据 1",
+      "sampleDataTwo": "示例数据 2"
+    }
+  },
+  "sms": {
+    "title": "短信",
+    "messages": "消息",
+    "providers": "供应商",
+    "templates": "消息模板",
+    "adminNotifications": "通知（管理）",
+    "personalNotifications": "通知（个人）",
+    "sampleDescription": "{0}管理示例页面。",
+    "sampleTable": {
+      "code": "编码",
+      "name": "名称",
+      "status": "状态",
+      "active": "启用",
+      "draft": "草稿",
+      "sampleDataOne": "示例数据 1",
+      "sampleDataTwo": "示例数据 2"
+    }
+  },
+  "system": {
+    "title": "系统",
+    "settings": "设置",
+    "tenants": "租户",
+    "authentication": "认证",
+    "sampleDescription": "{0}管理示例页面。",
+    "sampleTable": {
+      "code": "编码",
+      "name": "名称",
+      "status": "状态",
+      "active": "启用",
+      "draft": "草稿",
+      "sampleDataOne": "示例数据 1",
+      "sampleDataTwo": "示例数据 2"
+    }
   }
 }

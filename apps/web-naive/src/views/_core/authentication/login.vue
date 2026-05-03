@@ -1,6 +1,10 @@
 <script lang="ts" setup>
 import type { VbenFormSchema } from '@vben/common-ui';
-import type { BasicOption } from '@vben/types';
+import type { SelectOption } from 'naive-ui';
+
+type LoginAccountOption = Omit<SelectOption, 'value'> & {
+  value: null | string;
+};
 
 import { computed, markRaw } from 'vue';
 
@@ -13,18 +17,18 @@ defineOptions({ name: 'Login' });
 
 const authStore = useAuthStore();
 
-const MOCK_USER_OPTIONS: BasicOption[] = [
-  {
-    label: 'Super',
-    value: 'vben',
-  },
+const MOCK_USER_OPTIONS: LoginAccountOption[] = [
   {
     label: 'Admin',
-    value: 'admin',
+    value: null,
   },
   {
-    label: 'User',
-    value: 'jack',
+    label: 'FRT',
+    value: 'FRT',
+  },
+  {
+    label: 'NDA',
+    value: 'NDA',
   },
 ];
 
@@ -38,11 +42,7 @@ const formSchema = computed((): VbenFormSchema[] => {
       },
       fieldName: 'selectAccount',
       label: $t('authentication.selectAccount'),
-      rules: z
-        .string()
-        .min(1, { message: $t('authentication.selectAccount') })
-        .optional()
-        .default('vben'),
+      rules: z.nullable(z.string()).optional().default(null),
     },
     {
       component: 'VbenInput',
@@ -51,16 +51,14 @@ const formSchema = computed((): VbenFormSchema[] => {
       },
       dependencies: {
         trigger(values, form) {
-          if (values.selectAccount) {
-            const findUser = MOCK_USER_OPTIONS.find(
-              (item) => item.value === values.selectAccount,
-            );
-            if (findUser) {
-              form.setValues({
-                password: '123456',
-                username: findUser.value,
-              });
-            }
+          const findUser = MOCK_USER_OPTIONS.find(
+            (item) => item.value === values.selectAccount,
+          );
+          if (findUser) {
+            form.setValues({
+              password: '123456',
+              username: findUser.value ?? '',
+            });
           }
         },
         triggerFields: ['selectAccount'],

@@ -1,0 +1,86 @@
+{
+  "auth": {
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "codeLogin": "Đăng nhập bằng mã",
+    "qrcodeLogin": "Đăng nhập bằng mã QR",
+    "forgetPassword": "Quên mật khẩu",
+    "profile": "Hồ sơ cá nhân"
+  },
+  "dashboard": {
+    "title": "Bảng điều khiển",
+    "analytics": "Phân tích",
+    "workspace": "Không gian làm việc"
+  },
+  "hr": {
+    "title": "Nhân sự",
+    "attendance": "Chấm công",
+    "employees": "Nhân viên",
+    "payroll": "Bảng tính",
+    "contracts": "Hợp đồng",
+    "contractTypes": "Loại hợp đồng",
+    "workShifts": "Ca làm việc",
+    "workSchedules": "Lịch làm việc",
+    "dayOffs": "Ngày nghỉ",
+    "sampleDescription": "Trang mẫu quản lý {0}.",
+    "sampleTable": {
+      "code": "Mã",
+      "name": "Tên",
+      "status": "Trạng thái",
+      "active": "Đang hoạt động",
+      "draft": "Bản nháp",
+      "sampleDataOne": "Dữ liệu mẫu 1",
+      "sampleDataTwo": "Dữ liệu mẫu 2"
+    }
+  },
+  "identity": {
+    "title": "Quản lý định danh",
+    "users": "Người dùng",
+    "roles": "Vai trò",
+    "organizations": "Tổ chức",
+    "sampleDescription": "Trang mẫu quản lý {0}.",
+    "sampleTable": {
+      "code": "Mã",
+      "name": "Tên",
+      "status": "Trạng thái",
+      "active": "Đang hoạt động",
+      "draft": "Bản nháp",
+      "sampleDataOne": "Dữ liệu mẫu 1",
+      "sampleDataTwo": "Dữ liệu mẫu 2"
+    }
+  },
+  "sms": {
+    "title": "Sms",
+    "messages": "Tin nhắn",
+    "providers": "Nhà cung cấp",
+    "templates": "Mẫu tin nhắn",
+    "adminNotifications": "Thông báo (Quản trị)",
+    "personalNotifications": "Thông báo (Cá nhân)",
+    "sampleDescription": "Trang mẫu quản lý {0}.",
+    "sampleTable": {
+      "code": "Mã",
+      "name": "Tên",
+      "status": "Trạng thái",
+      "active": "Đang hoạt động",
+      "draft": "Bản nháp",
+      "sampleDataOne": "Dữ liệu mẫu 1",
+      "sampleDataTwo": "Dữ liệu mẫu 2"
+    }
+  },
+  "system": {
+    "title": "Hệ thống",
+    "settings": "Cài đặt",
+    "tenants": "Người thuê",
+    "authentication": "Xác thực",
+    "sampleDescription": "Trang mẫu quản lý {0}.",
+    "sampleTable": {
+      "code": "Mã",
+      "name": "Tên",
+      "status": "Trạng thái",
+      "active": "Đang hoạt động",
+      "draft": "Bản nháp",
+      "sampleDataOne": "Dữ liệu mẫu 1",
+      "sampleDataTwo": "Dữ liệu mẫu 2"
+    }
+  }
+}
