@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { formatDate } from "@vben/utils";
+import { formatDate } from '@vben/utils';
 
-import { NDivider, NFormItem, NInput, NInputNumber } from "naive-ui";
+import { NDivider, NFormItem, NInput, NInputNumber } from 'naive-ui';
 
-import EmployeeSearchSelect from "#/components/EmployeeSearchSelect.vue";
+import EmployeeSearchSelect from '#/components/EmployeeSearchSelect.vue';
 
 type ContractEmployeeInfoValue = null | number | string | undefined;
 type ContractEmployeeInfoField =
-  | "birthDate"
-  | "email"
-  | "employeeId"
-  | "identification"
-  | "phone"
-  | "tax";
+  | 'birthDate'
+  | 'email'
+  | 'employeeId'
+  | 'identification'
+  | 'phone'
+  | 'tax';
 
 type ContractEmployeeInfoForm = Partial<
   Record<ContractEmployeeInfoField, ContractEmployeeInfoValue>
@@ -24,13 +24,21 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  change: [value: ContractEmployeeInfoValue | ContractEmployeeInfoValue[], option?: unknown];
-  "update:form": [value: ContractEmployeeInfoForm];
-  "update:modelValue": [value: ContractEmployeeInfoValue | ContractEmployeeInfoValue[]];
+  change: [
+    value: ContractEmployeeInfoValue | ContractEmployeeInfoValue[],
+    option?: unknown,
+  ];
+  'update:form': [value: ContractEmployeeInfoForm];
+  'update:modelValue': [
+    value: ContractEmployeeInfoValue | ContractEmployeeInfoValue[],
+  ];
 }>();
 
-function updateField(field: ContractEmployeeInfoField, value: ContractEmployeeInfoValue) {
-  emit("update:form", {
+function updateField(
+  field: ContractEmployeeInfoField,
+  value: ContractEmployeeInfoValue,
+) {
+  emit('update:form', {
     ...props.form,
     [field]: value,
   });
@@ -38,17 +46,17 @@ function updateField(field: ContractEmployeeInfoField, value: ContractEmployeeIn
 
 function getTextValue(field: ContractEmployeeInfoField) {
   const value = props.form[field];
-  return value === null || value === undefined ? "" : String(value);
+  return value === null || value === undefined ? '' : String(value);
 }
 
 function getNumberValue(field: ContractEmployeeInfoField) {
   const value = props.form[field];
 
-  if (typeof value === "number" && Number.isFinite(value)) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
     return value;
   }
 
-  if (typeof value === "string" && value.trim()) {
+  if (typeof value === 'string' && value.trim()) {
     const numericValue = Number(value);
     return Number.isNaN(numericValue) ? null : numericValue;
   }
@@ -69,23 +77,25 @@ function getEmployeeIdValue() {
 function formatBirthDate() {
   const value = props.form.birthDate;
 
-  if (value === null || value === undefined || value === "") {
-    return "";
+  if (value === null || value === undefined || value === '') {
+    return '';
   }
 
-  return formatDate(value, "DD/MM/YYYY");
+  return formatDate(value, 'DD/MM/YYYY');
 }
 
 function onEmployeeChange(
   value: ContractEmployeeInfoValue | ContractEmployeeInfoValue[],
   option?: unknown,
 ) {
-  emit("change", value, option);
+  emit('change', value, option);
 }
 
-function onEmployeeModelUpdate(value: ContractEmployeeInfoValue | ContractEmployeeInfoValue[]) {
-  emit("update:modelValue", value);
-  updateField("employeeId", Array.isArray(value) ? value[0] : value);
+function onEmployeeModelUpdate(
+  value: ContractEmployeeInfoValue | ContractEmployeeInfoValue[],
+) {
+  emit('update:modelValue', value);
+  updateField('employeeId', Array.isArray(value) ? value[0] : value);
 }
 </script>
 

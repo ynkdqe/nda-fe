@@ -1,21 +1,24 @@
 <script setup lang="ts">
-import type { SelectOption } from "naive-ui";
+import type { SelectOption } from 'naive-ui';
 
-import { NDivider, NFormItem, NInput, NSelect } from "naive-ui";
+import { NDivider, NFormItem, NInput, NSelect } from 'naive-ui';
 
-import EmployeeSearchSelect from "#/components/EmployeeSearchSelect.vue";
+import EmployeeSearchSelect from '#/components/EmployeeSearchSelect.vue';
 
 type ContractStatusValue = null | number | string | undefined;
 type EmployeeSelectValue = number | string;
-type EmployeeModelValue = EmployeeSelectValue | EmployeeSelectValue[] | undefined;
-type ContractStatusField = "approver" | "checkers" | "notes" | "status";
+type EmployeeModelValue =
+  | EmployeeSelectValue
+  | EmployeeSelectValue[]
+  | undefined;
+type ContractStatusField = 'approver' | 'checkers' | 'notes' | 'status';
 
 type ContractStatusApprovalForm = Partial<
   Record<ContractStatusField, ContractStatusValue | EmployeeSelectValue[]>
 > &
   Record<string, unknown>;
 
-type ContractStatusOption = Omit<SelectOption, "value"> & {
+type ContractStatusOption = Omit<SelectOption, 'value'> & {
   value: number | string;
 };
 
@@ -25,14 +28,14 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  "update:form": [value: ContractStatusApprovalForm];
+  'update:form': [value: ContractStatusApprovalForm];
 }>();
 
 function updateField(
   field: ContractStatusField,
   value: ContractStatusValue | EmployeeSelectValue[],
 ) {
-  emit("update:form", {
+  emit('update:form', {
     ...props.form,
     [field]: value,
   });
@@ -43,14 +46,14 @@ function getStatusValue() {
   return value === null || value === undefined ? null : value;
 }
 
-function getEmployeeValue(field: "approver" | "checkers"): EmployeeModelValue {
+function getEmployeeValue(field: 'approver' | 'checkers'): EmployeeModelValue {
   const value = props.form[field];
 
   if (Array.isArray(value)) {
     return value;
   }
 
-  if (typeof value === "number" || typeof value === "string") {
+  if (typeof value === 'number' || typeof value === 'string') {
     return value;
   }
 
@@ -59,7 +62,7 @@ function getEmployeeValue(field: "approver" | "checkers"): EmployeeModelValue {
 
 function getNotesValue() {
   const value = props.form.notes;
-  return typeof value === "string" ? value : "";
+  return typeof value === 'string' ? value : '';
 }
 </script>
 

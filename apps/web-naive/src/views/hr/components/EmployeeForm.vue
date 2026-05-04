@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import type { FormInst, FormRules, SelectOption } from "naive-ui";
+import type { FormInst, FormRules, SelectOption } from 'naive-ui';
 
-import type { EmployeeApi } from "#/api";
+import type { EmployeeApi } from '#/api';
 
-import { computed, nextTick, reactive, ref, watch } from "vue";
+import { computed, nextTick, reactive, ref, watch } from 'vue';
 
-import { useVbenDrawer } from "@vben/common-ui";
+import { useVbenDrawer } from '@vben/common-ui';
 
 import {
   NButton,
@@ -17,11 +17,11 @@ import {
   NInput,
   NSelect,
   NSpace,
-} from "naive-ui";
+} from 'naive-ui';
 
-import { message } from "#/adapter/naive";
-import { createEmployeeApi, updateEmployeeApi } from "#/api";
-import UserSearchSelect from "#/components/UserSearchSelect.vue";
+import { message } from '#/adapter/naive';
+import { createEmployeeApi, updateEmployeeApi } from '#/api';
+import UserSearchSelect from '#/components/UserSearchSelect.vue';
 
 type NullableString = null | string;
 type EmployeeFormValue = null | number | string | undefined;
@@ -48,7 +48,7 @@ interface EmployeeFormData {
 
 const emit = defineEmits<{
   submit: [data: EmployeeApi.EmployeeMutationPayload];
-  "update:open": [value: boolean];
+  'update:open': [value: boolean];
 }>();
 
 const formRef = ref<FormInst | null>(null);
@@ -64,8 +64,8 @@ function resetForm(): EmployeeFormData {
     enrollDate: null,
     gender: null,
     id: undefined,
-    name: "",
-    phone: "",
+    name: '',
+    phone: '',
     position: null,
     resignationDate: null,
     status: null,
@@ -77,49 +77,49 @@ function resetForm(): EmployeeFormData {
 const formData = reactive<EmployeeFormData>(resetForm());
 
 const genderOptions: SelectOption[] = [
-  { label: "Nam", value: 1 },
-  { label: "Nữ", value: 2 },
-  { label: "Khác", value: 0 },
+  { label: 'Nam', value: 1 },
+  { label: 'Nữ', value: 2 },
+  { label: 'Khác', value: 0 },
 ];
 
 const departmentOptions: SelectOption[] = [
-  { label: "Nhân sự", value: "Nhân sự" },
-  { label: "Kế toán", value: "Kế toán" },
-  { label: "IT", value: "IT" },
-  { label: "Marketing", value: "Marketing" },
-  { label: "Kinh doanh", value: "Kinh doanh" },
+  { label: 'Nhân sự', value: 'Nhân sự' },
+  { label: 'Kế toán', value: 'Kế toán' },
+  { label: 'IT', value: 'IT' },
+  { label: 'Marketing', value: 'Marketing' },
+  { label: 'Kinh doanh', value: 'Kinh doanh' },
 ];
 
 const statusOptions: SelectOption[] = [
-  { label: "Đang làm", value: "Đang làm" },
-  { label: "Nghỉ việc", value: "Nghỉ việc" },
-  { label: "Nghỉ phép năm", value: "Nghỉ phép năm" },
-  { label: "Nghỉ ốm", value: "Nghỉ ốm" },
+  { label: 'Đang làm', value: 'Đang làm' },
+  { label: 'Nghỉ việc', value: 'Nghỉ việc' },
+  { label: 'Nghỉ phép năm', value: 'Nghỉ phép năm' },
+  { label: 'Nghỉ ốm', value: 'Nghỉ ốm' },
 ];
 
 const formRules: FormRules = {
   name: [
     {
-      message: "Vui lòng nhập họ tên",
+      message: 'Vui lòng nhập họ tên',
       required: true,
-      trigger: ["blur", "input"],
+      trigger: ['blur', 'input'],
     },
   ],
   phone: [
     {
-      message: "Vui lòng nhập số điện thoại",
+      message: 'Vui lòng nhập số điện thoại',
       required: true,
-      trigger: ["blur", "input"],
+      trigger: ['blur', 'input'],
     },
   ],
 };
 
 function toTimestamp(value: EmployeeFormValue): null | number {
-  if (value === null || value === undefined || value === "") {
+  if (value === null || value === undefined || value === '') {
     return null;
   }
 
-  if (typeof value === "number") {
+  if (typeof value === 'number') {
     return Number.isFinite(value) ? value : null;
   }
 
@@ -138,8 +138,8 @@ function toApiDate(value?: null | number) {
     return null;
   }
 
-  const month = `${date.getMonth() + 1}`.padStart(2, "0");
-  const day = `${date.getDate()}`.padStart(2, "0");
+  const month = `${date.getMonth() + 1}`.padStart(2, '0');
+  const day = `${date.getDate()}`.padStart(2, '0');
   return `${date.getFullYear()}-${month}-${day}`;
 }
 
@@ -147,7 +147,9 @@ function normalizeText(value?: NullableString) {
   return value?.trim() || null;
 }
 
-function normalizeRecord(record?: null | Partial<EmployeeApi.EmployeeItem>): EmployeeFormData {
+function normalizeRecord(
+  record?: null | Partial<EmployeeApi.EmployeeItem>,
+): EmployeeFormData {
   const initialValue = resetForm();
 
   if (!record) {
@@ -165,8 +167,8 @@ function normalizeRecord(record?: null | Partial<EmployeeApi.EmployeeItem>): Emp
     enrollDate: toTimestamp(record.enrollDate),
     gender: record.gender ?? null,
     id: record.id,
-    name: record.name ?? "",
-    phone: record.phone ?? "",
+    name: record.name ?? '',
+    phone: record.phone ?? '',
     position: record.position ?? null,
     resignationDate: toTimestamp(record.resignationDate),
     status: record.status ?? null,
@@ -197,13 +199,14 @@ function buildPayload(): EmployeeApi.EmployeeMutationPayload {
 
 function getUserText(user: UserRecord, key: string) {
   const value = user[key];
-  return typeof value === "string" ? value : "";
+  return typeof value === 'string' ? value : '';
 }
 
 function onUserSelected(user: UserRecord) {
-  formData.userName = getUserText(user, "userName") || null;
-  formData.email = getUserText(user, "email") || null;
-  formData.phone = getUserText(user, "phoneNumber") || getUserText(user, "phone") || "";
+  formData.userName = getUserText(user, 'userName') || null;
+  formData.email = getUserText(user, 'email') || null;
+  formData.phone =
+    getUserText(user, 'phoneNumber') || getUserText(user, 'phone') || '';
 }
 
 watch(
@@ -212,7 +215,7 @@ watch(
     if (!userId) {
       formData.userName = null;
       formData.email = null;
-      formData.phone = "";
+      formData.phone = '';
     }
   },
 );
@@ -222,13 +225,15 @@ async function handleSubmit() {
     await formRef.value?.validate();
     const payload = buildPayload();
 
-    await (formData.id ? updateEmployeeApi(formData.id, payload) : createEmployeeApi(payload));
+    await (formData.id
+      ? updateEmployeeApi(formData.id, payload)
+      : createEmployeeApi(payload));
 
-    message.success("Thao tác thành công");
-    emit("submit", payload);
+    message.success('Thao tác thành công');
+    emit('submit', payload);
     drawerApi.close();
   } catch {
-    message.error("Vui lòng kiểm tra lại thông tin");
+    message.error('Vui lòng kiểm tra lại thông tin');
   }
 }
 
@@ -256,11 +261,13 @@ const [Drawer, drawerApi] = useVbenDrawer({
     }
 
     Object.assign(formData, resetForm());
-    emit("update:open", false);
+    emit('update:open', false);
   },
 });
 
-const title = computed(() => (formData.id ? "Sửa nhân viên" : "Thêm nhân viên"));
+const title = computed(() =>
+  formData.id ? 'Sửa nhân viên' : 'Thêm nhân viên',
+);
 
 defineExpose({
   drawerApi,
@@ -290,15 +297,26 @@ defineExpose({
         </NFormItemGi>
 
         <NFormItemGi label="Tên người dùng" path="userName">
-          <NInput v-model:value="formData.userName" placeholder="Tên người dùng" readonly />
+          <NInput
+            v-model:value="formData.userName"
+            placeholder="Tên người dùng"
+            readonly
+          />
         </NFormItemGi>
 
         <NFormItemGi label="Mã nhân viên" path="employeeCode">
-          <NInput v-model:value="formData.employeeCode" placeholder="Mã nhân viên" readonly />
+          <NInput
+            v-model:value="formData.employeeCode"
+            placeholder="Mã nhân viên"
+            readonly
+          />
         </NFormItemGi>
 
         <NFormItemGi label="Số điện thoại" path="phone">
-          <NInput v-model:value="formData.phone" placeholder="Nhập số điện thoại" />
+          <NInput
+            v-model:value="formData.phone"
+            placeholder="Nhập số điện thoại"
+          />
         </NFormItemGi>
 
         <NFormItemGi label="Email" path="email">

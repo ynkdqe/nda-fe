@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import type { SelectOption } from "naive-ui";
+import type { SelectOption } from 'naive-ui';
 
-import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { computed, onBeforeUnmount, ref, watch } from 'vue';
 
-import { NSelect } from "naive-ui";
+import { NSelect } from 'naive-ui';
 
-import { requestClient } from "#/api/request";
+import { requestClient } from '#/api/request';
 
-type Mode = "multiple" | "single";
+type Mode = 'multiple' | 'single';
 type EmployeeSelectValue = number | string;
-type EmployeeModelValue = EmployeeSelectValue | EmployeeSelectValue[] | undefined;
+type EmployeeModelValue =
+  | EmployeeSelectValue
+  | EmployeeSelectValue[]
+  | undefined;
 
 type EmployeeRecord = Record<string, unknown>;
 
@@ -37,18 +40,21 @@ const props = withDefaults(
     allowClear: true,
     debounceMs: 300,
     disabled: false,
-    mode: "single",
+    mode: 'single',
     modelValue: undefined,
     placeholder: undefined,
   },
 );
 
 const emit = defineEmits<{
-  change: [value: EmployeeModelValue, option?: EmployeeOption | EmployeeOption[] | null];
-  "update:modelValue": [value: EmployeeModelValue];
+  change: [
+    value: EmployeeModelValue,
+    option?: EmployeeOption | EmployeeOption[] | null,
+  ];
+  'update:modelValue': [value: EmployeeModelValue];
 }>();
 
-const isMultiple = computed(() => props.mode === "multiple");
+const isMultiple = computed(() => props.mode === 'multiple');
 const innerValue = ref<EmployeeModelValue>(props.modelValue);
 const options = ref<EmployeeOption[]>([]);
 const loading = ref(false);
@@ -64,7 +70,7 @@ watch(
 );
 
 function isRecord(value: unknown): value is EmployeeRecord {
-  return Boolean(value && typeof value === "object" && !Array.isArray(value));
+  return Boolean(value && typeof value === 'object' && !Array.isArray(value));
 }
 
 function toRecordList(response: unknown): EmployeeRecord[] {
@@ -90,16 +96,16 @@ function toRecordList(response: unknown): EmployeeRecord[] {
   return [];
 }
 
-function toText(value: unknown, fallback = "") {
-  return typeof value === "string" ? value : fallback;
+function toText(value: unknown, fallback = '') {
+  return typeof value === 'string' ? value : fallback;
 }
 
 function toOptionValue(value: unknown): EmployeeSelectValue | undefined {
-  if (typeof value === "number" && Number.isFinite(value)) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
     return value;
   }
 
-  if (typeof value === "string" && value.trim()) {
+  if (typeof value === 'string' && value.trim()) {
     const numericValue = Number(value);
     return Number.isNaN(numericValue) ? value : numericValue;
   }
@@ -113,7 +119,7 @@ function normalize(response: unknown): EmployeeOption[] {
       const value = toOptionValue(employee.id);
       const userName = toText(employee.userName);
       const email = toText(employee.email);
-      const name = toText(employee.name, userName || email || "Unknown");
+      const name = toText(employee.name, userName || email || 'Unknown');
       const birthDate = toText(employee.birthDate);
 
       if (value === undefined) {
@@ -124,7 +130,7 @@ function normalize(response: unknown): EmployeeOption[] {
         birthDate: birthDate ? new Date(birthDate) : null,
         email,
         identification: toText(employee.identification),
-        label: `${name}${userName ? ` (${userName})` : ""}`,
+        label: `${name}${userName ? ` (${userName})` : ''}`,
         name,
         phone: toText(employee.phone),
         userName,
@@ -135,9 +141,9 @@ function normalize(response: unknown): EmployeeOption[] {
 }
 
 async function fetchEmployees(keyword: string) {
-  return requestClient.get<unknown>("/api/hrms/employee/_search", {
+  return requestClient.get<unknown>('/api/hrms/employee/_search', {
     params: { Keyword: keyword || undefined },
-    responseReturn: "body",
+    responseReturn: 'body',
   });
 }
 
@@ -186,13 +192,13 @@ function onChange(
   const nextValue = normalizeModelValue(value);
 
   innerValue.value = nextValue;
-  emit("update:modelValue", nextValue);
-  emit("change", nextValue, option);
+  emit('update:modelValue', nextValue);
+  emit('change', nextValue, option);
 }
 
 function onFocus() {
   if (options.value.length === 0) {
-    onSearch("");
+    onSearch('');
   }
 }
 
@@ -209,7 +215,9 @@ onBeforeUnmount(() => {
     :loading="loading"
     :multiple="isMultiple"
     :options="options"
-    :placeholder="placeholder || (isMultiple ? 'Chọn nhiều nhân viên' : 'Chọn nhân viên')"
+    :placeholder="
+      placeholder || (isMultiple ? 'Chọn nhiều nhân viên' : 'Chọn nhân viên')
+    "
     remote
     :value="innerValue"
     @focus="onFocus"

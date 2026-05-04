@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { SelectOption } from "naive-ui";
+import type { SelectOption } from 'naive-ui';
 
-import { computed } from "vue";
+import { computed } from 'vue';
 
-import { NSelect } from "naive-ui";
+import { NSelect } from 'naive-ui';
 
 type StatusValue = number | string;
 type StatusModelValue = null | StatusValue | StatusValue[] | undefined;
@@ -30,7 +30,7 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  "update:modelValue": [value: StatusModelValue];
+  'update:modelValue': [value: StatusModelValue];
 }>();
 
 const options = computed<SelectOption[]>(() => {
@@ -53,7 +53,7 @@ const options = computed<SelectOption[]>(() => {
 });
 
 function onChange(value: StatusModelValue) {
-  emit("update:modelValue", value);
+  emit('update:modelValue', value);
 }
 </script>
 

@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { SelectOption } from "naive-ui";
+import type { SelectOption } from 'naive-ui';
 
-import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { computed, onBeforeUnmount, ref, watch } from 'vue';
 
-import { NSelect } from "naive-ui";
+import { NSelect } from 'naive-ui';
 
-import { requestClient } from "#/api/request";
+import { requestClient } from '#/api/request';
 
-type Mode = "multiple" | "single";
+type Mode = 'multiple' | 'single';
 type UserSelectValue = string;
 type UserModelValue = null | string | string[] | undefined;
 type UserRecord = Record<string, unknown>;
@@ -31,7 +31,7 @@ const props = withDefaults(
     allowClear: true,
     debounceMs: 300,
     disabled: false,
-    mode: "single",
+    mode: 'single',
     modelValue: undefined,
     placeholder: undefined,
   },
@@ -39,11 +39,11 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   change: [value: UserModelValue];
-  "update:modelValue": [value: UserModelValue];
+  'update:modelValue': [value: UserModelValue];
   userSelected: [user: UserRecord];
 }>();
 
-const isMultiple = computed(() => props.mode === "multiple");
+const isMultiple = computed(() => props.mode === 'multiple');
 const innerValue = ref<UserModelValue>(props.modelValue);
 const options = ref<UserOption[]>([]);
 const loading = ref(false);
@@ -60,7 +60,7 @@ watch(
 );
 
 function isRecord(value: unknown): value is UserRecord {
-  return Boolean(value && typeof value === "object" && !Array.isArray(value));
+  return Boolean(value && typeof value === 'object' && !Array.isArray(value));
 }
 
 function toRecordList(response: unknown): UserRecord[] {
@@ -86,22 +86,22 @@ function toRecordList(response: unknown): UserRecord[] {
   return [];
 }
 
-function toText(value: unknown, fallback = "") {
-  return typeof value === "string" ? value : fallback;
+function toText(value: unknown, fallback = '') {
+  return typeof value === 'string' ? value : fallback;
 }
 
 function toUserId(user: UserRecord) {
   const id = user.id ?? user.userId;
 
-  if (typeof id === "string") {
+  if (typeof id === 'string') {
     return id.trim();
   }
 
-  if (typeof id === "number" && Number.isFinite(id)) {
+  if (typeof id === 'number' && Number.isFinite(id)) {
     return String(id);
   }
 
-  return "";
+  return '';
 }
 
 function normalize(response: unknown): UserOption[] {
@@ -117,11 +117,11 @@ function normalize(response: unknown): UserOption[] {
 
     const userName = toText(user.userName);
     const email = toText(user.email);
-    const name = toText(user.name, userName || email || "Unknown");
+    const name = toText(user.name, userName || email || 'Unknown');
 
     nextUserDataMap[userId] = user;
     nextOptions.push({
-      label: `${name}${userName ? ` (${userName})` : ""}`,
+      label: `${name}${userName ? ` (${userName})` : ''}`,
       rawData: user,
       value: userId,
     });
@@ -132,9 +132,9 @@ function normalize(response: unknown): UserOption[] {
 }
 
 async function fetchUsers(keyword: string) {
-  return requestClient.get<unknown>("/api/identity/users/_search", {
+  return requestClient.get<unknown>('/api/identity/users/_search', {
     params: { Keyword: keyword || undefined },
-    responseReturn: "body",
+    responseReturn: 'body',
   });
 }
 
@@ -179,21 +179,21 @@ function onChange(value: null | string | string[]) {
   const nextValue = normalizeModelValue(value);
 
   innerValue.value = nextValue;
-  emit("update:modelValue", nextValue);
-  emit("change", nextValue);
+  emit('update:modelValue', nextValue);
+  emit('change', nextValue);
 
-  if (!isMultiple.value && typeof nextValue === "string") {
+  if (!isMultiple.value && typeof nextValue === 'string') {
     const selectedUser = userDataMap.value[nextValue];
 
     if (selectedUser) {
-      emit("userSelected", selectedUser);
+      emit('userSelected', selectedUser);
     }
   }
 }
 
 function onFocus() {
   if (options.value.length === 0) {
-    onSearch("");
+    onSearch('');
   }
 }
 
@@ -210,7 +210,9 @@ onBeforeUnmount(() => {
     :loading="loading"
     :multiple="isMultiple"
     :options="options"
-    :placeholder="placeholder || (isMultiple ? 'Chọn nhiều người dùng' : 'Chọn người dùng')"
+    :placeholder="
+      placeholder || (isMultiple ? 'Chọn nhiều người dùng' : 'Chọn người dùng')
+    "
     remote
     :value="innerValue"
     @focus="onFocus"
