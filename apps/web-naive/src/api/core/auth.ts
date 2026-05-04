@@ -36,6 +36,7 @@ export async function loginApi(data: AuthApi.LoginParams) {
   return requestClient.post<AuthApi.LoginResult>('/connect/token', body, {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
+      ...(data.tenant ? { 'x-tenant-id': data.tenant } : {}),
     },
     responseReturn: 'body',
   });
