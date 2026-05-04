@@ -17,6 +17,10 @@ import { message } from '#/adapter/naive';
 import { useAuthStore } from '#/store';
 
 import { refreshTokenApi } from './core';
+import {
+  getStoredAuthTokenInfo,
+  removeStoredAuthTokenInfo,
+} from './core/token';
 
 const { apiURL } = useAppConfig(import.meta.env, import.meta.env.PROD);
 
@@ -34,6 +38,7 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
     const accessStore = useAccessStore();
     const authStore = useAuthStore();
     accessStore.setAccessToken(null);
+    removeStoredAuthTokenInfo();
     if (
       preferences.app.loginExpiredMode === 'modal' &&
       accessStore.isAccessChecked
@@ -63,8 +68,20 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
   client.addRequestInterceptor({
     fulfilled: async (config) => {
       const accessStore = useAccessStore();
+      const storedTokenInfo = getStoredAuthTokenInfo();
+      const accessToken =
+        accessStore.accessToken || storedTokenInfo?.access_token;
 
-      config.headers.Authorization = formatToken(accessStore.accessToken);
+      if (accessToken && !accessStore.accessToken) {
+        accessStore.setAccessToken(accessToken);
+      }
+
+      const authorization = formatToken(accessToken ?? null);
+      if (authorization) {
+        config.headers.Authorization = authorization;
+      } else {
+        delete config.headers.Authorization;
+      }
       config.headers['Accept-Language'] = preferences.app.locale;
       return config;
     },

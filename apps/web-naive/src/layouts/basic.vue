@@ -126,6 +126,19 @@ const avatar = computed(() => {
   return userStore.userInfo?.avatar ?? preferences.app.defaultAvatar;
 });
 
+const userDropdownDescription = computed(() => {
+  return (
+    userStore.userInfo?.email ||
+    userStore.userInfo?.username ||
+    userStore.userInfo?.realName ||
+    ''
+  );
+});
+
+const userDropdownText = computed(() => {
+  return userStore.userInfo?.realName || userStore.userInfo?.username || '';
+});
+
 async function handleLogout() {
   await authStore.logout(false);
 }
@@ -222,8 +235,8 @@ watch(
       <UserDropdown
         :avatar
         :menus
-        :text="userStore.userInfo?.realName"
-        description="ann.vben@gmail.com"
+        :description="userDropdownDescription"
+        :text="userDropdownText"
         tag-text="Pro"
         @logout="handleLogout"
       />

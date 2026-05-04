@@ -4,12 +4,16 @@ export namespace AuthApi {
   /** 登录接口参数 */
   export interface LoginParams {
     password?: string;
+    tenant?: null | string;
     username?: string;
   }
 
   /** 登录接口返回值 */
   export interface LoginResult {
-    accessToken: string;
+    access_token: string;
+    expires_in: number;
+    refresh_token?: string;
+    token_type: string;
   }
 
   export interface RefreshTokenResult {
@@ -22,7 +26,22 @@ export namespace AuthApi {
  * 登录
  */
 export async function loginApi(data: AuthApi.LoginParams) {
-  return requestClient.post<AuthApi.LoginResult>('/auth/login', data);
+  const body = new URLSearchParams({
+    client_id: import.meta.env.VITE_APP_CLIENT_ID ?? '',
+    client_secret: import.meta.env.VITE_APP_CLIENT_SECRET ?? '',
+    grant_type: import.meta.env.VITE_APP_GRANT_TYPE ?? '',
+    password: data.password ?? '',
+    scope: import.meta.env.VITE_APP_SCOPE ?? '',
+    tenant: data.tenant ?? '',
+    username: data.username ?? '',
+  });
+
+  return requestClient.post<AuthApi.LoginResult>('/connect/token', body, {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    responseReturn: 'body',
+  });
 }
 
 /**
