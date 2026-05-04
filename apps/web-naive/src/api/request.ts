@@ -1,35 +1,35 @@
 /**
  * 该文件可自行根据业务逻辑进行调整
  */
-import type { RequestClientOptions } from '@vben/request';
+import type { RequestClientOptions } from "@vben/request";
 
-import { useAppConfig } from '@vben/hooks';
-import { preferences } from '@vben/preferences';
+import { useAppConfig } from "@vben/hooks";
+import { preferences } from "@vben/preferences";
 import {
   authenticateResponseInterceptor,
   defaultResponseInterceptor,
   errorMessageResponseInterceptor,
   RequestClient,
-} from '@vben/request';
-import { useAccessStore } from '@vben/stores';
+} from "@vben/request";
+import { useAccessStore } from "@vben/stores";
 
-import { message } from '#/adapter/naive';
-import { useAuthStore } from '#/store';
+import { message } from "#/adapter/naive";
+import { useAuthStore } from "#/store";
 
-import { refreshTokenApi } from './core';
+import { refreshTokenApi } from "./core";
 import {
   getStoredAuthTokenInfo,
   isAccessTokenExpiring,
   removeStoredAuthTokenInfo,
   setStoredAuthTokenInfo,
-} from './core/token';
+} from "./core/token";
 
 const { apiURL } = useAppConfig(import.meta.env, import.meta.env.PROD);
 
 let refreshTokenPromise: null | Promise<string> = null;
 
 function isConnectTokenRequest(url?: string) {
-  return Boolean(url?.includes('/connect/token'));
+  return Boolean(url?.includes("/connect/token"));
 }
 
 function createRequestClient(baseURL: string, options?: RequestClientOptions) {
@@ -42,15 +42,12 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
    * 重新认证逻辑
    */
   async function doReAuthenticate() {
-    console.warn('Access token or refresh token is invalid or expired. ');
+    console.warn("Access token or refresh token is invalid or expired. ");
     const accessStore = useAccessStore();
     const authStore = useAuthStore();
     accessStore.setAccessToken(null);
     removeStoredAuthTokenInfo();
-    if (
-      preferences.app.loginExpiredMode === 'modal' &&
-      accessStore.isAccessChecked
-    ) {
+    if (preferences.app.loginExpiredMode === "modal" && accessStore.isAccessChecked) {
       accessStore.setLoginExpired(true);
     } else {
       await authStore.logout();
@@ -68,11 +65,10 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
     refreshTokenPromise = (async () => {
       const accessStore = useAccessStore();
       const storedTokenInfo = getStoredAuthTokenInfo();
-      const refreshToken =
-        accessStore.refreshToken || storedTokenInfo?.refresh_token;
+      const refreshToken = accessStore.refreshToken || storedTokenInfo?.refresh_token;
 
       if (!refreshToken) {
-        throw new Error('Refresh token is missing.');
+        throw new Error("Refresh token is missing.");
       }
 
       const resp = await refreshTokenApi(refreshToken);
@@ -111,18 +107,14 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
     fulfilled: async (config) => {
       const accessStore = useAccessStore();
       const storedTokenInfo = getStoredAuthTokenInfo();
-      let accessToken =
-        accessStore.accessToken || storedTokenInfo?.access_token;
+      let accessToken = accessStore.accessToken || storedTokenInfo?.access_token;
 
-      if (
-        !isConnectTokenRequest(config.url) &&
-        isAccessTokenExpiring(storedTokenInfo)
-      ) {
+      if (!isConnectTokenRequest(config.url) && isAccessTokenExpiring(storedTokenInfo)) {
         try {
           accessToken = await doRefreshToken();
         } catch {
           await doReAuthenticate();
-          throw new Error('Unable to refresh access token.');
+          throw new Error("Unable to refresh access token.");
         }
       }
 
@@ -130,15 +122,15 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
         accessStore.setAccessToken(accessToken);
       }
 
-      const authorization = !isConnectTokenRequest(config.url)
-        ? formatToken(accessToken ?? null)
-        : null;
+      const authorization = isConnectTokenRequest(config.url)
+        ? null
+        : formatToken(accessToken ?? null);
       if (authorization) {
         config.headers.Authorization = authorization;
       } else {
         delete config.headers.Authorization;
       }
-      config.headers['Accept-Language'] = preferences.app.locale;
+      config.headers["Accept-Language"] = preferences.app.locale;
       return config;
     },
   });
@@ -146,8 +138,8 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
   // 处理返回的响应数据格式
   client.addResponseInterceptor(
     defaultResponseInterceptor({
-      codeField: 'code',
-      dataField: 'data',
+      codeField: "code",
+      dataField: "data",
       successCode: 0,
     }),
   );
@@ -169,7 +161,7 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
       // 这里可以根据业务进行定制,你可以拿到 error 内的信息进行定制化处理，根据不同的 code 做不同的提示，而不是直接使用 message.error 提示 msg
       // 当前mock接口返回的错误字段是 error 或者 message
       const responseData = error?.response?.data ?? {};
-      const errorMessage = responseData?.error ?? responseData?.message ?? '';
+      const errorMessage = responseData?.error ?? responseData?.message ?? "";
       // 如果没有错误信息，则会根据状态码进行提示
       message.error(errorMessage || msg);
     }),
@@ -179,7 +171,7 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
 }
 
 export const requestClient = createRequestClient(apiURL, {
-  responseReturn: 'data',
+  responseReturn: "data",
 });
 
 export const baseRequestClient = new RequestClient({ baseURL: apiURL });

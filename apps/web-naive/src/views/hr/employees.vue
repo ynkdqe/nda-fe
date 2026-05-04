@@ -1,59 +1,56 @@
 <script lang="ts" setup>
-import type { VbenFormProps } from '#/adapter/form';
-import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { VbenFormProps } from "#/adapter/form";
+import type { VxeGridProps } from "#/adapter/vxe-table";
 
-import { Page, useVbenDrawer } from '@vben/common-ui';
-import { IconifyIcon } from '@vben/icons';
-import { formatDate } from '@vben/utils';
+import { Page, useVbenDrawer } from "@vben/common-ui";
+import { IconifyIcon } from "@vben/icons";
+import { formatDate } from "@vben/utils";
 
-import { NButton, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui';
+import { NButton, NPopconfirm, NSpace, NTag, NTooltip } from "naive-ui";
 
-import type { EmployeeApi } from '#/api';
+import type { EmployeeApi } from "#/api";
 
-import { message } from '#/adapter/naive';
-import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { getEmployeeListApi } from '#/api';
+import { message } from "#/adapter/naive";
+import { useVbenVxeGrid } from "#/adapter/vxe-table";
+import { getEmployeeListApi } from "#/api";
 
-import EmployeeForm from './components/EmployeeForm.vue';
+import EmployeeForm from "./components/EmployeeForm.vue";
 
 const DEFAULT_PAGE_SIZE = 10;
 
-const STATUS_TYPE_MAP: Record<
-  string,
-  'default' | 'error' | 'info' | 'success' | 'warning'
-> = {
-  'Đang làm': 'success',
-  'Luân chuyển nội bộ FRT': 'info',
-  'Nghỉ chăm con': 'warning',
-  'Nghỉ không lương': 'default',
-  'Nghỉ ốm': 'warning',
-  'Nghỉ phép năm': 'warning',
-  'Nghỉ sinh con khối BO': 'warning',
-  'Nghỉ sinh con khối Shop': 'warning',
-  'Nghỉ việc': 'error',
-  'Tạm khóa user': 'error',
-  'Thử việc': 'info',
+const STATUS_TYPE_MAP: Record<string, "default" | "error" | "info" | "success" | "warning"> = {
+  "Đang làm": "success",
+  "Luân chuyển nội bộ FRT": "info",
+  "Nghỉ chăm con": "warning",
+  "Nghỉ không lương": "default",
+  "Nghỉ ốm": "warning",
+  "Nghỉ phép năm": "warning",
+  "Nghỉ sinh con khối BO": "warning",
+  "Nghỉ sinh con khối Shop": "warning",
+  "Nghỉ việc": "error",
+  "Tạm khóa user": "error",
+  "Thử việc": "info",
 };
 
 const statusOptions = [
-  { label: 'Đang làm', value: 'Đang làm' },
-  { label: 'Nghỉ việc', value: 'Nghỉ việc' },
-  { label: 'Nghỉ phép năm', value: 'Nghỉ phép năm' },
-  { label: 'Nghỉ sinh con khối BO', value: 'Nghỉ sinh con khối BO' },
-  { label: 'Nghỉ ốm', value: 'Nghỉ ốm' },
-  { label: 'Nghỉ không lương', value: 'Nghỉ không lương' },
-  { label: 'Nghỉ chăm con', value: 'Nghỉ chăm con' },
-  { label: 'Nghỉ sinh con khối Shop', value: 'Nghỉ sinh con khối Shop' },
-  { label: 'Tạm khóa user', value: 'Tạm khóa user' },
-  { label: 'Luân chuyển nội bộ FRT', value: 'Luân chuyển nội bộ FRT' },
+  { label: "Đang làm", value: "Đang làm" },
+  { label: "Nghỉ việc", value: "Nghỉ việc" },
+  { label: "Nghỉ phép năm", value: "Nghỉ phép năm" },
+  { label: "Nghỉ sinh con khối BO", value: "Nghỉ sinh con khối BO" },
+  { label: "Nghỉ ốm", value: "Nghỉ ốm" },
+  { label: "Nghỉ không lương", value: "Nghỉ không lương" },
+  { label: "Nghỉ chăm con", value: "Nghỉ chăm con" },
+  { label: "Nghỉ sinh con khối Shop", value: "Nghỉ sinh con khối Shop" },
+  { label: "Tạm khóa user", value: "Tạm khóa user" },
+  { label: "Luân chuyển nội bộ FRT", value: "Luân chuyển nội bộ FRT" },
 ];
 
 function getStatusLabel(status?: null | string) {
-  return status || '-';
+  return status || "-";
 }
 
 function getStatusType(status?: null | string) {
-  return status ? (STATUS_TYPE_MAP[status] ?? 'default') : 'default';
+  return status ? (STATUS_TYPE_MAP[status] ?? "default") : "default";
 }
 
 function normalizeFormValues(formValues?: Record<string, any>) {
@@ -67,114 +64,113 @@ function normalizeFormValues(formValues?: Record<string, any>) {
 }
 
 function formatEmployeeDate(value?: null | string) {
-  return value ? formatDate(value, 'DD-MM-YYYY') : '-';
+  return value ? formatDate(value, "DD-MM-YYYY") : "-";
 }
 
 function formatEmployeeDateTime(value?: null | string) {
-  return value ? formatDate(value, 'DD-MM-YYYY HH:mm:ss') : '-';
+  return value ? formatDate(value, "DD-MM-YYYY HH:mm:ss") : "-";
 }
 
 const formOptions: VbenFormProps = {
   collapsed: false,
-  resetButtonOptions: { content: 'Đặt lại' },
+  resetButtonOptions: { content: "Đặt lại" },
   schema: [
     {
-      component: 'Input',
+      component: "Input",
       componentProps: {
-        placeholder:
-          'Nhập tài khoản, mã nhân viên, họ tên, điện thoại hoặc email',
+        placeholder: "Nhập tài khoản, mã nhân viên, họ tên, điện thoại hoặc email",
       },
-      fieldName: 'keyword',
-      label: 'Từ khóa',
+      fieldName: "keyword",
+      label: "Từ khóa",
     },
     {
-      component: 'Select',
+      component: "Select",
       componentProps: {
         clearable: true,
         options: statusOptions,
-        placeholder: 'Chọn trạng thái',
-        style: { minWidth: '180px' },
+        placeholder: "Chọn trạng thái",
+        style: { minWidth: "180px" },
       },
-      fieldName: 'status',
-      label: 'Trạng thái',
+      fieldName: "status",
+      label: "Trạng thái",
     },
   ],
   showCollapseButton: true,
-  submitButtonOptions: { content: 'Tìm kiếm' },
+  submitButtonOptions: { content: "Tìm kiếm" },
   submitOnChange: false,
   submitOnEnter: true,
 };
 
 const gridOptions: VxeGridProps<EmployeeApi.EmployeeItem> = {
-  border: 'full',
+  border: "full",
   columns: [
-    { align: 'center', title: '#', type: 'seq', width: 60 },
+    { align: "center", title: "#", type: "seq", width: 60 },
     {
-      field: 'userName',
-      title: 'Tài khoản',
+      field: "userName",
+      title: "Tài khoản",
       width: 120,
     },
     {
-      field: 'employeeCode',
-      title: 'Mã nhân viên',
+      field: "employeeCode",
+      title: "Mã nhân viên",
       width: 105,
     },
     {
-      field: 'name',
+      field: "name",
       minWidth: 180,
-      title: 'Họ tên',
+      title: "Họ tên",
     },
     {
-      field: 'phone',
-      title: 'Điện thoại',
+      field: "phone",
+      title: "Điện thoại",
       width: 140,
     },
     {
-      field: 'email',
-      title: 'Email',
+      field: "email",
+      title: "Email",
       width: 200,
     },
     {
-      field: 'status',
-      slots: { default: 'statusCell' },
-      title: 'Trạng thái',
+      field: "status",
+      slots: { default: "statusCell" },
+      title: "Trạng thái",
       width: 180,
     },
     {
-      field: 'birthDate',
+      field: "birthDate",
       formatter: ({ cellValue }: any) => formatEmployeeDate(cellValue),
-      title: 'Ngày sinh',
+      title: "Ngày sinh",
       width: 140,
     },
     {
-      field: 'enrollDate',
+      field: "enrollDate",
       formatter: ({ cellValue }: any) => formatEmployeeDate(cellValue),
-      title: 'Ngày vào làm',
+      title: "Ngày vào làm",
       width: 160,
     },
     {
-      field: 'resignationDate',
+      field: "resignationDate",
       formatter: ({ cellValue }: any) => formatEmployeeDate(cellValue),
-      title: 'Ngày nghỉ việc',
+      title: "Ngày nghỉ việc",
       width: 160,
     },
     {
-      field: 'creationTime',
+      field: "creationTime",
       formatter: ({ cellValue }: any) => formatEmployeeDateTime(cellValue),
-      title: 'Ngày tạo',
+      title: "Ngày tạo",
       width: 170,
     },
     {
-      field: 'modificationTime',
+      field: "modificationTime",
       formatter: ({ cellValue }: any) => formatEmployeeDateTime(cellValue),
-      title: 'Ngày chỉnh sửa',
+      title: "Ngày chỉnh sửa",
       width: 170,
     },
     {
-      align: 'center',
-      fixed: 'right',
-      slots: { default: 'actions' },
-      title: 'Hành động',
+      align: "center",
+      fixed: "right",
+      slots: { default: "actions" },
+      title: "Hành động",
       width: 120,
     },
   ],
@@ -229,17 +225,15 @@ function onEdit(row: EmployeeApi.EmployeeItem) {
 }
 
 function onDelete(row: EmployeeApi.EmployeeItem) {
-  message.info(
-    `Chưa có API xóa nhân viên: ${row?.name || row?.userName || ''}`,
-  );
+  message.info(`Chưa có API xóa nhân viên: ${row?.name || row?.userName || ""}`);
 }
 
 function onDetail(row: EmployeeApi.EmployeeItem) {
-  message.info(`Chi tiết nhân viên: ${row?.name || row?.userName || ''}`);
+  message.info(`Chi tiết nhân viên: ${row?.name || row?.userName || ""}`);
 }
 
 function onFormSubmit(_formData: Record<string, any>) {
-  message.success('Lưu thông tin nhân viên thành công');
+  message.success("Lưu thông tin nhân viên thành công");
   drawerApi.close();
   gridApi.query();
 }
@@ -267,13 +261,7 @@ function onFormSubmit(_formData: Record<string, any>) {
         <NSpace justify="center" :size="4">
           <NTooltip trigger="hover">
             <template #trigger>
-              <NButton
-                circle
-                quaternary
-                size="small"
-                type="primary"
-                @click="onEdit(row)"
-              >
+              <NButton circle quaternary size="small" type="primary" @click="onEdit(row)">
                 <template #icon>
                   <IconifyIcon class="size-4" icon="lucide:pencil" />
                 </template>
@@ -304,13 +292,7 @@ function onFormSubmit(_formData: Record<string, any>) {
 
           <NTooltip trigger="hover">
             <template #trigger>
-              <NButton
-                circle
-                quaternary
-                size="small"
-                type="info"
-                @click="onDetail(row)"
-              >
+              <NButton circle quaternary size="small" type="info" @click="onDetail(row)">
                 <template #icon>
                   <IconifyIcon class="size-4" icon="lucide:eye" />
                 </template>

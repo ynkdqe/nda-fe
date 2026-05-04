@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import type { ContractTypeApi } from '#/api';
+import type { ContractTypeApi } from "#/api";
 
-import { ref } from 'vue';
+import { ref } from "vue";
 
-import { useVbenModal } from '@vben/common-ui';
-import { IconifyIcon } from '@vben/icons';
+import { useVbenModal } from "@vben/common-ui";
+import { IconifyIcon } from "@vben/icons";
 
-import { NButton, NInput, NInputNumber, NSpace } from 'naive-ui';
+import { NButton, NInput, NInputNumber, NSpace } from "naive-ui";
 
 const emit = defineEmits<{
   submit: [
@@ -22,10 +22,10 @@ const durations = ref<ContractTypeApi.DurationItem[]>([]);
 
 function addDuration() {
   durations.value.push({
-    description: '',
+    description: "",
     duration: null,
-    name: '',
-    unit: '',
+    name: "",
+    unit: "",
   });
 }
 
@@ -43,7 +43,7 @@ const [Modal, modalApi] = useVbenModal({
       return;
     }
 
-    emit('submit', {
+    emit("submit", {
       contractTypeId: record.value.id,
       durations: durations.value,
     });
@@ -60,7 +60,7 @@ const [Modal, modalApi] = useVbenModal({
     record.value = data.record;
     durations.value = [...(data.record?.durations ?? [])];
   },
-  title: 'Thời hạn hợp đồng',
+  title: "Thời hạn hợp đồng",
 });
 </script>
 
@@ -76,10 +76,7 @@ const [Modal, modalApi] = useVbenModal({
         </NButton>
       </div>
 
-      <div
-        v-if="durations.length === 0"
-        class="py-8 text-center text-muted-foreground"
-      >
+      <div v-if="durations.length === 0" class="py-8 text-center text-muted-foreground">
         Chưa có thời hạn hợp đồng
       </div>
 
@@ -98,13 +95,7 @@ const [Modal, modalApi] = useVbenModal({
         <NInput v-model:value="item.unit" placeholder="Đơn vị" />
         <NInput v-model:value="item.description" placeholder="Mô tả" />
         <NSpace justify="end">
-          <NButton
-            circle
-            quaternary
-            size="small"
-            type="error"
-            @click="removeDuration(index)"
-          >
+          <NButton circle quaternary size="small" type="error" @click="removeDuration(index)">
             <template #icon>
               <IconifyIcon class="size-4" icon="lucide:trash-2" />
             </template>
