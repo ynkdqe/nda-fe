@@ -364,9 +364,9 @@ function badgeClass(type?: string) {
 
 .calendar-toolbar {
   display: flex;
+  gap: 12px;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
 }
 
 .calendar-title {

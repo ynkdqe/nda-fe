@@ -125,9 +125,9 @@ const normalizedOverview = computed(() => {
 
 .monthly-detail__overview-item,
 .monthly-detail__stat-item {
+  background: hsl(var(--background));
   border: 1px solid hsl(var(--border));
   border-radius: 12px;
-  background: hsl(var(--background));
 }
 
 .monthly-detail__overview-item {
