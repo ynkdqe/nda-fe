@@ -11,6 +11,8 @@ export interface AuthTokenInfo {
 
 export const AUTH_TOKEN_STORAGE_KEY = 'nda-web-naive-auth-token';
 
+export const ACCESS_TOKEN_REFRESH_BUFFER_MS = 60_000;
+
 export function getStoredAuthTokenInfo() {
   const rawValue = localStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
   if (!rawValue) {
@@ -23,6 +25,15 @@ export function getStoredAuthTokenInfo() {
     localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
     return null;
   }
+}
+
+export function isAccessTokenExpiring(
+  tokenInfo: AuthTokenInfo | null,
+  bufferMs = ACCESS_TOKEN_REFRESH_BUFFER_MS,
+) {
+  return Boolean(
+    tokenInfo?.refresh_token && tokenInfo.expires_at <= Date.now() + bufferMs,
+  );
 }
 
 export function removeStoredAuthTokenInfo() {

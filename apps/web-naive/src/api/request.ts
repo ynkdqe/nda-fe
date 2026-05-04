@@ -19,10 +19,18 @@ import { useAuthStore } from '#/store';
 import { refreshTokenApi } from './core';
 import {
   getStoredAuthTokenInfo,
+  isAccessTokenExpiring,
   removeStoredAuthTokenInfo,
+  setStoredAuthTokenInfo,
 } from './core/token';
 
 const { apiURL } = useAppConfig(import.meta.env, import.meta.env.PROD);
+
+let refreshTokenPromise: null | Promise<string> = null;
+
+function isConnectTokenRequest(url?: string) {
+  return Boolean(url?.includes('/connect/token'));
+}
 
 function createRequestClient(baseURL: string, options?: RequestClientOptions) {
   const client = new RequestClient({
@@ -53,11 +61,45 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
    * 刷新token逻辑
    */
   async function doRefreshToken() {
-    const accessStore = useAccessStore();
-    const resp = await refreshTokenApi();
-    const newToken = resp.data;
-    accessStore.setAccessToken(newToken);
-    return newToken;
+    if (refreshTokenPromise) {
+      return await refreshTokenPromise;
+    }
+
+    refreshTokenPromise = (async () => {
+      const accessStore = useAccessStore();
+      const storedTokenInfo = getStoredAuthTokenInfo();
+      const refreshToken =
+        accessStore.refreshToken || storedTokenInfo?.refresh_token;
+
+      if (!refreshToken) {
+        throw new Error('Refresh token is missing.');
+      }
+
+      const resp = await refreshTokenApi(refreshToken);
+      const newToken = resp.access_token;
+      const newRefreshToken = resp.refresh_token ?? refreshToken;
+
+      accessStore.setAccessToken(newToken);
+      accessStore.setRefreshToken(newRefreshToken);
+      setStoredAuthTokenInfo({
+        access_token: newToken,
+        expires_at: Date.now() + resp.expires_in * 1000,
+        expires_in: resp.expires_in,
+        refresh_token: newRefreshToken,
+        scope: import.meta.env.VITE_APP_SCOPE,
+        tenant: storedTokenInfo?.tenant ?? null,
+        token_type: resp.token_type,
+        username: storedTokenInfo?.username,
+      });
+
+      return newToken;
+    })();
+
+    try {
+      return await refreshTokenPromise;
+    } finally {
+      refreshTokenPromise = null;
+    }
   }
 
   function formatToken(token: null | string) {
@@ -69,14 +111,28 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
     fulfilled: async (config) => {
       const accessStore = useAccessStore();
       const storedTokenInfo = getStoredAuthTokenInfo();
-      const accessToken =
+      let accessToken =
         accessStore.accessToken || storedTokenInfo?.access_token;
+
+      if (
+        !isConnectTokenRequest(config.url) &&
+        isAccessTokenExpiring(storedTokenInfo)
+      ) {
+        try {
+          accessToken = await doRefreshToken();
+        } catch {
+          await doReAuthenticate();
+          throw new Error('Unable to refresh access token.');
+        }
+      }
 
       if (accessToken && !accessStore.accessToken) {
         accessStore.setAccessToken(accessToken);
       }
 
-      const authorization = formatToken(accessToken ?? null);
+      const authorization = !isConnectTokenRequest(config.url)
+        ? formatToken(accessToken ?? null)
+        : null;
       if (authorization) {
         config.headers.Authorization = authorization;
       } else {
