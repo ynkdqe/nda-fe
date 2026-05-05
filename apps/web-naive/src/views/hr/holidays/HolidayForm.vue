@@ -536,15 +536,15 @@ defineExpose({
 }
 
 .holiday-calendar__cell--selected .holiday-calendar__date {
-  color: #fff;
   font-weight: 700;
+  color: #fff;
   background-color: var(--primary-color);
 }
 
 .holiday-calendar__cell--today:not(.holiday-calendar__cell--selected)
   .holiday-calendar__date {
-  color: var(--primary-color);
   font-weight: 700;
+  color: var(--primary-color);
   box-shadow: inset 0 0 0 1px var(--primary-color);
 }
 
