@@ -15,7 +15,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: "HrAttendance",
         path: "/hr/attendance",
-        component: () => import("#/views/hr/attendance.vue"),
+        component: () => import("#/views/hr/timesheets/index.vue"),
         meta: {
           icon: "lucide:calendar-check",
           title: $t("page.hr.attendance"),
@@ -24,7 +24,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: "HrEmployees",
         path: "/hr/employees",
-        component: () => import("#/views/hr/employees.vue"),
+        component: () => import("#/views/hr/employees/index.vue"),
         meta: {
           icon: "lucide:user-round",
           title: $t("page.hr.employees"),
@@ -33,7 +33,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: "HrPayroll",
         path: "/hr/payroll",
-        component: () => import("#/views/hr/payroll.vue"),
+        component: () => import("#/views/hr/payrolls/index.vue"),
         meta: {
           icon: "lucide:calculator",
           title: $t("page.hr.payroll"),
@@ -42,7 +42,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: "HrContracts",
         path: "/hr/contracts",
-        component: () => import("#/views/hr/contracts.vue"),
+        component: () => import("#/views/hr/contracts/index.vue"),
         meta: {
           icon: "lucide:file-signature",
           title: $t("page.hr.contracts"),
@@ -51,7 +51,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: "HrContractTypes",
         path: "/hr/contract-types",
-        component: () => import("#/views/hr/contract-types.vue"),
+        component: () => import("#/views/hr/contract-types/index.vue"),
         meta: {
           icon: "lucide:files",
           title: $t("page.hr.contractTypes"),
@@ -60,7 +60,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: "HrWorkShifts",
         path: "/hr/work-shifts",
-        component: () => import("#/views/hr/work-shifts.vue"),
+        component: () => import("#/views/hr/workshifts/index.vue"),
         meta: {
           icon: "lucide:clock-3",
           title: $t("page.hr.workShifts"),
@@ -69,7 +69,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: "HrWorkSchedules",
         path: "/hr/work-schedules",
-        component: () => import("#/views/hr/work-schedules.vue"),
+        component: () => import("#/views/hr/work-schedules/index.vue"),
         meta: {
           icon: "lucide:calendar-days",
           title: $t("page.hr.workSchedules"),
@@ -78,7 +78,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: "HrDayOffs",
         path: "/hr/day-offs",
-        component: () => import("#/views/hr/day-offs.vue"),
+        component: () => import("#/views/hr/holidays/index.vue"),
         meta: {
           icon: "lucide:calendar-x",
           title: $t("page.hr.dayOffs"),

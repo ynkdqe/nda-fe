@@ -1,29 +1,26 @@
 <script lang="ts" setup>
-import type {
-  TimesheetOverviewItem,
-  TimesheetStatisticItem,
-} from './components/TimesheetMonthlyDetail.vue';
+import type { TimesheetOverviewItem, TimesheetStatisticItem } from "./TimesheetMonthlyDetail.vue";
 
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from "vue";
 
-import { Page } from '@vben/common-ui';
+import { Page } from "@vben/common-ui";
 
-import { getTimesheetListApi } from '#/api';
+import { getTimesheetListApi } from "#/api";
 
-import TimesheetCalendar from './components/TimesheetCalendar.vue';
-import TimesheetMonthlyDetail from './components/TimesheetMonthlyDetail.vue';
+import TimesheetCalendar from "./TimesheetCalendar.vue";
+import TimesheetMonthlyDetail from "./TimesheetMonthlyDetail.vue";
 
 function pad(value: number) {
-  return String(value).padStart(2, '0');
+  return String(value).padStart(2, "0");
 }
 
 function toDateKey(value: Date | string) {
-  const date = typeof value === 'string' ? new Date(value) : value;
+  const date = typeof value === "string" ? new Date(value) : value;
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
 function parseDateKey(value: string) {
-  const [year, month, day] = value.split('-').map(Number);
+  const [year, month, day] = value.split("-").map(Number);
   return new Date(year || new Date().getFullYear(), (month || 1) - 1, day || 1);
 }
 
@@ -38,11 +35,7 @@ function addMonths(value: Date, offset: number) {
   return date;
 }
 
-const currentMonth = new Date(
-  new Date().getFullYear(),
-  new Date().getMonth(),
-  1,
-);
+const currentMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 const allowedMonths = Array.from({ length: 3 }, (_, index) => {
   const date = addMonths(currentMonth, -index);
   const value = toDateKey(date);
@@ -77,16 +70,16 @@ const overviewMetrics = computed<TimesheetOverviewItem[]>(() => {
 
   return [
     {
-      color: 'primary',
-      label: 'Ngày công thực tế',
+      color: "primary",
+      label: "Ngày công thực tế",
       total: dataExtend?.workdays ?? 0,
       value: dataExtend?.actualWorkdays ?? 0,
     },
     {
-      color: 'success',
-      label: 'Giờ làm thực tế',
+      color: "success",
+      label: "Giờ làm thực tế",
       total: dataExtend?.workHours ?? 0,
-      unit: 'h',
+      unit: "h",
       value: dataExtend?.actualWorkHours ?? 0,
     },
   ];
@@ -97,29 +90,29 @@ const statistics = computed<TimesheetStatisticItem[]>(() => {
 
   return [
     {
-      label: 'Tổng công',
-      value: dataExtend?.actualWorkdays?.toString() ?? '0',
+      label: "Tổng công",
+      value: dataExtend?.actualWorkdays?.toString() ?? "0",
     },
-    { label: 'Giờ làm', value: `${dataExtend?.actualWorkHours ?? 0}h` },
+    { label: "Giờ làm", value: `${dataExtend?.actualWorkHours ?? 0}h` },
     {
-      label: 'Đi muộn/về sớm',
-      trend: 'down',
+      label: "Đi muộn/về sớm",
+      trend: "down",
       value: dataExtend?.earlyLate ?? 0,
     },
     {
-      label: 'Thiếu check-in/out',
-      trend: 'down',
+      label: "Thiếu check-in/out",
+      trend: "down",
       value: dataExtend?.missing ?? 0,
     },
     {
-      label: 'Nghỉ phép năm',
-      value: dataExtend?.annualLeave?.toString() ?? '0',
+      label: "Nghỉ phép năm",
+      value: dataExtend?.annualLeave?.toString() ?? "0",
     },
-    { label: 'Tăng ca', trend: 'up', value: `${dataExtend?.overtime ?? 0}h` },
-    { label: 'Nghỉ có lương', value: dataExtend?.paidLeave?.toString() ?? '0' },
+    { label: "Tăng ca", trend: "up", value: `${dataExtend?.overtime ?? 0}h` },
+    { label: "Nghỉ có lương", value: dataExtend?.paidLeave?.toString() ?? "0" },
     {
-      label: 'Nghỉ không lương',
-      value: dataExtend?.unpaidLeave?.toString() ?? '0',
+      label: "Nghỉ không lương",
+      value: dataExtend?.unpaidLeave?.toString() ?? "0",
     },
   ];
 });

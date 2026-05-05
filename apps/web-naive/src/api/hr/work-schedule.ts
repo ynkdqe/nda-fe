@@ -15,11 +15,11 @@ export namespace WorkScheduleApi {
   }
 
   export interface WorkScheduleListParams {
-    date?: string;
-    datePicker?: string;
-    employeeIds?: Array<number | string>;
+    endDate?: string;
+    ids?: Array<number | string>;
     page: number;
     pageSize: number;
+    startDate?: string;
   }
 
   export interface WorkScheduleListResult {

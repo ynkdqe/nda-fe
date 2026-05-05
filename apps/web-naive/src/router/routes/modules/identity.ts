@@ -1,42 +1,42 @@
-import type { RouteRecordRaw } from 'vue-router';
+import type { RouteRecordRaw } from "vue-router";
 
-import { $t } from '#/locales';
+import { $t } from "#/locales";
 
 const routes: RouteRecordRaw[] = [
   {
     meta: {
-      icon: 'lucide:shield-user',
+      icon: "lucide:shield-user",
       order: 20,
-      title: $t('page.identity.title'),
+      title: $t("page.identity.title"),
     },
-    name: 'IdentityManagement',
-    path: '/identity',
+    name: "IdentityManagement",
+    path: "/identity",
     children: [
       {
-        name: 'IdentityUsers',
-        path: '/identity/users',
-        component: () => import('#/views/identity/users.vue'),
+        name: "IdentityUsers",
+        path: "/identity/users",
+        component: () => import("#/views/identity/users/index.vue"),
         meta: {
-          icon: 'lucide:users',
-          title: $t('page.identity.users'),
+          icon: "lucide:users",
+          title: $t("page.identity.users"),
         },
       },
       {
-        name: 'IdentityRoles',
-        path: '/identity/roles',
-        component: () => import('#/views/identity/roles.vue'),
+        name: "IdentityRoles",
+        path: "/identity/roles",
+        component: () => import("#/views/identity/roles/index.vue"),
         meta: {
-          icon: 'lucide:shield-check',
-          title: $t('page.identity.roles'),
+          icon: "lucide:shield-check",
+          title: $t("page.identity.roles"),
         },
       },
       {
-        name: 'IdentityOrganizations',
-        path: '/identity/organizations',
-        component: () => import('#/views/identity/organizations.vue'),
+        name: "IdentityOrganizations",
+        path: "/identity/organizations",
+        component: () => import("#/views/identity/organizations/index.vue"),
         meta: {
-          icon: 'lucide:building-2',
-          title: $t('page.identity.organizations'),
+          icon: "lucide:building-2",
+          title: $t("page.identity.organizations"),
         },
       },
     ],

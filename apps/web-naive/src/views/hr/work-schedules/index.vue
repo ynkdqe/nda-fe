@@ -3,6 +3,8 @@ import type { VbenFormProps } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { WorkScheduleApi } from '#/api';
 
+import { markRaw } from 'vue';
+
 import { Page, useVbenDrawer } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
 import { formatDate } from '@vben/utils';
@@ -15,10 +17,11 @@ import {
   createWorkScheduleApi,
   deleteWorkScheduleApi,
   getWorkScheduleListApi,
-  updateWorkScheduleApi,
 } from '#/api';
 
-import WorkScheduleForm from './components/WorkScheduleForm.vue';
+import EmployeeSearchSelect from '#/components/EmployeeSearchSelect.vue';
+
+import WorkScheduleForm from './WorkScheduleForm.vue';
 
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -43,15 +46,59 @@ function normalizeEmployeeIds(value: unknown) {
   return ids.length > 0 ? ids : undefined;
 }
 
+function formatDateToYmd(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function normalizeDate(value: unknown) {
+  if (value === null || value === undefined || value === '') {
+    return undefined;
+  }
+
+  if (value instanceof Date) {
+    return formatDateToYmd(value);
+  }
+
+  if (typeof value === 'number') {
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? undefined : formatDateToYmd(date);
+  }
+
+  if (typeof value === 'string') {
+    const ymdMatch = /^\d{4}-\d{2}-\d{2}/.exec(value);
+    if (ymdMatch) {
+      return ymdMatch[0];
+    }
+
+    const dmyMatch = /^(\d{2})-(\d{2})-(\d{4})$/.exec(value);
+    if (dmyMatch) {
+      return `${dmyMatch[3]}-${dmyMatch[2]}-${dmyMatch[1]}`;
+    }
+
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? undefined : formatDateToYmd(date);
+  }
+
+  return undefined;
+}
+
 function normalizeFormValues(formValues?: Record<string, any>) {
-  const employeeIds = normalizeEmployeeIds(
-    formValues?.employeeIds ?? formValues?.ids,
-  );
-  const datePicker = formValues?.datePicker;
+  const ids = normalizeEmployeeIds(formValues?.ids ?? formValues?.employeeIds);
+  const dateRange = formValues?.dateRange;
+  const startDate = Array.isArray(dateRange)
+    ? normalizeDate(dateRange[0])
+    : undefined;
+  const endDate = Array.isArray(dateRange)
+    ? normalizeDate(dateRange[1])
+    : undefined;
 
   return {
-    ...(employeeIds ? { employeeIds } : {}),
-    ...(datePicker ? { datePicker } : {}),
+    ...(ids ? { ids } : {}),
+    ...(startDate ? { startDate } : {}),
+    ...(endDate ? { endDate } : {}),
   };
 }
 
@@ -59,22 +106,25 @@ const formOptions: VbenFormProps = {
   collapsed: false,
   schema: [
     {
-      component: 'Input',
+      component: markRaw(EmployeeSearchSelect),
       componentProps: {
-        placeholder: 'Nhập ID nhân viên, nhiều ID cách nhau bằng dấu phẩy',
+        mode: 'multiple',
+        placeholder: 'Chọn nhân viên',
+        style: { minWidth: '240px' },
       },
-      fieldName: 'employeeIds',
+      fieldName: 'ids',
       label: 'Nhân viên',
+      modelPropName: 'modelValue',
     },
     {
       component: 'DatePicker',
       componentProps: {
         clearable: true,
         format: 'dd-MM-yyyy',
-        type: 'date',
+        type: 'daterange',
         valueFormat: 'yyyy-MM-dd',
       },
-      fieldName: 'datePicker',
+      fieldName: 'dateRange',
       label: 'Ngày',
     },
   ],
@@ -177,11 +227,6 @@ function handleAdd() {
   drawerApi.open();
 }
 
-function handleEdit(row: WorkScheduleApi.WorkScheduleItem) {
-  drawerApi.setData({ record: row });
-  drawerApi.open();
-}
-
 async function handleDelete(row: WorkScheduleApi.WorkScheduleItem) {
   if (!row.id) {
     return;
@@ -197,12 +242,12 @@ async function handleFormSubmit(
   original?: WorkScheduleApi.WorkScheduleItem | null,
 ) {
   if (original?.id) {
-    await updateWorkScheduleApi(original.id, payload);
-    message.success('Cập nhật lịch làm việc thành công');
-  } else {
-    await createWorkScheduleApi(payload);
-    message.success('Tạo lịch làm việc thành công');
+    message.warning('Không cho phép cập nhật lịch làm việc');
+    return;
   }
+
+  await createWorkScheduleApi(payload);
+  message.success('Tạo lịch làm việc thành công');
 
   drawerApi.close();
   await gridApi.query();
@@ -227,23 +272,6 @@ async function handleFormSubmit(
 
       <template #actions="{ row }">
         <NSpace justify="center" :size="4">
-          <NTooltip trigger="hover">
-            <template #trigger>
-              <NButton
-                circle
-                quaternary
-                size="small"
-                type="primary"
-                @click="handleEdit(row)"
-              >
-                <template #icon>
-                  <IconifyIcon class="size-4" icon="lucide:pencil" />
-                </template>
-              </NButton>
-            </template>
-            Sửa
-          </NTooltip>
-
           <NPopconfirm
             negative-text="Hủy"
             positive-text="Xóa"
