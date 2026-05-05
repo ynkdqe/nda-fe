@@ -11,14 +11,16 @@ import {
   NForm,
   NFormItem,
   NInput,
+  NRadioButton,
+  NRadioGroup,
   NSelect,
-  NSwitch,
   NTag,
 } from 'naive-ui';
 
 import { message } from '#/adapter/naive';
 
 type HolidayTypeOption = { label: string; value: number | string };
+type WeekendQuickMode = 'none' | 'saturday' | 'sunday' | 'weekend';
 
 type HolidayFormState = {
   dates: string[];
@@ -55,14 +57,30 @@ const monthLabel = computed(() => {
   }).format(new Date(calendarYear.value, calendarMonth.value - 1, 1));
 });
 
-const weekendMode = computed(
-  () =>
-    !!(
-      form.value.weekendFull ||
-      form.value.saturdayOnly ||
-      form.value.sundayOnly
-    ),
-);
+const weekendQuickMode = computed<WeekendQuickMode>({
+  get() {
+    if (form.value.weekendFull) {
+      return 'weekend';
+    }
+
+    if (form.value.saturdayOnly) {
+      return 'saturday';
+    }
+
+    if (form.value.sundayOnly) {
+      return 'sunday';
+    }
+
+    return 'none';
+  },
+  set(value) {
+    form.value.saturdayOnly = value === 'saturday';
+    form.value.sundayOnly = value === 'sunday';
+    form.value.weekendFull = value === 'weekend';
+  },
+});
+
+const weekendMode = computed(() => weekendQuickMode.value !== 'none');
 
 const calendarDays = computed(() => {
   const firstDate = new Date(calendarYear.value, calendarMonth.value - 1, 1);
@@ -133,7 +151,7 @@ function updateFormDates() {
     ...autoWeekendDates.value,
     ...manualDates.value,
   ]);
-  form.value.dates = [...combined].sort();
+  form.value.dates = [...combined].toSorted();
 }
 
 function computeAutoWeekends(month: number, year: number) {
@@ -206,7 +224,7 @@ function isToday(date: Date) {
 }
 
 function selectDate(date: Date) {
-  if (weekendMode.value) {
+  if (weekendMode.value || isOtherMonth(date)) {
     return;
   }
 
@@ -271,18 +289,14 @@ async function handleSubmit() {
 
   emit('submit', {
     ...form.value,
-    dates: [...form.value.dates].sort(),
+    dates: [...form.value.dates].toSorted(),
     description,
     name,
   });
 }
 
 watch(
-  () => [
-    form.value.weekendFull,
-    form.value.saturdayOnly,
-    form.value.sundayOnly,
-  ],
+  () => weekendQuickMode.value,
   () => {
     computeAutoWeekends(calendarMonth.value, calendarYear.value);
     updateFormDates();
@@ -339,19 +353,18 @@ defineExpose({
           </NFormItem>
         </div>
 
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <NFormItem label="Chỉ thứ 7">
-            <NSwitch v-model:value="form.saturdayOnly" />
-          </NFormItem>
-
-          <NFormItem label="Chỉ chủ nhật">
-            <NSwitch v-model:value="form.sundayOnly" />
-          </NFormItem>
-
-          <NFormItem label="Cả thứ 7 và chủ nhật">
-            <NSwitch v-model:value="form.weekendFull" />
-          </NFormItem>
-        </div>
+        <NFormItem label="Chọn nhanh cuối tuần">
+          <NRadioGroup
+            v-model:value="weekendQuickMode"
+            class="weekend-mode-options"
+            name="weekendQuickMode"
+          >
+            <NRadioButton value="none">Không chọn nhanh</NRadioButton>
+            <NRadioButton value="saturday">Chỉ thứ 7</NRadioButton>
+            <NRadioButton value="sunday">Chỉ chủ nhật</NRadioButton>
+            <NRadioButton value="weekend">Thứ 7 và chủ nhật</NRadioButton>
+          </NRadioGroup>
+        </NFormItem>
 
         <NFormItem label="Ngày nghỉ" required>
           <div class="holiday-calendar">
@@ -386,11 +399,13 @@ defineExpose({
                 :key="formatDateToYmd(day)"
                 class="holiday-calendar__cell"
                 :class="{
-                  'holiday-calendar__cell--disabled': weekendMode,
+                  'holiday-calendar__cell--disabled':
+                    weekendMode || isOtherMonth(day),
                   'holiday-calendar__cell--other-month': isOtherMonth(day),
                   'holiday-calendar__cell--selected': isSelected(day),
                   'holiday-calendar__cell--today': isToday(day),
                 }"
+                :disabled="weekendMode || isOtherMonth(day)"
                 type="button"
                 @click="selectDate(day)"
               >
@@ -504,7 +519,10 @@ defineExpose({
 
 .holiday-calendar__cell--other-month {
   color: var(--text-color-disabled);
+  cursor: not-allowed;
   background-color: var(--body-color);
+  border-color: var(--border-color);
+  opacity: 0.55;
 }
 
 .holiday-calendar__cell--today {
@@ -512,13 +530,30 @@ defineExpose({
 }
 
 .holiday-calendar__cell--selected {
-  color: #fff;
-  background-color: var(--primary-color);
+  background-color: rgb(24 160 88 / 10%);
   border-color: var(--primary-color);
+  box-shadow: inset 0 0 0 1px var(--primary-color);
+}
+
+.holiday-calendar__cell--selected .holiday-calendar__date {
+  color: #fff;
+  font-weight: 700;
+  background-color: var(--primary-color);
+}
+
+.holiday-calendar__cell--today:not(.holiday-calendar__cell--selected)
+  .holiday-calendar__date {
+  color: var(--primary-color);
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px var(--primary-color);
 }
 
 .holiday-calendar__cell--disabled {
   cursor: not-allowed;
+}
+
+.holiday-calendar__cell--disabled:hover {
+  border-color: var(--border-color);
 }
 
 .holiday-calendar__date {
