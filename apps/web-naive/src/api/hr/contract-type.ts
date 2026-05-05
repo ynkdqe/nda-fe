@@ -1,4 +1,4 @@
-import { requestClient } from '#/api/request';
+import { requestClient } from "#/api/request";
 
 export namespace ContractTypeApi {
   export interface DurationItem {
@@ -10,12 +10,19 @@ export namespace ContractTypeApi {
   }
 
   export interface ContractTypeItem {
+    businessHealthInsurancePercent?: null | number | string;
+    businessOccAccInsurancePercent?: null | number | string;
+    businessSocialInsurancePercent?: null | number | string;
+    businessUnemploymentInsurancePercent?: null | number | string;
     code?: null | string;
     creationTime?: null | string;
     durations?: DurationItem[];
     employeeHealthInsurancePercent?: null | number | string;
+    employeeMinTaxSalary?: null | number | string;
     employeeSocialInsurancePercent?: null | number | string;
+    employeeUnionPercent?: null | number | string;
     employeeUnemployeeInsurancePercent?: null | number | string;
+
     hasSocialInsurance?: boolean | null;
     id: number | string;
     isTaxFixed?: boolean | null;
@@ -43,45 +50,34 @@ export namespace ContractTypeApi {
   }
 }
 
-export async function getContractTypeListApi(
-  params: ContractTypeApi.ContractTypeListParams,
-) {
-  return requestClient.get<ContractTypeApi.ContractTypeListResult>(
-    '/api/hrms/contract-type',
-    {
-      params,
-      responseReturn: 'body',
-    },
-  );
-}
-
-export async function getContractTypeByIdApi(id: number | string) {
-  return requestClient.get<ContractTypeApi.ContractTypeItem>(
-    `/api/hrms/contract-type/${id}`,
-    {
-      responseReturn: 'body',
-    },
-  );
-}
-
-export async function createContractTypeApi(data: Record<string, any>) {
-  return requestClient.post('/api/hrms/contract-type', data, {
-    responseReturn: 'body',
+export async function getContractTypeListApi(params: ContractTypeApi.ContractTypeListParams) {
+  return requestClient.get<ContractTypeApi.ContractTypeListResult>("/api/hrms/contract-type", {
+    params,
+    responseReturn: "body",
   });
 }
 
-export async function updateContractTypeApi(
-  id: number | string,
-  data: Record<string, any>,
-) {
+export async function getContractTypeByIdApi(id: number | string) {
+  return requestClient.get<ContractTypeApi.ContractTypeItem>(`/api/hrms/contract-type/${id}`, {
+    responseReturn: "body",
+  });
+}
+
+export async function createContractTypeApi(data: Record<string, any>) {
+  return requestClient.post("/api/hrms/contract-type", data, {
+    responseReturn: "body",
+  });
+}
+
+export async function updateContractTypeApi(id: number | string, data: Record<string, any>) {
   return requestClient.put(`/api/hrms/contract-type/${id}`, data, {
-    responseReturn: 'body',
+    responseReturn: "body",
   });
 }
 
 export async function deleteContractTypeApi(id: number | string) {
   return requestClient.delete(`/api/hrms/contract-type/${id}`, {
-    responseReturn: 'body',
+    responseReturn: "body",
   });
 }
 
@@ -92,6 +88,6 @@ export async function updateContractTypeDurationsApi(
   return requestClient.put(
     `/api/hrms/contract-type/update-duration/${contractTypeId}`,
     { durations },
-    { responseReturn: 'body' },
+    { responseReturn: "body" },
   );
 }

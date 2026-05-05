@@ -1,116 +1,207 @@
 <script lang="ts" setup>
-import type { ContractTypeApi } from '#/api';
+import type { VxeGridProps } from "#/adapter/vxe-table";
+import type { ContractTypeApi } from "#/api";
 
-import { ref } from 'vue';
+import { ref, watch } from "vue";
 
-import { useVbenModal } from '@vben/common-ui';
-import { IconifyIcon } from '@vben/icons';
+import { useVbenModal } from "@vben/common-ui";
+import { IconifyIcon } from "@vben/icons";
 
-import { NButton, NInput, NInputNumber, NSpace } from 'naive-ui';
+import { NButton, NInput, NInputNumber, NSpace } from "naive-ui";
+
+import { message } from "#/adapter/naive";
+import { useVbenVxeGrid } from "#/adapter/vxe-table";
+
+type DurationRow = Pick<ContractTypeApi.DurationItem, "duration" | "id" | "name">;
 
 const emit = defineEmits<{
+  cancel: [];
   submit: [
-    {
+    payload: {
       contractTypeId: number | string;
-      durations: ContractTypeApi.DurationItem[];
+      durations: DurationRow[];
     },
   ];
 }>();
 
-const record = ref<ContractTypeApi.ContractTypeItem | null>(null);
-const durations = ref<ContractTypeApi.DurationItem[]>([]);
+const durations = ref<DurationRow[]>([]);
+const loading = ref(false);
+const contractTypeId = ref<null | number | string>(null);
 
-function addDuration() {
-  durations.value.push({
-    description: '',
-    duration: null,
-    name: '',
-    unit: '',
+function normalizeDuration(row: DurationRow): DurationRow {
+  return {
+    duration: row.duration ?? null,
+    id: row.id ?? null,
+    name: row.name ?? null,
+  };
+}
+
+function getGridFullData() {
+  const tableData = gridApi?.grid?.getTableData?.() as undefined | { fullData?: DurationRow[] };
+
+  return tableData?.fullData ?? durations.value;
+}
+
+function setupGridData() {
+  durations.value = getGridFullData().map((duration) => normalizeDuration(duration));
+}
+
+function syncGridData() {
+  gridApi?.setGridOptions?.({
+    data: durations.value,
   });
 }
 
-function removeDuration(index: number) {
-  durations.value.splice(index, 1);
+function addRow() {
+  setupGridData();
+  durations.value.push({ duration: 1, name: "" });
+  syncGridData();
 }
 
-const [Modal, modalApi] = useVbenModal({
-  fullscreenButton: false,
-  onCancel() {
-    modalApi.close();
-  },
-  onConfirm() {
-    if (!record.value?.id) {
-      return;
-    }
+function removeRow(index: number) {
+  setupGridData();
+  durations.value.splice(index, 1);
+  syncGridData();
+}
 
-    emit('submit', {
-      contractTypeId: record.value.id,
-      durations: durations.value,
+async function handleSubmit() {
+  if (!contractTypeId.value) {
+    message.error("Không tìm thấy loại hợp đồng");
+    return;
+  }
+
+  loading.value = true;
+
+  try {
+    const normalized = getGridFullData().map((duration) => normalizeDuration(duration));
+    durations.value = normalized;
+
+    emit("submit", {
+      contractTypeId: contractTypeId.value,
+      durations: normalized,
     });
+  } catch {
+    message.error("Lưu thời hạn hợp đồng thất bại");
+  } finally {
+    loading.value = false;
+  }
+}
+
+function close() {
+  emit("cancel");
+  modalApi.close();
+}
+
+const gridOptions: VxeGridProps<DurationRow> = {
+  autoResize: true,
+  border: "full",
+  columns: [
+    {
+      align: "center",
+      title: "#",
+      type: "seq",
+      width: 60,
+    },
+    {
+      field: "name",
+      minWidth: 180,
+      slots: { default: "name" },
+      title: "Tên thời hạn",
+    },
+    {
+      field: "duration",
+      minWidth: 140,
+      slots: { default: "duration" },
+      title: "Thời hạn",
+    },
+    {
+      align: "center",
+      fixed: "right",
+      minWidth: 120,
+      slots: { default: "actions" },
+      title: "Hành động",
+    },
+  ],
+  data: durations.value,
+  stripe: true,
+  toolbarConfig: {
+    custom: false,
   },
+};
+
+const [Grid, gridApi] = useVbenVxeGrid<DurationRow>({ gridOptions });
+
+const [Modal, modalApi] = useVbenModal({
+  bordered: true,
+  class: "w-[800px]",
+  fullscreenButton: false,
+  onCancel: close,
+  onConfirm: handleSubmit,
   onOpenChange(isOpen) {
     if (!isOpen) {
       return;
     }
 
     const data = modalApi.getData<{
-      record: ContractTypeApi.ContractTypeItem;
+      record?: ContractTypeApi.ContractTypeItem;
     }>();
+    const record = data.record;
 
-    record.value = data.record;
-    durations.value = [...(data.record?.durations ?? [])];
+    contractTypeId.value = record?.id ?? null;
+    durations.value = (record?.durations ?? []).map((duration) => normalizeDuration(duration));
+    syncGridData();
   },
-  title: 'Thời hạn hợp đồng',
+  title: "Thời hạn hợp đồng",
 });
+
+watch(
+  durations,
+  () => {
+    syncGridData();
+  },
+  { deep: true },
+);
 </script>
 
 <template>
-  <Modal class="md:w-[900px]">
-    <div class="space-y-3">
-      <div class="flex justify-end">
-        <NButton size="small" type="primary" @click="addDuration">
+  <Modal>
+    <Grid>
+      <template #toolbar-actions>
+        <NButton size="small" type="primary" @click="addRow">
           <template #icon>
             <IconifyIcon icon="lucide:plus" />
           </template>
           Thêm thời hạn
         </NButton>
-      </div>
+      </template>
 
-      <div
-        v-if="durations.length === 0"
-        class="py-8 text-center text-muted-foreground"
-      >
-        Chưa có thời hạn hợp đồng
-      </div>
+      <template #toolbar-tools>
+        <div class="text-foreground/80">Tổng: {{ durations.length }}</div>
+      </template>
 
-      <div
-        v-for="(item, index) in durations"
-        :key="item.id ?? index"
-        class="grid grid-cols-1 gap-3 rounded-md border border-border p-3 md:grid-cols-[1fr_140px_120px_1fr_auto]"
-      >
-        <NInput v-model:value="item.name" placeholder="Tên thời hạn" />
+      <template #name="{ row }">
+        <NInput v-model:value="row.name" placeholder="Tên thời hạn" />
+      </template>
+
+      <template #duration="{ row }">
         <NInputNumber
-          v-model:value="item.duration"
+          v-model:value="row.duration"
           :min="0"
           placeholder="Thời hạn"
           :show-button="false"
+          style="width: 100%"
         />
-        <NInput v-model:value="item.unit" placeholder="Đơn vị" />
-        <NInput v-model:value="item.description" placeholder="Mô tả" />
-        <NSpace justify="end">
-          <NButton
-            circle
-            quaternary
-            size="small"
-            type="error"
-            @click="removeDuration(index)"
-          >
+      </template>
+
+      <template #actions="{ rowIndex }">
+        <NSpace justify="center">
+          <NButton circle quaternary size="small" type="error" @click="() => removeRow(rowIndex)">
             <template #icon>
               <IconifyIcon class="size-4" icon="lucide:trash-2" />
             </template>
           </NButton>
         </NSpace>
-      </div>
-    </div>
+      </template>
+    </Grid>
   </Modal>
 </template>
