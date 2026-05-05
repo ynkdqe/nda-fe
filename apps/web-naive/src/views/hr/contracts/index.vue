@@ -1,18 +1,18 @@
 <script lang="ts" setup>
-import type { VbenFormProps } from "#/adapter/form";
-import type { VxeGridProps } from "#/adapter/vxe-table";
-import type { ContractApi } from "#/api";
+import type { VbenFormProps } from '#/adapter/form';
+import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { ContractApi } from '#/api';
 
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch } from 'vue';
 
-import { Page, useVbenDrawer } from "@vben/common-ui";
-import { IconifyIcon } from "@vben/icons";
-import { formatDate } from "@vben/utils";
+import { Page, useVbenDrawer } from '@vben/common-ui';
+import { IconifyIcon } from '@vben/icons';
+import { formatDate } from '@vben/utils';
 
-import { NButton, NPopconfirm, NSpace, NTag, NTooltip } from "naive-ui";
+import { NButton, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui';
 
-import { message } from "#/adapter/naive";
-import { useVbenVxeGrid } from "#/adapter/vxe-table";
+import { message } from '#/adapter/naive';
+import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import {
   createContractApi,
   deleteContractApi,
@@ -20,9 +20,9 @@ import {
   getContractStatusOptionsApi,
   getContractTypeOptionsApi,
   updateContractApi,
-} from "#/api";
+} from '#/api';
 
-import ContractForm from "./ContractForm.vue";
+import ContractForm from './ContractForm.vue';
 
 type SelectOption = { label: string; value: number | string };
 
@@ -33,7 +33,9 @@ const statusMap = ref<Record<string, string>>({});
 const contractTypes = ref<SelectOption[]>([]);
 const currentRecord = ref<ContractApi.ContractItem | null>(null);
 
-function extractOptions(response: ContractApi.ContractOptionResult): SelectOption[] {
+function extractOptions(
+  response: ContractApi.ContractOptionResult,
+): SelectOption[] {
   let list: ContractApi.ContractOptionItem[] = [];
 
   if (Array.isArray(response)) {
@@ -74,20 +76,20 @@ async function loadContractTypes() {
 }
 
 function numberFormatter(value?: null | number | string) {
-  if (value === null || value === undefined || value === "") {
-    return "-";
+  if (value === null || value === undefined || value === '') {
+    return '-';
   }
 
-  return String(value).replaceAll(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return String(value).replaceAll(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 function formatContractDate(value?: null | number | string) {
-  return value ? formatDate(value, "DD-MM-YYYY") : "-";
+  return value ? formatDate(value, 'DD-MM-YYYY') : '-';
 }
 
 function getStatusLabel(status?: null | number | string) {
-  if (status === null || status === undefined || status === "") {
-    return "-";
+  if (status === null || status === undefined || status === '') {
+    return '-';
   }
 
   return statusMap.value[String(status)] || String(status);
@@ -97,33 +99,41 @@ function getStatusType(status?: null | number | string) {
   const value = Number(status);
 
   if (value === 1) {
-    return "success";
+    return 'success';
   }
 
   if (value === 0) {
-    return "error";
+    return 'error';
   }
 
-  return "default";
+  return 'default';
 }
 
 function toApiDate(value?: null | number | string) {
-  return value ? formatDate(value, "YYYY-MM-DD") : undefined;
+  return value ? formatDate(value, 'YYYY-MM-DD') : undefined;
 }
 
 function normalizeFormValues(formValues?: Record<string, any>) {
   const keyword = formValues?.keyword?.trim?.();
   const effective = formValues?.effective;
-  const effectiveStart = Array.isArray(effective) ? toApiDate(effective[0]) : undefined;
-  const effectiveEnd = Array.isArray(effective) ? toApiDate(effective[1]) : undefined;
+  const effectiveStart = Array.isArray(effective)
+    ? toApiDate(effective[0])
+    : undefined;
+  const effectiveEnd = Array.isArray(effective)
+    ? toApiDate(effective[1])
+    : undefined;
   const status = Array.isArray(formValues?.status)
-    ? formValues.status.join(",")
+    ? formValues.status.join(',')
     : formValues?.status;
 
   return {
     ...(keyword ? { keyword } : {}),
-    ...(status !== null && status !== undefined && status !== "" ? { status } : {}),
-    ...(formValues?.contractType ? { contractType: formValues.contractType } : {}),
+    ...(status !== null && status !== undefined && status !== ''
+      ? { status }
+      : {}),
+    ...(formValues?.contractType
+      ? { contractType: formValues.contractType }
+      : {}),
     ...(formValues?.isActive !== null && formValues?.isActive !== undefined
       ? { isActive: formValues.isActive }
       : {}),
@@ -134,134 +144,141 @@ function normalizeFormValues(formValues?: Record<string, any>) {
 
 const formOptions: VbenFormProps = {
   collapsed: false,
-  resetButtonOptions: { content: "Đặt lại" },
+  resetButtonOptions: { content: 'Đặt lại' },
   schema: [
     {
-      component: "Input",
+      component: 'Input',
       componentProps: {
-        placeholder: "Nhập mã hợp đồng, tên hợp đồng hoặc nhân viên",
+        placeholder: 'Nhập mã hợp đồng, tên hợp đồng hoặc nhân viên',
       },
-      fieldName: "keyword",
-      label: "Từ khóa",
+      fieldName: 'keyword',
+      label: 'Từ khóa',
     },
     {
-      component: "Select",
+      component: 'Select',
       componentProps: {
         clearable: true,
         multiple: true,
         options: [],
-        placeholder: "Chọn trạng thái",
-        style: { minWidth: "180px" },
+        placeholder: 'Chọn trạng thái',
+        style: { minWidth: '180px' },
       },
-      fieldName: "status",
-      label: "Trạng thái",
+      fieldName: 'status',
+      label: 'Trạng thái',
     },
     {
-      component: "Select",
+      component: 'Select',
       componentProps: {
         clearable: true,
         options: [],
-        placeholder: "Chọn loại hợp đồng",
-        style: { minWidth: "180px" },
+        placeholder: 'Chọn loại hợp đồng',
+        style: { minWidth: '180px' },
       },
-      fieldName: "contractType",
-      label: "Loại HĐ",
+      fieldName: 'contractType',
+      label: 'Loại HĐ',
     },
     {
-      component: "DatePicker",
+      component: 'DatePicker',
       componentProps: {
         clearable: true,
-        format: "dd-MM-yyyy",
-        type: "daterange",
-        valueFormat: "yyyy-MM-dd",
+        format: 'dd-MM-yyyy',
+        type: 'daterange',
+        valueFormat: 'yyyy-MM-dd',
       },
-      fieldName: "effective",
-      label: "Hiệu lực",
+      fieldName: 'effective',
+      label: 'Hiệu lực',
     },
     {
-      component: "Select",
+      component: 'Select',
       componentProps: {
         clearable: true,
         options: [
-          { label: "Hiệu lực", value: 1 },
-          { label: "Hết hạn", value: 0 },
+          { label: 'Hiệu lực', value: 1 },
+          { label: 'Hết hạn', value: 0 },
         ],
-        placeholder: "Hiệu lực",
-        style: { minWidth: "120px" },
+        placeholder: 'Hiệu lực',
+        style: { minWidth: '120px' },
       },
-      fieldName: "isActive",
-      label: "Hiệu lực",
+      fieldName: 'isActive',
+      label: 'Hiệu lực',
     },
   ],
   showCollapseButton: true,
-  submitButtonOptions: { content: "Tìm kiếm" },
+  submitButtonOptions: { content: 'Tìm kiếm' },
   submitOnChange: false,
   submitOnEnter: true,
 };
 
 const gridOptions: VxeGridProps<ContractApi.ContractItem> = {
-  border: "full",
+  border: 'full',
   columns: [
-    { align: "center", title: "#", type: "seq", width: 60 },
+    { align: 'center', title: '#', type: 'seq', width: 60 },
     {
-      field: "contractCode",
-      title: "Mã HĐ",
+      field: 'contractCode',
+      title: 'Mã HĐ',
       width: 160,
     },
     {
-      field: "contractName",
-      formatter: ({ row }: any) => String(row?.contractName ?? row?.name ?? ""),
+      field: 'contractName',
+      formatter: ({ row }: any) => String(row?.contractName ?? row?.name ?? ''),
       minWidth: 180,
-      title: "Tên HĐ",
+      title: 'Tên HĐ',
     },
     {
-      field: "employee.name",
-      formatter: ({ row }: any) => String(row?.employee?.name ?? row?.employeeName ?? ""),
-      minWidth: 180,
-      title: "Tên nhân viên",
-    },
-    {
-      field: "employee.employeeCode",
+      field: 'employee.name',
       formatter: ({ row }: any) =>
-        String(row?.employee?.employeeCode ?? row?.employeeCode ?? row?.employee?.userName ?? ""),
-      title: "Mã nhân viên",
+        String(row?.employee?.name ?? row?.employeeName ?? ''),
+      minWidth: 180,
+      title: 'Tên nhân viên',
+    },
+    {
+      field: 'employee.employeeCode',
+      formatter: ({ row }: any) =>
+        String(
+          row?.employee?.employeeCode ??
+            row?.employeeCode ??
+            row?.employee?.userName ??
+            '',
+        ),
+      title: 'Mã nhân viên',
       width: 140,
     },
     {
-      field: "effectiveDate",
+      field: 'effectiveDate',
       formatter: ({ cellValue }: any) => formatContractDate(cellValue),
-      title: "Hiệu lực",
+      title: 'Hiệu lực',
       width: 120,
     },
     {
-      field: "expiryDate",
+      field: 'expiryDate',
       formatter: ({ cellValue }: any) => formatContractDate(cellValue),
-      title: "Hết hạn",
+      title: 'Hết hạn',
       width: 120,
     },
     {
-      field: "salaryGross",
-      formatter: ({ row }: any) => numberFormatter(row?.salaryGross ?? row?.totalSalary),
-      title: "Lương gross",
+      field: 'salaryGross',
+      formatter: ({ row }: any) =>
+        numberFormatter(row?.salaryGross ?? row?.totalSalary),
+      title: 'Lương gross',
       width: 140,
     },
     {
-      field: "totalCost",
+      field: 'totalCost',
       formatter: ({ row }: any) => numberFormatter(row?.totalCost),
-      title: "Chi phí hợp đồng",
+      title: 'Chi phí hợp đồng',
       width: 160,
     },
     {
-      field: "status",
-      slots: { default: "statusCell" },
-      title: "Trạng thái",
+      field: 'status',
+      slots: { default: 'statusCell' },
+      title: 'Trạng thái',
       width: 140,
     },
     {
-      align: "center",
-      fixed: "right",
-      slots: { default: "actions" },
-      title: "Hành động",
+      align: 'center',
+      fixed: 'right',
+      slots: { default: 'actions' },
+      title: 'Hành động',
       width: 120,
     },
   ],
@@ -308,7 +325,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
 function syncFormSelectOptions() {
   const current = (gridApi.formApi as any).getState?.();
   const schema = (current?.schema || []).map((item: any) => {
-    if (item.fieldName === "status") {
+    if (item.fieldName === 'status') {
       return {
         ...item,
         componentProps: {
@@ -318,7 +335,7 @@ function syncFormSelectOptions() {
       };
     }
 
-    if (item.fieldName === "contractType") {
+    if (item.fieldName === 'contractType') {
       return {
         ...item,
         componentProps: {
@@ -360,7 +377,7 @@ async function onDelete(row: ContractApi.ContractItem) {
   }
 
   await deleteContractApi(row.id);
-  message.success("Xóa hợp đồng thành công");
+  message.success('Xóa hợp đồng thành công');
   await gridApi.query();
 }
 
@@ -369,10 +386,10 @@ async function onFormSubmit(formData: Record<string, any>) {
 
   if (id) {
     await updateContractApi(id, formData);
-    message.success("Cập nhật hợp đồng thành công");
+    message.success('Cập nhật hợp đồng thành công');
   } else {
     await createContractApi(formData);
-    message.success("Tạo hợp đồng thành công");
+    message.success('Tạo hợp đồng thành công');
   }
 
   drawerApi.close();
@@ -409,7 +426,13 @@ onMounted(async () => {
         <NSpace justify="center" :size="4">
           <NTooltip trigger="hover">
             <template #trigger>
-              <NButton circle quaternary size="small" type="primary" @click="onEdit(row)">
+              <NButton
+                circle
+                quaternary
+                size="small"
+                type="primary"
+                @click="onEdit(row)"
+              >
                 <template #icon>
                   <IconifyIcon class="size-4" icon="lucide:pencil" />
                 </template>

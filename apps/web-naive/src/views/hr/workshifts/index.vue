@@ -1,26 +1,26 @@
 <script lang="ts" setup>
-import type { VbenFormProps } from "#/adapter/form";
-import type { VxeGridProps } from "#/adapter/vxe-table";
-import type { WorkShiftApi } from "#/api";
+import type { VbenFormProps } from '#/adapter/form';
+import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { WorkShiftApi } from '#/api';
 
-import { ref } from "vue";
+import { ref } from 'vue';
 
-import { Page, useVbenDrawer } from "@vben/common-ui";
-import { IconifyIcon } from "@vben/icons";
+import { Page, useVbenDrawer } from '@vben/common-ui';
+import { IconifyIcon } from '@vben/icons';
 
-import { NButton, NPopconfirm, NSpace, NSwitch, NTooltip } from "naive-ui";
+import { NButton, NPopconfirm, NSpace, NSwitch, NTooltip } from 'naive-ui';
 
-import { message } from "#/adapter/naive";
-import { useVbenVxeGrid } from "#/adapter/vxe-table";
+import { message } from '#/adapter/naive';
+import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import {
   createWorkShiftApi,
   deleteWorkShiftApi,
   getWorkShiftByIdApi,
   getWorkShiftListApi,
   updateWorkShiftApi,
-} from "#/api";
+} from '#/api';
 
-import WorkShiftForm from "./WorkShiftForm.vue";
+import WorkShiftForm from './WorkShiftForm.vue';
 
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -41,89 +41,89 @@ function normalizeWorkShiftDetail(
         data?: WorkShiftApi.WorkShiftItem;
       },
 ) {
-  return "data" in response && response.data ? response.data : response;
+  return 'data' in response && response.data ? response.data : response;
 }
 
 const formOptions: VbenFormProps = {
   collapsed: false,
-  resetButtonOptions: { content: "Đặt lại" },
+  resetButtonOptions: { content: 'Đặt lại' },
   schema: [
     {
-      component: "Input",
+      component: 'Input',
       componentProps: {
-        placeholder: "Nhập mã hoặc tên ca làm việc",
+        placeholder: 'Nhập mã hoặc tên ca làm việc',
       },
-      fieldName: "keyword",
-      label: "Từ khóa",
+      fieldName: 'keyword',
+      label: 'Từ khóa',
     },
   ],
   showCollapseButton: true,
-  submitButtonOptions: { content: "Tìm kiếm" },
+  submitButtonOptions: { content: 'Tìm kiếm' },
   submitOnChange: false,
   submitOnEnter: true,
 };
 
 const gridOptions: VxeGridProps<WorkShiftApi.WorkShiftItem> = {
-  border: "full",
+  border: 'full',
   checkboxConfig: {
     highlight: true,
-    labelField: "name",
+    labelField: 'name',
   },
   columns: [
-    { align: "center", title: "#", type: "seq", width: 50 },
+    { align: 'center', title: '#', type: 'seq', width: 50 },
     {
-      field: "code",
+      field: 'code',
       minWidth: 140,
-      title: "Mã ca",
+      title: 'Mã ca',
     },
     {
-      field: "name",
+      field: 'name',
       minWidth: 180,
-      title: "Tên ca",
+      title: 'Tên ca',
     },
     {
-      field: "fromTime",
-      title: "Giờ bắt đầu",
+      field: 'fromTime',
+      title: 'Giờ bắt đầu',
       width: 130,
     },
     {
-      field: "toTime",
-      title: "Giờ kết thúc",
+      field: 'toTime',
+      title: 'Giờ kết thúc',
       width: 130,
     },
     {
-      field: "workHours",
-      title: "Số giờ làm việc",
+      field: 'workHours',
+      title: 'Số giờ làm việc',
       width: 140,
     },
     {
-      field: "workPoint",
-      title: "Điểm",
+      field: 'workPoint',
+      title: 'Điểm',
       width: 100,
     },
     {
-      field: "isDefault",
-      slots: { default: "isDefaultCell" },
-      title: "Ca mặc định",
+      field: 'isDefault',
+      slots: { default: 'isDefaultCell' },
+      title: 'Ca mặc định',
       width: 120,
     },
     {
-      field: "overShift",
-      slots: { default: "overShiftCell" },
-      title: "Qua ngày",
+      field: 'overShift',
+      slots: { default: 'overShiftCell' },
+      title: 'Qua ngày',
       width: 110,
     },
     {
-      field: "hasBreak",
-      slots: { default: "hasBreakCell" },
-      title: "Có nghỉ giữa ca",
+      field: 'hasBreak',
+      slots: { default: 'hasBreakCell' },
+      title: 'Có nghỉ giữa ca',
       width: 140,
     },
     {
-      align: "center",
-      fixed: "right",
-      slots: { default: "actions" },
-      title: "Hành động",
+      align: 'center',
+      fixed: 'right',
+      slots: { default: 'actions' },
+      title: 'Hành động',
       width: 120,
     },
   ],
@@ -189,17 +189,17 @@ async function handleDelete(row: WorkShiftApi.WorkShiftItem) {
   }
 
   await deleteWorkShiftApi(row.id);
-  message.success("Xóa ca làm việc thành công");
+  message.success('Xóa ca làm việc thành công');
   await gridApi.query();
 }
 
 async function handleFormSubmit(payload: Record<string, any>) {
   if (currentEditId.value) {
     await updateWorkShiftApi(currentEditId.value, payload);
-    message.success("Cập nhật ca làm việc thành công");
+    message.success('Cập nhật ca làm việc thành công');
   } else {
     await createWorkShiftApi(payload);
-    message.success("Tạo ca làm việc thành công");
+    message.success('Tạo ca làm việc thành công');
   }
 
   drawerApi.close();
@@ -235,7 +235,13 @@ async function handleFormSubmit(payload: Record<string, any>) {
         <NSpace justify="center" :size="4">
           <NTooltip trigger="hover">
             <template #trigger>
-              <NButton circle quaternary size="small" type="primary" @click="handleEdit(row)">
+              <NButton
+                circle
+                quaternary
+                size="small"
+                type="primary"
+                @click="handleEdit(row)"
+              >
                 <template #icon>
                   <IconifyIcon class="size-4" icon="lucide:pencil" />
                 </template>

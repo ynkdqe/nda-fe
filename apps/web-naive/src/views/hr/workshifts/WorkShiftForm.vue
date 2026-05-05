@@ -1,11 +1,18 @@
 <script lang="ts" setup>
-import type { FormInst, FormRules } from "naive-ui";
+import type { FormInst, FormRules } from 'naive-ui';
 
-import { computed, reactive, ref } from "vue";
+import { computed, reactive, ref } from 'vue';
 
-import { useVbenDrawer } from "@vben/common-ui";
+import { useVbenDrawer } from '@vben/common-ui';
 
-import { NForm, NFormItem, NInput, NInputNumber, NSwitch, NTimePicker } from "naive-ui";
+import {
+  NForm,
+  NFormItem,
+  NInput,
+  NInputNumber,
+  NSwitch,
+  NTimePicker,
+} from 'naive-ui';
 
 type WorkShiftFormModel = {
   breakFrom: null | string;
@@ -31,7 +38,7 @@ type WorkShiftRecord = Partial<WorkShiftFormModel> & Record<string, any>;
 
 const emit = defineEmits<{
   submit: [Record<string, any>];
-  "update:open": [boolean];
+  'update:open': [boolean];
 }>();
 
 const formRef = ref<FormInst | null>(null);
@@ -40,7 +47,7 @@ function createInitialForm(): WorkShiftFormModel {
   return {
     breakFrom: null,
     breakTo: null,
-    code: "",
+    code: '',
     flexible: false,
     fromTime: null,
     hasBreak: false,
@@ -49,8 +56,8 @@ function createInitialForm(): WorkShiftFormModel {
     maxCheckOut: null,
     minCheckIn: null,
     minCheckOut: null,
-    name: "",
-    nameAscii: "",
+    name: '',
+    nameAscii: '',
     overShift: false,
     toTime: null,
     workHours: 0,
@@ -64,51 +71,51 @@ const rules: FormRules = {
   code: [
     {
       max: 10,
-      message: "Mã ca tối đa 10 ký tự",
-      trigger: ["blur", "input"],
+      message: 'Mã ca tối đa 10 ký tự',
+      trigger: ['blur', 'input'],
     },
   ],
   fromTime: [
     {
       required: true,
-      message: "Vui lòng chọn giờ bắt đầu",
-      trigger: ["blur", "change"],
+      message: 'Vui lòng chọn giờ bắt đầu',
+      trigger: ['blur', 'change'],
     },
   ],
   name: [
     {
       required: true,
-      message: "Vui lòng nhập tên ca làm việc",
-      trigger: ["blur", "input"],
+      message: 'Vui lòng nhập tên ca làm việc',
+      trigger: ['blur', 'input'],
     },
     {
       max: 255,
-      message: "Tên ca tối đa 255 ký tự",
-      trigger: ["blur", "input"],
+      message: 'Tên ca tối đa 255 ký tự',
+      trigger: ['blur', 'input'],
     },
   ],
   nameAscii: [
     {
       max: 20,
-      message: "Tên ASCII tối đa 20 ký tự",
-      trigger: ["blur", "input"],
+      message: 'Tên ASCII tối đa 20 ký tự',
+      trigger: ['blur', 'input'],
     },
   ],
   toTime: [
     {
       required: true,
-      message: "Vui lòng chọn giờ kết thúc",
-      trigger: ["blur", "change"],
+      message: 'Vui lòng chọn giờ kết thúc',
+      trigger: ['blur', 'change'],
     },
   ],
 };
 
 function pad(value: number) {
-  return String(value).padStart(2, "0");
+  return String(value).padStart(2, '0');
 }
 
 function normalizeTime(value: unknown): null | string {
-  if (value === null || value === undefined || value === "") {
+  if (value === null || value === undefined || value === '') {
     return null;
   }
 
@@ -116,12 +123,12 @@ function normalizeTime(value: unknown): null | string {
     return `${pad(value.getHours())}:${pad(value.getMinutes())}`;
   }
 
-  if (typeof value === "number" && Number.isFinite(value)) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
     const date = new Date(value);
     return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
   }
 
-  if (typeof value !== "string") {
+  if (typeof value !== 'string') {
     return null;
   }
 
@@ -155,11 +162,11 @@ function normalizeTime(value: unknown): null | string {
 }
 
 function toNumber(value: unknown, fallback = 0) {
-  if (typeof value === "number" && Number.isFinite(value)) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
     return value;
   }
 
-  if (typeof value === "string" && value.trim()) {
+  if (typeof value === 'string' && value.trim()) {
     const numberValue = Number(value);
     return Number.isNaN(numberValue) ? fallback : numberValue;
   }
@@ -176,7 +183,7 @@ function fillForm(record?: null | WorkShiftRecord) {
   Object.assign(form, {
     breakFrom: normalizeTime(record?.breakFrom),
     breakTo: normalizeTime(record?.breakTo),
-    code: record?.code ?? "",
+    code: record?.code ?? '',
     flexible: !!record?.flexible,
     fromTime: normalizeTime(record?.fromTime),
     hasBreak: !!record?.hasBreak,
@@ -185,8 +192,8 @@ function fillForm(record?: null | WorkShiftRecord) {
     maxCheckOut: normalizeTime(record?.maxCheckOut),
     minCheckIn: normalizeTime(record?.minCheckIn),
     minCheckOut: normalizeTime(record?.minCheckOut),
-    name: record?.name ?? "",
-    nameAscii: record?.nameAscii ?? "",
+    name: record?.name ?? '',
+    nameAscii: record?.nameAscii ?? '',
     overShift: !!record?.overShift,
     toTime: normalizeTime(record?.toTime),
     workHours: toNumber(record?.workHours, 0),
@@ -208,18 +215,18 @@ function createPayload() {
 
 async function handleSubmit() {
   await formRef.value?.validate();
-  emit("submit", createPayload());
+  emit('submit', createPayload());
 }
 
 const [Drawer, drawerApi] = useVbenDrawer({
   onCancel() {
-    emit("update:open", false);
+    emit('update:open', false);
     drawerApi.close();
   },
   onConfirm: handleSubmit,
   onOpenChange(isOpen) {
     if (!isOpen) {
-      emit("update:open", false);
+      emit('update:open', false);
       resetForm();
       return;
     }
@@ -237,7 +244,7 @@ const title = computed(() => {
     record: null | WorkShiftRecord;
   }>();
 
-  return data.record ? "Sửa ca làm việc" : "Thêm ca làm việc";
+  return data.record ? 'Sửa ca làm việc' : 'Thêm ca làm việc';
 });
 
 defineExpose({
@@ -270,7 +277,12 @@ defineExpose({
           </NFormItem>
 
           <NFormItem label="Mã ca" path="code">
-            <NInput v-model:value="form.code" :maxlength="10" placeholder="Nhập mã ca" show-count />
+            <NInput
+              v-model:value="form.code"
+              :maxlength="10"
+              placeholder="Nhập mã ca"
+              show-count
+            />
           </NFormItem>
         </div>
 
