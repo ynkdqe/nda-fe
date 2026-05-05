@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { reactive, ref } from 'vue';
 
-import { useVbenModal } from "@vben/common-ui";
+import { useVbenModal } from '@vben/common-ui';
 
-import { NForm, NFormItem, NInput } from "naive-ui";
+import { NForm, NFormItem, NInput } from 'naive-ui';
 
 type UserRecord = {
   id?: number | string;
@@ -11,12 +11,12 @@ type UserRecord = {
 };
 
 const form = reactive({
-  password: "",
+  password: '',
 });
 const currentRecord = ref<null | UserRecord>(null);
 
 function resetForm() {
-  form.password = "";
+  form.password = '';
 }
 
 const [Modal, modalApi] = useVbenModal({
@@ -37,7 +37,7 @@ const [Modal, modalApi] = useVbenModal({
     const data = modalApi.getData<{ record?: UserRecord }>();
     currentRecord.value = data.record ?? null;
   },
-  title: "Đặt mật khẩu",
+  title: 'Đặt mật khẩu',
 });
 </script>
 

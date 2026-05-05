@@ -63,7 +63,10 @@ const title = computed(() => (form.id ? 'Sửa người dùng' : 'Thêm người
   <Drawer :title="title" class="md:w-[720px]">
     <NForm :model="form" label-placement="top">
       <NFormItem label="Tên đăng nhập" path="userName">
-        <NInput v-model:value="form.userName" placeholder="Nhập tên đăng nhập" />
+        <NInput
+          v-model:value="form.userName"
+          placeholder="Nhập tên đăng nhập"
+        />
       </NFormItem>
       <NFormItem label="Họ tên" path="name">
         <NInput v-model:value="form.name" placeholder="Nhập họ tên" />
@@ -72,7 +75,10 @@ const title = computed(() => (form.id ? 'Sửa người dùng' : 'Thêm người
         <NInput v-model:value="form.email" placeholder="Nhập email" />
       </NFormItem>
       <NFormItem label="Số điện thoại" path="phoneNumber">
-        <NInput v-model:value="form.phoneNumber" placeholder="Nhập số điện thoại" />
+        <NInput
+          v-model:value="form.phoneNumber"
+          placeholder="Nhập số điện thoại"
+        />
       </NFormItem>
       <NFormItem label="Hoạt động" path="isActive">
         <NSwitch v-model:value="form.isActive" />

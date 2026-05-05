@@ -1,18 +1,21 @@
 <script lang="ts" setup>
-import type { VxeGridProps } from "#/adapter/vxe-table";
-import type { ContractTypeApi } from "#/api";
+import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { ContractTypeApi } from '#/api';
 
-import { ref, watch } from "vue";
+import { ref, watch } from 'vue';
 
-import { useVbenModal } from "@vben/common-ui";
-import { IconifyIcon } from "@vben/icons";
+import { useVbenModal } from '@vben/common-ui';
+import { IconifyIcon } from '@vben/icons';
 
-import { NButton, NInput, NInputNumber, NSpace } from "naive-ui";
+import { NButton, NInput, NInputNumber, NSpace } from 'naive-ui';
 
-import { message } from "#/adapter/naive";
-import { useVbenVxeGrid } from "#/adapter/vxe-table";
+import { message } from '#/adapter/naive';
+import { useVbenVxeGrid } from '#/adapter/vxe-table';
 
-type DurationRow = Pick<ContractTypeApi.DurationItem, "duration" | "id" | "name">;
+type DurationRow = Pick<
+  ContractTypeApi.DurationItem,
+  'duration' | 'id' | 'name'
+>;
 
 const emit = defineEmits<{
   cancel: [];
@@ -37,13 +40,17 @@ function normalizeDuration(row: DurationRow): DurationRow {
 }
 
 function getGridFullData() {
-  const tableData = gridApi?.grid?.getTableData?.() as undefined | { fullData?: DurationRow[] };
+  const tableData = gridApi?.grid?.getTableData?.() as
+    | undefined
+    | { fullData?: DurationRow[] };
 
   return tableData?.fullData ?? durations.value;
 }
 
 function setupGridData() {
-  durations.value = getGridFullData().map((duration) => normalizeDuration(duration));
+  durations.value = getGridFullData().map((duration) =>
+    normalizeDuration(duration),
+  );
 }
 
 function syncGridData() {
@@ -54,7 +61,7 @@ function syncGridData() {
 
 function addRow() {
   setupGridData();
-  durations.value.push({ duration: 1, name: "" });
+  durations.value.push({ duration: 1, name: '' });
   syncGridData();
 }
 
@@ -66,60 +73,62 @@ function removeRow(index: number) {
 
 async function handleSubmit() {
   if (!contractTypeId.value) {
-    message.error("Không tìm thấy loại hợp đồng");
+    message.error('Không tìm thấy loại hợp đồng');
     return;
   }
 
   loading.value = true;
 
   try {
-    const normalized = getGridFullData().map((duration) => normalizeDuration(duration));
+    const normalized = getGridFullData().map((duration) =>
+      normalizeDuration(duration),
+    );
     durations.value = normalized;
 
-    emit("submit", {
+    emit('submit', {
       contractTypeId: contractTypeId.value,
       durations: normalized,
     });
   } catch {
-    message.error("Lưu thời hạn hợp đồng thất bại");
+    message.error('Lưu thời hạn hợp đồng thất bại');
   } finally {
     loading.value = false;
   }
 }
 
 function close() {
-  emit("cancel");
+  emit('cancel');
   modalApi.close();
 }
 
 const gridOptions: VxeGridProps<DurationRow> = {
   autoResize: true,
-  border: "full",
+  border: 'full',
   columns: [
     {
-      align: "center",
-      title: "#",
-      type: "seq",
+      align: 'center',
+      title: '#',
+      type: 'seq',
       width: 60,
     },
     {
-      field: "name",
+      field: 'name',
       minWidth: 180,
-      slots: { default: "name" },
-      title: "Tên thời hạn",
+      slots: { default: 'name' },
+      title: 'Tên thời hạn',
     },
     {
-      field: "duration",
+      field: 'duration',
       minWidth: 140,
-      slots: { default: "duration" },
-      title: "Thời hạn",
+      slots: { default: 'duration' },
+      title: 'Thời hạn',
     },
     {
-      align: "center",
-      fixed: "right",
+      align: 'center',
+      fixed: 'right',
       minWidth: 120,
-      slots: { default: "actions" },
-      title: "Hành động",
+      slots: { default: 'actions' },
+      title: 'Hành động',
     },
   ],
   data: durations.value,
@@ -133,7 +142,7 @@ const [Grid, gridApi] = useVbenVxeGrid<DurationRow>({ gridOptions });
 
 const [Modal, modalApi] = useVbenModal({
   bordered: true,
-  class: "w-[800px]",
+  class: 'w-[800px]',
   fullscreenButton: false,
   onCancel: close,
   onConfirm: handleSubmit,
@@ -148,10 +157,12 @@ const [Modal, modalApi] = useVbenModal({
     const record = data.record;
 
     contractTypeId.value = record?.id ?? null;
-    durations.value = (record?.durations ?? []).map((duration) => normalizeDuration(duration));
+    durations.value = (record?.durations ?? []).map((duration) =>
+      normalizeDuration(duration),
+    );
     syncGridData();
   },
-  title: "Thời hạn hợp đồng",
+  title: 'Thời hạn hợp đồng',
 });
 
 watch(
@@ -195,7 +206,13 @@ watch(
 
       <template #actions="{ rowIndex }">
         <NSpace justify="center">
-          <NButton circle quaternary size="small" type="error" @click="() => removeRow(rowIndex)">
+          <NButton
+            circle
+            quaternary
+            size="small"
+            type="error"
+            @click="() => removeRow(rowIndex)"
+          >
             <template #icon>
               <IconifyIcon class="size-4" icon="lucide:trash-2" />
             </template>

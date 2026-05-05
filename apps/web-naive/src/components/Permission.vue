@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NCard, NDescriptions, NDescriptionsItem, NModal } from "naive-ui";
+import { NCard, NDescriptions, NDescriptionsItem, NModal } from 'naive-ui';
 
 const props = withDefaults(
   defineProps<{
@@ -10,14 +10,14 @@ const props = withDefaults(
   }>(),
   {
     modelValue: false,
-    providerKey: "",
-    providerName: "",
-    title: "Quyền",
+    providerKey: '',
+    providerName: '',
+    title: 'Quyền',
   },
 );
 
 const emit = defineEmits<{
-  "update:modelValue": [value: boolean];
+  'update:modelValue': [value: boolean];
 }>();
 </script>
 
