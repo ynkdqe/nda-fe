@@ -61,9 +61,7 @@ export const useAuthStore = defineStore('auth', () => {
 
       // 如果成功获取到 accessToken
       if (accessToken) {
-        // 将 token 存储到 accessStore 与 localStorage 中
-        accessStore.setAccessToken(accessToken);
-        accessStore.setRefreshToken(loginResult.refresh_token ?? null);
+        // 将 token 存储到 core-access store，由 pinia persist 写入 localStorage
         setStoredAuthTokenInfo({
           access_token: accessToken,
           expires_at: Date.now() + loginResult.expires_in * 1000,

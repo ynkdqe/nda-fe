@@ -6,6 +6,15 @@ import { acceptHMRUpdate, defineStore } from 'pinia';
 
 type AccessToken = null | string;
 
+interface AuthTokenInfo {
+  expiresAt?: null | number;
+  expiresIn?: null | number;
+  scope?: string;
+  tenant?: null | string;
+  tokenType?: null | string;
+  username?: string;
+}
+
 interface AccessState {
   /**
    * 权限码
@@ -24,6 +33,14 @@ interface AccessState {
    */
   accessToken: AccessToken;
   /**
+   * accessToken 过期时间戳
+   */
+  expiresAt?: null | number;
+  /**
+   * accessToken 有效秒数
+   */
+  expiresIn?: null | number;
+  /**
    * 是否已经检查过权限
    */
   isAccessChecked: boolean;
@@ -40,9 +57,25 @@ interface AccessState {
    */
   loginExpired: boolean;
   /**
-   * 登录 accessToken
+   * 登录 refreshToken
    */
   refreshToken: AccessToken;
+  /**
+   * token scope
+   */
+  scope?: string;
+  /**
+   * 登录租户
+   */
+  tenant?: null | string;
+  /**
+   * token 类型
+   */
+  tokenType?: null | string;
+  /**
+   * 登录用户名
+   */
+  username?: string;
 }
 
 /**
@@ -82,6 +115,16 @@ export const useAccessStore = defineStore('core-access', {
     setAccessRoutes(routes: RouteRecordRaw[]) {
       this.accessRoutes = routes;
     },
+    clearAuthTokenInfo() {
+      this.accessToken = null;
+      this.refreshToken = null;
+      this.expiresAt = null;
+      this.expiresIn = null;
+      this.scope = undefined;
+      this.tenant = null;
+      this.tokenType = null;
+      this.username = undefined;
+    },
     setAccessToken(token: AccessToken) {
       this.accessToken = token;
     },
@@ -94,6 +137,21 @@ export const useAccessStore = defineStore('core-access', {
     setRefreshToken(token: AccessToken) {
       this.refreshToken = token;
     },
+    setTokenInfo(
+      tokenInfo: AuthTokenInfo & {
+        accessToken: AccessToken;
+        refreshToken?: AccessToken;
+      },
+    ) {
+      this.accessToken = tokenInfo.accessToken;
+      this.refreshToken = tokenInfo.refreshToken ?? null;
+      this.expiresAt = tokenInfo.expiresAt ?? null;
+      this.expiresIn = tokenInfo.expiresIn ?? null;
+      this.scope = tokenInfo.scope;
+      this.tenant = tokenInfo.tenant ?? null;
+      this.tokenType = tokenInfo.tokenType ?? null;
+      this.username = tokenInfo.username;
+    },
     unlockScreen() {
       this.isLockScreen = false;
       this.lockScreenPassword = undefined;
@@ -104,6 +162,12 @@ export const useAccessStore = defineStore('core-access', {
     pick: [
       'accessToken',
       'refreshToken',
+      'expiresAt',
+      'expiresIn',
+      'scope',
+      'tenant',
+      'tokenType',
+      'username',
       'accessCodes',
       'isLockScreen',
       'lockScreenPassword',
@@ -114,11 +178,17 @@ export const useAccessStore = defineStore('core-access', {
     accessMenus: [],
     accessRoutes: [],
     accessToken: null,
+    expiresAt: null,
+    expiresIn: null,
     isAccessChecked: false,
     isLockScreen: false,
     lockScreenPassword: undefined,
     loginExpired: false,
     refreshToken: null,
+    scope: undefined,
+    tenant: null,
+    tokenType: null,
+    username: undefined,
   }),
 });
 

@@ -1,3 +1,5 @@
+import { useAccessStore } from '@vben/stores';
+
 export interface AuthTokenInfo {
   access_token: string;
   expires_at: number;
@@ -9,22 +11,32 @@ export interface AuthTokenInfo {
   username?: string;
 }
 
-export const AUTH_TOKEN_STORAGE_KEY = 'nda-web-naive-auth-token';
-
 export const ACCESS_TOKEN_REFRESH_BUFFER_MS = 60_000;
 
+const LEGACY_AUTH_TOKEN_STORAGE_KEY = 'nda-web-naive-auth-token';
+
+function removeLegacyAuthTokenInfo() {
+  localStorage.removeItem(LEGACY_AUTH_TOKEN_STORAGE_KEY);
+}
+
 export function getStoredAuthTokenInfo() {
-  const rawValue = localStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
-  if (!rawValue) {
+  removeLegacyAuthTokenInfo();
+  const accessStore = useAccessStore();
+
+  if (!accessStore.accessToken) {
     return null;
   }
 
-  try {
-    return JSON.parse(rawValue) as AuthTokenInfo;
-  } catch {
-    localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
-    return null;
-  }
+  return {
+    access_token: accessStore.accessToken,
+    expires_at: accessStore.expiresAt ?? 0,
+    expires_in: accessStore.expiresIn ?? 0,
+    refresh_token: accessStore.refreshToken ?? undefined,
+    scope: accessStore.scope,
+    tenant: accessStore.tenant ?? null,
+    token_type: accessStore.tokenType ?? 'Bearer',
+    username: accessStore.username,
+  } satisfies AuthTokenInfo;
 }
 
 export function isAccessTokenExpiring(
@@ -37,9 +49,22 @@ export function isAccessTokenExpiring(
 }
 
 export function removeStoredAuthTokenInfo() {
-  localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+  removeLegacyAuthTokenInfo();
+  const accessStore = useAccessStore();
+  accessStore.clearAuthTokenInfo();
 }
 
 export function setStoredAuthTokenInfo(tokenInfo: AuthTokenInfo) {
-  localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, JSON.stringify(tokenInfo));
+  removeLegacyAuthTokenInfo();
+  const accessStore = useAccessStore();
+  accessStore.setTokenInfo({
+    accessToken: tokenInfo.access_token,
+    expiresAt: tokenInfo.expires_at,
+    expiresIn: tokenInfo.expires_in,
+    refreshToken: tokenInfo.refresh_token ?? null,
+    scope: tokenInfo.scope,
+    tenant: tokenInfo.tenant ?? null,
+    tokenType: tokenInfo.token_type,
+    username: tokenInfo.username,
+  });
 }

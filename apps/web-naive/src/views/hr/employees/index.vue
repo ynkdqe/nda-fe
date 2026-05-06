@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { VbenFormProps } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { EmployeeApi } from '#/api';
 
 import { Page, useVbenDrawer } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
@@ -8,11 +9,9 @@ import { formatDate } from '@vben/utils';
 
 import { NButton, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui';
 
-import type { EmployeeApi } from '#/api';
-
 import { message } from '#/adapter/naive';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { getEmployeeListApi } from '#/api';
+import { getEmployeeByIdApi, getEmployeeListApi } from '#/api';
 
 import EmployeeForm from './EmployeeForm.vue';
 
@@ -72,6 +71,16 @@ function formatEmployeeDate(value?: null | string) {
 
 function formatEmployeeDateTime(value?: null | string) {
   return value ? formatDate(value, 'DD-MM-YYYY HH:mm:ss') : '-';
+}
+
+function normalizeEmployeeDetail(
+  response: EmployeeApi.EmployeeDetailResult,
+): EmployeeApi.EmployeeItem {
+  if ('data' in response && response.data) {
+    return response.data;
+  }
+
+  return response as EmployeeApi.EmployeeItem;
 }
 
 const formOptions: VbenFormProps = {
@@ -223,9 +232,18 @@ function openCreate() {
   drawerApi.open();
 }
 
-function onEdit(row: EmployeeApi.EmployeeItem) {
-  drawerApi.setData({ record: row });
-  drawerApi.open();
+async function onEdit(row: EmployeeApi.EmployeeItem) {
+  try {
+    const response = await getEmployeeByIdApi(row.id);
+    const record = normalizeEmployeeDetail(response);
+
+    drawerApi.setData({ record });
+    drawerApi.open();
+  } catch {
+    message.error(
+      `Không thể tải thông tin nhân viên: ${row?.name || row?.userName || ''}`,
+    );
+  }
 }
 
 function onDelete(row: EmployeeApi.EmployeeItem) {

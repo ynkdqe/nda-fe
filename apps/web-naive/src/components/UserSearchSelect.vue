@@ -26,6 +26,7 @@ const props = withDefaults(
     mode?: Mode;
     modelValue?: UserModelValue;
     placeholder?: string;
+    user?: null | UserRecord;
   }>(),
   {
     allowClear: true,
@@ -34,6 +35,7 @@ const props = withDefaults(
     mode: 'single',
     modelValue: undefined,
     placeholder: undefined,
+    user: null,
   },
 );
 
@@ -53,9 +55,13 @@ let timer: null | ReturnType<typeof setTimeout> = null;
 let searchSeq = 0;
 
 watch(
-  () => props.modelValue,
-  (value) => {
+  () => [props.modelValue, props.user] as const,
+  ([value]) => {
     innerValue.value = value;
+    upsertUserOption(getInjectedUserOption());
+  },
+  {
+    immediate: true,
   },
 );
 
@@ -91,7 +97,7 @@ function toText(value: unknown, fallback = '') {
 }
 
 function toUserId(user: UserRecord) {
-  const id = user.id ?? user.userId;
+  const id = user.Id ?? user.id ?? user.UserId ?? user.userId;
 
   if (typeof id === 'string') {
     return id.trim();
@@ -104,31 +110,78 @@ function toUserId(user: UserRecord) {
   return '';
 }
 
+function toUserOption(user?: null | UserRecord): null | UserOption {
+  if (!user) {
+    return null;
+  }
+
+  const userId = toUserId(user);
+
+  if (!userId) {
+    return null;
+  }
+
+  const explicitLabel = toText(user.Label ?? user.label);
+  const userName = toText(user.userName ?? user.UserName);
+  const email = toText(user.email ?? user.Email);
+  const name = toText(user.name ?? user.Name, userName || email || 'Unknown');
+
+  return {
+    label: explicitLabel || `${name}${userName ? ` (${userName})` : ''}`,
+    rawData: user,
+    value: userId,
+  };
+}
+
+function getInjectedUserOption() {
+  return toUserOption(isRecord(props.user) ? props.user : null);
+}
+
+function mergeInjectedUserOption(nextOptions: UserOption[]) {
+  const injectedOption = getInjectedUserOption();
+
+  if (!injectedOption) {
+    return nextOptions;
+  }
+
+  return [
+    injectedOption,
+    ...nextOptions.filter((option) => option.value !== injectedOption.value),
+  ];
+}
+
+function syncUserDataMap(nextOptions: UserOption[]) {
+  userDataMap.value = Object.fromEntries(
+    nextOptions.map((option) => [option.value, option.rawData]),
+  );
+}
+
+function upsertUserOption(option?: null | UserOption) {
+  if (!option) {
+    return;
+  }
+
+  options.value = mergeInjectedUserOption(options.value);
+  userDataMap.value = {
+    ...userDataMap.value,
+    [option.value]: option.rawData,
+  };
+}
+
 function normalize(response: unknown): UserOption[] {
-  const nextUserDataMap: Record<string, UserRecord> = {};
   const nextOptions: UserOption[] = [];
 
   for (const user of toRecordList(response)) {
-    const userId = toUserId(user);
+    const option = toUserOption(user);
 
-    if (!userId) {
-      continue;
+    if (option) {
+      nextOptions.push(option);
     }
-
-    const userName = toText(user.userName);
-    const email = toText(user.email);
-    const name = toText(user.name, userName || email || 'Unknown');
-
-    nextUserDataMap[userId] = user;
-    nextOptions.push({
-      label: `${name}${userName ? ` (${userName})` : ''}`,
-      rawData: user,
-      value: userId,
-    });
   }
 
-  userDataMap.value = nextUserDataMap;
-  return nextOptions;
+  const mergedOptions = mergeInjectedUserOption(nextOptions);
+  syncUserDataMap(mergedOptions);
+  return mergedOptions;
 }
 
 async function fetchUsers(keyword: string) {
@@ -160,8 +213,8 @@ function onSearch(keyword: string) {
       }
     } catch {
       if (currentSeq === searchSeq) {
-        options.value = [];
-        userDataMap.value = {};
+        options.value = mergeInjectedUserOption([]);
+        syncUserDataMap(options.value);
       }
     } finally {
       if (currentSeq === searchSeq) {
