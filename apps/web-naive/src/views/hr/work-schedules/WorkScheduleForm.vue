@@ -3,56 +3,63 @@ import type {
   WorkScheduleApi,
   WorkScheduleFormRecord,
   WorkScheduleSelectOption,
-} from "#/models/hr/work-schedule";
-import type { WorkShiftApi } from "#/models/hr/workshift";
+} from '#/models/hr/work-schedule';
+import type { WorkShiftApi } from '#/models/hr/workshift';
 
-import { computed, defineComponent, h, markRaw, onMounted, reactive } from "vue";
+import {
+  computed,
+  defineComponent,
+  h,
+  markRaw,
+  onMounted,
+  reactive,
+} from 'vue';
 
-import { useVbenDrawer } from "@vben/common-ui";
+import { useVbenDrawer } from '@vben/common-ui';
 
-import { NSwitch } from "naive-ui";
+import { NSwitch } from 'naive-ui';
 
-import { useVbenForm } from "#/adapter/form";
-import { message } from "#/adapter/naive";
-import { getWorkShiftListApi } from "#/api";
-import EmployeeSearchSelect from "#/components/EmployeeSearchSelect.vue";
+import { useVbenForm } from '#/adapter/form';
+import { message } from '#/adapter/naive';
+import { getWorkShiftListApi } from '#/api';
+import EmployeeSearchSelect from '#/components/EmployeeSearchSelect.vue';
 
 const emit = defineEmits<{
   submit: [Record<string, any>, null | WorkScheduleApi.WorkScheduleItem];
 }>();
 
 const workshiftOptions = reactive<WorkScheduleSelectOption[]>([]);
-const DATE_RANGE_WARNING = "Đến ngày phải lớn hơn hoặc bằng Từ ngày";
+const DATE_RANGE_WARNING = 'Đến ngày phải lớn hơn hoặc bằng Từ ngày';
 
 const InlineSwitch = defineComponent({
-  name: "InlineSwitch",
+  name: 'InlineSwitch',
   props: {
     checked: Boolean,
     disabled: Boolean,
     label: {
-      default: "",
+      default: '',
       type: String,
     },
     modelValue: Boolean,
     value: Boolean,
   },
-  emits: ["update:checked", "update:modelValue", "update:value"],
+  emits: ['update:checked', 'update:modelValue', 'update:value'],
   setup(props, { emit }) {
     const getValue = () => props.value || props.modelValue || props.checked;
 
     const updateValue = (value: boolean) => {
-      emit("update:value", value);
-      emit("update:modelValue", value);
-      emit("update:checked", value);
+      emit('update:value', value);
+      emit('update:modelValue', value);
+      emit('update:checked', value);
     };
 
     return () =>
-      h("div", { class: "inline-switch" }, [
-        h("span", { class: "inline-switch__label" }, props.label),
+      h('div', { class: 'inline-switch' }, [
+        h('span', { class: 'inline-switch__label' }, props.label),
         h(NSwitch, {
           disabled: props.disabled,
           value: getValue(),
-          "onUpdate:value": updateValue,
+          'onUpdate:value': updateValue,
         }),
       ]);
   },
@@ -63,13 +70,13 @@ function normalizeWorkShiftOptions(response: WorkShiftApi.WorkShiftListResult) {
 
   return items
     .map((item) => {
-      if (item.id === null || item.id === undefined || item.id === "") {
+      if (item.id === null || item.id === undefined || item.id === '') {
         return null;
       }
 
-      const fromTime = item.fromTime || "";
-      const toTime = item.toTime || "";
-      const timeLabel = fromTime && toTime ? ` (${fromTime} - ${toTime})` : "";
+      const fromTime = item.fromTime || '';
+      const toTime = item.toTime || '';
+      const timeLabel = fromTime && toTime ? ` (${fromTime} - ${toTime})` : '';
 
       return {
         label: `${item.name || item.code || item.id}${timeLabel}`,
@@ -82,14 +89,18 @@ function normalizeWorkShiftOptions(response: WorkShiftApi.WorkShiftListResult) {
 async function loadWorkShifts() {
   try {
     const response = await getWorkShiftListApi({ page: 1, pageSize: 100 });
-    workshiftOptions.splice(0, workshiftOptions.length, ...normalizeWorkShiftOptions(response));
+    workshiftOptions.splice(
+      0,
+      workshiftOptions.length,
+      ...normalizeWorkShiftOptions(response),
+    );
   } catch {
     workshiftOptions.splice(0);
   }
 }
 
 function getDateTime(value: unknown) {
-  if (value === null || value === undefined || value === "") {
+  if (value === null || value === undefined || value === '') {
     return null;
   }
 
@@ -118,34 +129,34 @@ function isBeforeDate(value: unknown, target: unknown) {
 const [Form, formApi] = useVbenForm({
   commonConfig: {
     componentProps: {
-      class: "w-full",
+      class: 'w-full',
     },
   },
-  layout: "vertical",
+  layout: 'vertical',
   schema: [
     {
-      component: "DatePicker",
+      component: 'DatePicker',
       componentProps: {
         clearable: true,
-        format: "dd-MM-yyyy",
-        placeholder: "Từ ngày",
-        style: { width: "100%" },
-        type: "date",
-        valueFormat: "yyyy-MM-dd",
+        format: 'dd-MM-yyyy',
+        placeholder: 'Từ ngày',
+        style: { width: '100%' },
+        type: 'date',
+        valueFormat: 'yyyy-MM-dd',
       },
-      fieldName: "fromDate",
-      label: "Từ ngày",
-      rules: "required",
+      fieldName: 'fromDate',
+      label: 'Từ ngày',
+      rules: 'required',
     },
     {
-      component: "DatePicker",
+      component: 'DatePicker',
       componentProps: {
         clearable: true,
-        format: "dd-MM-yyyy",
-        placeholder: "Đến ngày",
-        style: { width: "100%" },
-        type: "date",
-        valueFormat: "yyyy-MM-dd",
+        format: 'dd-MM-yyyy',
+        placeholder: 'Đến ngày',
+        style: { width: '100%' },
+        type: 'date',
+        valueFormat: 'yyyy-MM-dd',
       },
       dependencies: {
         trigger(values: Record<string, any>) {
@@ -163,77 +174,77 @@ const [Form, formApi] = useVbenForm({
             formApi.setValues({ toDate: values.fromDate });
           }
         },
-        triggerFields: ["fromDate", "toDate"],
+        triggerFields: ['fromDate', 'toDate'],
       },
-      fieldName: "toDate",
-      label: "Đến ngày",
-      rules: "required",
+      fieldName: 'toDate',
+      label: 'Đến ngày',
+      rules: 'required',
     },
     {
       component: markRaw(EmployeeSearchSelect),
       componentProps: {
-        mode: "multiple",
-        placeholder: "Chọn nhân viên",
-        style: { width: "100%" },
+        mode: 'multiple',
+        placeholder: 'Chọn nhân viên',
+        style: { width: '100%' },
       },
       dependencies: {
         disabled: (values: Record<string, any>) => !!values.isApplyAll,
-        triggerFields: ["isApplyAll"],
+        triggerFields: ['isApplyAll'],
       },
       defaultValue: [],
-      fieldName: "employeeIds",
-      formItemClass: "md:col-span-2",
-      label: "Nhân viên",
-      modelPropName: "modelValue",
+      fieldName: 'employeeIds',
+      formItemClass: 'md:col-span-2',
+      label: 'Nhân viên',
+      modelPropName: 'modelValue',
     },
     {
-      component: "Select",
+      component: 'Select',
       componentProps: {
         clearable: true,
         options: workshiftOptions,
-        placeholder: "Chọn ca làm việc",
-        style: { width: "100%" },
+        placeholder: 'Chọn ca làm việc',
+        style: { width: '100%' },
       },
-      fieldName: "workshiftId",
-      formItemClass: "md:col-span-2",
-      label: "Ca làm việc",
-      rules: "selectRequired",
+      fieldName: 'workshiftId',
+      formItemClass: 'md:col-span-2',
+      label: 'Ca làm việc',
+      rules: 'selectRequired',
     },
     {
       component: markRaw(InlineSwitch),
       componentProps: {
-        label: "Áp dụng tất cả",
+        label: 'Áp dụng tất cả',
       },
-      fieldName: "isApplyAll",
-      formItemClass: "md:col-span-2",
-      label: "",
+      fieldName: 'isApplyAll',
+      formItemClass: 'md:col-span-2',
+      label: '',
     },
     {
-      component: "Input",
-      fieldName: "source",
-      formItemClass: "md:col-span-2",
-      label: "Nguồn",
+      component: 'Input',
+      fieldName: 'source',
+      formItemClass: 'md:col-span-2',
+      label: 'Nguồn',
     },
     {
-      component: "Input",
-      fieldName: "description",
-      formItemClass: "md:col-span-2",
-      label: "Mô tả",
+      component: 'Input',
+      fieldName: 'description',
+      formItemClass: 'md:col-span-2',
+      label: 'Mô tả',
     },
   ],
   showDefaultActions: false,
-  wrapperClass: "grid-cols-1 md:grid-cols-2 gap-4",
+  wrapperClass: 'grid-cols-1 md:grid-cols-2 gap-4',
 });
 
 function formatDateToYmd(date: Date) {
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
 
 function normalizeDate(value: unknown) {
-  if (value === null || value === undefined || value === "") {
+  if (value === null || value === undefined || value === '') {
     return null;
   }
 
@@ -241,14 +252,14 @@ function normalizeDate(value: unknown) {
     return formatDateToYmd(value);
   }
 
-  if (typeof value === "number") {
+  if (typeof value === 'number') {
     const date = new Date(value);
     if (!Number.isNaN(date.getTime())) {
       return formatDateToYmd(date);
     }
   }
 
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     const ymdMatch = /^\d{4}-\d{2}-\d{2}/.exec(value);
     if (ymdMatch) {
       return ymdMatch[0];
@@ -273,12 +284,12 @@ function normalizeEmployeeIds(value: unknown) {
     return value;
   }
 
-  if (typeof value !== "string") {
+  if (typeof value !== 'string') {
     return value;
   }
 
   return value
-    .split(",")
+    .split(',')
     .map((item) => item.trim())
     .filter(Boolean);
 }
@@ -310,10 +321,12 @@ const [Drawer, drawerApi] = useVbenDrawer({
     }
 
     emit(
-      "submit",
+      'submit',
       {
         ...payloadValues,
-        employeeIds: values.isApplyAll ? [] : normalizeEmployeeIds(values.employeeIds),
+        employeeIds: values.isApplyAll
+          ? []
+          : normalizeEmployeeIds(values.employeeIds),
         fromDate,
         toDate,
       },
@@ -344,7 +357,8 @@ const [Drawer, drawerApi] = useVbenDrawer({
       isApplyAll: false,
       isOverride: false,
       toDate: recordValue?.toDate ?? recordValue?.date ?? null,
-      employeeIds: record?.employeeIds ?? (record?.employeeId ? [record.employeeId] : []),
+      employeeIds:
+        record?.employeeIds ?? (record?.employeeId ? [record.employeeId] : []),
     });
   },
 });
@@ -354,7 +368,7 @@ const title = computed(() => {
     record: null | WorkScheduleApi.WorkScheduleItem;
   }>();
 
-  return data.record ? "Sửa lịch làm việc" : "Thêm lịch làm việc";
+  return data.record ? 'Sửa lịch làm việc' : 'Thêm lịch làm việc';
 });
 
 onMounted(loadWorkShifts);

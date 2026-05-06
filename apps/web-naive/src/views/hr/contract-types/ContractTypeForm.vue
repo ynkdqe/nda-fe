@@ -1,18 +1,26 @@
 <script lang="ts" setup>
-import type { FormInst, FormRules } from "naive-ui";
+import type { FormInst, FormRules } from 'naive-ui';
 
-import type { UnknownRecord } from "#/models/hr/contract";
+import type { UnknownRecord } from '#/models/hr/contract';
 import type {
   ContractDurationFormItem,
   ContractTypeApi,
   ContractTypeFormModel,
-} from "#/models/hr/contract-type";
+} from '#/models/hr/contract-type';
 
-import { computed, nextTick, reactive, ref } from "vue";
+import { computed, nextTick, reactive, ref } from 'vue';
 
-import { useVbenDrawer } from "@vben/common-ui";
+import { useVbenDrawer } from '@vben/common-ui';
 
-import { NButton, NDivider, NForm, NFormItem, NInput, NInputNumber, NSwitch } from "naive-ui";
+import {
+  NButton,
+  NDivider,
+  NForm,
+  NFormItem,
+  NInput,
+  NInputNumber,
+  NSwitch,
+} from 'naive-ui';
 
 const emit = defineEmits<{
   cancel: [];
@@ -27,7 +35,7 @@ function resetForm(): ContractTypeFormModel {
     businessOccAccInsurancePercent: 0.5,
     businessSocialInsurancePercent: 17.5,
     businessUnemploymentInsurancePercent: 1,
-    code: "",
+    code: '',
     contractDurations: [],
     employeeHealthInsurancePercent: 1.5,
     employeeMinTaxSalary: 0,
@@ -39,7 +47,7 @@ function resetForm(): ContractTypeFormModel {
     id: undefined,
     isTaxFixed: false,
     minInsuranceSalary: 0,
-    name: "",
+    name: '',
     taxPercent: 0,
   };
 }
@@ -49,19 +57,19 @@ const model = reactive<ContractTypeFormModel>(resetForm());
 const formRules: FormRules = {
   name: [
     {
-      message: "Vui lòng nhập tên loại hợp đồng",
+      message: 'Vui lòng nhập tên loại hợp đồng',
       required: true,
-      trigger: ["blur", "input"],
+      trigger: ['blur', 'input'],
     },
   ],
 };
 
 function toNumber(value: unknown, fallback = 0): number {
-  if (typeof value === "number" && Number.isFinite(value)) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
     return value;
   }
 
-  if (typeof value === "string" && value.trim()) {
+  if (typeof value === 'string' && value.trim()) {
     const numericValue = Number(value);
     return Number.isNaN(numericValue) ? fallback : numericValue;
   }
@@ -71,14 +79,14 @@ function toNumber(value: unknown, fallback = 0): number {
 
 function numberFormatter(value: null | number) {
   if (value === null || value === undefined) {
-    return "";
+    return '';
   }
 
-  return String(value).replaceAll(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return String(value).replaceAll(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 function numberParser(value: string) {
-  const numericValue = Number(value.replaceAll(",", ""));
+  const numericValue = Number(value.replaceAll(',', ''));
   return Number.isNaN(numericValue) ? null : numericValue;
 }
 
@@ -87,8 +95,8 @@ function normalizeDuration(
 ): ContractDurationFormItem {
   return {
     duration: toNumber(duration.duration, 1),
-    id: typeof duration.id === "number" ? duration.id : null,
-    name: duration.name ?? "",
+    id: typeof duration.id === 'number' ? duration.id : null,
+    name: duration.name ?? '',
   };
 }
 
@@ -99,13 +107,18 @@ function normalizeRecord(record?: ContractTypeApi.ContractTypeItem | null) {
     return initialValue;
   }
 
-  const rawExtraProperties = (record as unknown as UnknownRecord).extraProperties;
+  const rawExtraProperties = (record as unknown as UnknownRecord)
+    .extraProperties;
   const extraProperties =
-    typeof rawExtraProperties === "object" && rawExtraProperties !== null
+    typeof rawExtraProperties === 'object' && rawExtraProperties !== null
       ? (rawExtraProperties as UnknownRecord)
       : {};
-  const extraDurations = Array.isArray(extraProperties.durations) ? extraProperties.durations : [];
-  const durations = record.durations?.length ? record.durations : extraDurations;
+  const extraDurations = Array.isArray(extraProperties.durations)
+    ? extraProperties.durations
+    : [];
+  const durations = record.durations?.length
+    ? record.durations
+    : extraDurations;
 
   return {
     ...initialValue,
@@ -126,7 +139,7 @@ function normalizeRecord(record?: ContractTypeApi.ContractTypeItem | null) {
       record.businessUnemploymentInsurancePercent,
       initialValue.businessUnemploymentInsurancePercent ?? 0,
     ),
-    code: record.code ?? "",
+    code: record.code ?? '',
     contractDurations: durations.map((duration) =>
       normalizeDuration(duration as ContractTypeApi.DurationItem),
     ),
@@ -151,17 +164,21 @@ function normalizeRecord(record?: ContractTypeApi.ContractTypeItem | null) {
       initialValue.employeeUnemployeeInsurancePercent ?? 0,
     ),
     extraProperties,
-    hasSocialInsurance: record.hasSocialInsurance ?? initialValue.hasSocialInsurance,
+    hasSocialInsurance:
+      record.hasSocialInsurance ?? initialValue.hasSocialInsurance,
     id: record.id,
     isTaxFixed: record.isTaxFixed ?? initialValue.isTaxFixed,
-    minInsuranceSalary: toNumber(record.minInsuranceSalary, initialValue.minInsuranceSalary ?? 0),
-    name: record.name ?? "",
+    minInsuranceSalary: toNumber(
+      record.minInsuranceSalary,
+      initialValue.minInsuranceSalary ?? 0,
+    ),
+    name: record.name ?? '',
     taxPercent: toNumber(record.taxPercent, initialValue.taxPercent ?? 0),
   } satisfies ContractTypeFormModel;
 }
 
 function addDuration() {
-  model.contractDurations.push({ duration: 1, id: null, name: "" });
+  model.contractDurations.push({ duration: 1, id: null, name: '' });
 }
 
 function removeDuration(index: number) {
@@ -176,7 +193,7 @@ async function handleSubmit() {
     name: duration.name,
   }));
 
-  emit("submit", {
+  emit('submit', {
     ...model,
     extraProperties: {
       ...model.extraProperties,
@@ -187,7 +204,7 @@ async function handleSubmit() {
 
 const [Drawer, drawerApi] = useVbenDrawer({
   onCancel() {
-    emit("cancel");
+    emit('cancel');
     drawerApi.close();
   },
   onConfirm: handleSubmit,
@@ -205,7 +222,9 @@ const [Drawer, drawerApi] = useVbenDrawer({
   },
 });
 
-const title = computed(() => (model.id ? "Sửa loại hợp đồng" : "Thêm loại hợp đồng"));
+const title = computed(() =>
+  model.id ? 'Sửa loại hợp đồng' : 'Thêm loại hợp đồng',
+);
 </script>
 
 <template>
@@ -218,11 +237,17 @@ const title = computed(() => (model.id ? "Sửa loại hợp đồng" : "Thêm l
       :rules="formRules"
     >
       <NFormItem label="Tên loại hợp đồng" path="name">
-        <NInput v-model:value="model.name" placeholder="Nhập tên loại hợp đồng" />
+        <NInput
+          v-model:value="model.name"
+          placeholder="Nhập tên loại hợp đồng"
+        />
       </NFormItem>
 
       <NFormItem label="Mã loại hợp đồng" path="code">
-        <NInput v-model:value="model.code" placeholder="Nhập mã loại hợp đồng" />
+        <NInput
+          v-model:value="model.code"
+          placeholder="Nhập mã loại hợp đồng"
+        />
       </NFormItem>
 
       <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
@@ -247,7 +272,10 @@ const title = computed(() => (model.id ? "Sửa loại hợp đồng" : "Thêm l
           <NSwitch v-model:value="model.hasSocialInsurance" />
         </NFormItem>
 
-        <NFormItem label="BHXH nhân viên (%)" path="employeeSocialInsurancePercent">
+        <NFormItem
+          label="BHXH nhân viên (%)"
+          path="employeeSocialInsurancePercent"
+        >
           <NInputNumber
             v-model:value="model.employeeSocialInsurancePercent"
             :disabled="!model.hasSocialInsurance"
@@ -257,7 +285,10 @@ const title = computed(() => (model.id ? "Sửa loại hợp đồng" : "Thêm l
           />
         </NFormItem>
 
-        <NFormItem label="BHYT nhân viên (%)" path="employeeHealthInsurancePercent">
+        <NFormItem
+          label="BHYT nhân viên (%)"
+          path="employeeHealthInsurancePercent"
+        >
           <NInputNumber
             v-model:value="model.employeeHealthInsurancePercent"
             :disabled="!model.hasSocialInsurance"
@@ -267,7 +298,10 @@ const title = computed(() => (model.id ? "Sửa loại hợp đồng" : "Thêm l
           />
         </NFormItem>
 
-        <NFormItem label="BHTN nhân viên (%)" path="employeeUnemployeeInsurancePercent">
+        <NFormItem
+          label="BHTN nhân viên (%)"
+          path="employeeUnemployeeInsurancePercent"
+        >
           <NInputNumber
             v-model:value="model.employeeUnemployeeInsurancePercent"
             :disabled="!model.hasSocialInsurance"
@@ -277,7 +311,10 @@ const title = computed(() => (model.id ? "Sửa loại hợp đồng" : "Thêm l
           />
         </NFormItem>
 
-        <NFormItem label="Phí công đoàn nhân viên (%)" path="employeeUnionPercent">
+        <NFormItem
+          label="Phí công đoàn nhân viên (%)"
+          path="employeeUnionPercent"
+        >
           <NInputNumber
             v-model:value="model.employeeUnionPercent"
             :disabled="!model.hasSocialInsurance"
@@ -287,7 +324,10 @@ const title = computed(() => (model.id ? "Sửa loại hợp đồng" : "Thêm l
           />
         </NFormItem>
 
-        <NFormItem label="Lương tính thuế tối thiểu" path="employeeMinTaxSalary">
+        <NFormItem
+          label="Lương tính thuế tối thiểu"
+          path="employeeMinTaxSalary"
+        >
           <NInputNumber
             v-model:value="model.employeeMinTaxSalary"
             :disabled="!model.hasSocialInsurance"
@@ -302,7 +342,10 @@ const title = computed(() => (model.id ? "Sửa loại hợp đồng" : "Thêm l
 
       <NDivider title-placement="left">Chi phí doanh nghiệp</NDivider>
       <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
-        <NFormItem label="BHXH doanh nghiệp (%)" path="businessSocialInsurancePercent">
+        <NFormItem
+          label="BHXH doanh nghiệp (%)"
+          path="businessSocialInsurancePercent"
+        >
           <NInputNumber
             v-model:value="model.businessSocialInsurancePercent"
             :disabled="!model.hasSocialInsurance"
@@ -312,7 +355,10 @@ const title = computed(() => (model.id ? "Sửa loại hợp đồng" : "Thêm l
           />
         </NFormItem>
 
-        <NFormItem label="BHYT doanh nghiệp (%)" path="businessHealthInsurancePercent">
+        <NFormItem
+          label="BHYT doanh nghiệp (%)"
+          path="businessHealthInsurancePercent"
+        >
           <NInputNumber
             v-model:value="model.businessHealthInsurancePercent"
             :disabled="!model.hasSocialInsurance"
@@ -322,7 +368,10 @@ const title = computed(() => (model.id ? "Sửa loại hợp đồng" : "Thêm l
           />
         </NFormItem>
 
-        <NFormItem label="BHTN doanh nghiệp (%)" path="businessUnemploymentInsurancePercent">
+        <NFormItem
+          label="BHTN doanh nghiệp (%)"
+          path="businessUnemploymentInsurancePercent"
+        >
           <NInputNumber
             v-model:value="model.businessUnemploymentInsurancePercent"
             :disabled="!model.hasSocialInsurance"
@@ -332,7 +381,10 @@ const title = computed(() => (model.id ? "Sửa loại hợp đồng" : "Thêm l
           />
         </NFormItem>
 
-        <NFormItem label="BHTNLĐ-BNN doanh nghiệp (%)" path="businessOccAccInsurancePercent">
+        <NFormItem
+          label="BHTNLĐ-BNN doanh nghiệp (%)"
+          path="businessOccAccInsurancePercent"
+        >
           <NInputNumber
             v-model:value="model.businessOccAccInsurancePercent"
             :disabled="!model.hasSocialInsurance"
@@ -363,17 +415,25 @@ const title = computed(() => (model.id ? "Sửa loại hợp đồng" : "Thêm l
             :key="duration.id ?? index"
             class="flex items-center gap-2"
           >
-            <NInput v-model:value="duration.name" class="flex-[3]" placeholder="Tên thời hạn" />
+            <NInput
+              v-model:value="duration.name"
+              class="flex-[3]"
+              placeholder="Tên thời hạn"
+            />
             <NInputNumber
               v-model:value="duration.duration"
               :min="1"
               :show-button="false"
               style="width: 80px"
             />
-            <NButton text type="error" @click="() => removeDuration(index)"> Xóa </NButton>
+            <NButton text type="error" @click="() => removeDuration(index)">
+              Xóa
+            </NButton>
           </div>
 
-          <NButton dashed type="primary" @click="addDuration"> Thêm thời hạn </NButton>
+          <NButton dashed type="primary" @click="addDuration">
+            Thêm thời hạn
+          </NButton>
         </div>
       </NFormItem>
     </NForm>

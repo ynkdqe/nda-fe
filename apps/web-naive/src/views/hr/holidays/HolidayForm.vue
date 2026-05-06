@@ -4,12 +4,12 @@ import type {
   HolidayFormState,
   HolidayTypeOption,
   WeekendQuickMode,
-} from "#/models/hr/holiday";
+} from '#/models/hr/holiday';
 
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch } from 'vue';
 
-import { useVbenDrawer } from "@vben/common-ui";
-import { formatDate } from "@vben/utils";
+import { useVbenDrawer } from '@vben/common-ui';
+import { formatDate } from '@vben/utils';
 
 import {
   NButton,
@@ -20,15 +20,15 @@ import {
   NRadioGroup,
   NSelect,
   NTag,
-} from "naive-ui";
+} from 'naive-ui';
 
-import { message } from "#/adapter/naive";
+import { message } from '#/adapter/naive';
 
 const emit = defineEmits<{
   submit: [Record<string, any>];
 }>();
 
-const weekDays = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
+const weekDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 
 const holidayTypes = ref<HolidayTypeOption[]>([]);
 const calendarMonth = ref(new Date().getMonth() + 1);
@@ -39,40 +39,40 @@ const form = ref<HolidayFormState>(createDefaultForm());
 
 const title = computed(() => {
   const data = drawerApi.getData<{ record: HolidayApi.HolidayItem | null }>();
-  return data.record ? "Sửa ngày nghỉ" : "Thêm ngày nghỉ";
+  return data.record ? 'Sửa ngày nghỉ' : 'Thêm ngày nghỉ';
 });
 
 const monthLabel = computed(() => {
-  return new Intl.DateTimeFormat("vi-VN", {
-    month: "long",
-    year: "numeric",
+  return new Intl.DateTimeFormat('vi-VN', {
+    month: 'long',
+    year: 'numeric',
   }).format(new Date(calendarYear.value, calendarMonth.value - 1, 1));
 });
 
 const weekendQuickMode = computed<WeekendQuickMode>({
   get() {
     if (form.value.weekendFull) {
-      return "weekend";
+      return 'weekend';
     }
 
     if (form.value.saturdayOnly) {
-      return "saturday";
+      return 'saturday';
     }
 
     if (form.value.sundayOnly) {
-      return "sunday";
+      return 'sunday';
     }
 
-    return "none";
+    return 'none';
   },
   set(value) {
-    form.value.saturdayOnly = value === "saturday";
-    form.value.sundayOnly = value === "sunday";
-    form.value.weekendFull = value === "weekend";
+    form.value.saturdayOnly = value === 'saturday';
+    form.value.sundayOnly = value === 'sunday';
+    form.value.weekendFull = value === 'weekend';
   },
 });
 
-const weekendMode = computed(() => weekendQuickMode.value !== "none");
+const weekendMode = computed(() => weekendQuickMode.value !== 'none');
 
 const calendarDays = computed(() => {
   const firstDate = new Date(calendarYear.value, calendarMonth.value - 1, 1);
@@ -90,9 +90,9 @@ const calendarDays = computed(() => {
 function createDefaultForm(): HolidayFormState {
   return {
     dates: [],
-    description: "",
+    description: '',
     holidayType: null,
-    name: "",
+    name: '',
     saturdayOnly: false,
     sundayOnly: false,
     weekendFull: false,
@@ -101,13 +101,13 @@ function createDefaultForm(): HolidayFormState {
 
 function formatDateToYmd(date: Date) {
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
 
 function normalizeDate(value: unknown) {
-  if (value === null || value === undefined || value === "") {
+  if (value === null || value === undefined || value === '') {
     return null;
   }
 
@@ -115,12 +115,12 @@ function normalizeDate(value: unknown) {
     return formatDateToYmd(value);
   }
 
-  if (typeof value === "number") {
+  if (typeof value === 'number') {
     const date = new Date(value);
     return Number.isNaN(date.getTime()) ? null : formatDateToYmd(date);
   }
 
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     const ymdMatch = /^\d{4}-\d{2}-\d{2}/.exec(value);
     if (ymdMatch) {
       return ymdMatch[0];
@@ -139,7 +139,10 @@ function normalizeDate(value: unknown) {
 }
 
 function updateFormDates() {
-  const combined = new Set<string>([...autoWeekendDates.value, ...manualDates.value]);
+  const combined = new Set<string>([
+    ...autoWeekendDates.value,
+    ...manualDates.value,
+  ]);
   form.value.dates = [...combined].toSorted();
 }
 
@@ -186,9 +189,9 @@ function syncRecord(record?: HolidayApi.HolidayItem | null) {
   const date = normalizeDate(record.date);
   form.value = {
     ...form.value,
-    description: record.description ?? "",
+    description: record.description ?? '',
     holidayType: record.holidayType ?? record.type ?? null,
-    name: record.name ?? "",
+    name: record.name ?? '',
   };
 
   if (date) {
@@ -228,7 +231,11 @@ function selectDate(date: Date) {
 }
 
 function changeMonth(offset: number) {
-  const date = new Date(calendarYear.value, calendarMonth.value - 1 + offset, 1);
+  const date = new Date(
+    calendarYear.value,
+    calendarMonth.value - 1 + offset,
+    1,
+  );
   calendarMonth.value = date.getMonth() + 1;
   calendarYear.value = date.getFullYear();
   computeAutoWeekends(calendarMonth.value, calendarYear.value);
@@ -258,21 +265,21 @@ async function handleSubmit() {
   const description = form.value.description.trim();
 
   if (!name) {
-    message.error("Vui lòng nhập tên ngày nghỉ");
+    message.error('Vui lòng nhập tên ngày nghỉ');
     return;
   }
 
   if (!form.value.holidayType) {
-    message.error("Vui lòng chọn loại ngày nghỉ");
+    message.error('Vui lòng chọn loại ngày nghỉ');
     return;
   }
 
   if (form.value.dates.length === 0) {
-    message.error("Vui lòng chọn ít nhất một ngày nghỉ");
+    message.error('Vui lòng chọn ít nhất một ngày nghỉ');
     return;
   }
 
-  emit("submit", {
+  emit('submit', {
     ...form.value,
     dates: [...form.value.dates].toSorted(),
     description,
@@ -321,7 +328,11 @@ defineExpose({
       <NForm :model="form" label-placement="top">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <NFormItem label="Tên ngày nghỉ" required>
-            <NInput v-model:value="form.name" clearable placeholder="Nhập tên ngày nghỉ" />
+            <NInput
+              v-model:value="form.name"
+              clearable
+              placeholder="Nhập tên ngày nghỉ"
+            />
           </NFormItem>
 
           <NFormItem label="Loại ngày nghỉ" required>
@@ -350,16 +361,26 @@ defineExpose({
         <NFormItem label="Ngày nghỉ" required>
           <div class="holiday-calendar">
             <div class="holiday-calendar__toolbar">
-              <NButton size="small" secondary @click="changeMonth(-1)"> Tháng trước </NButton>
+              <NButton size="small" secondary @click="changeMonth(-1)">
+                Tháng trước
+              </NButton>
               <div class="holiday-calendar__title">{{ monthLabel }}</div>
               <div class="holiday-calendar__actions">
-                <NButton size="small" secondary @click="goCurrentMonth"> Hôm nay </NButton>
-                <NButton size="small" secondary @click="changeMonth(1)"> Tháng sau </NButton>
+                <NButton size="small" secondary @click="goCurrentMonth">
+                  Hôm nay
+                </NButton>
+                <NButton size="small" secondary @click="changeMonth(1)">
+                  Tháng sau
+                </NButton>
               </div>
             </div>
 
             <div class="holiday-calendar__weekdays">
-              <div v-for="day in weekDays" :key="day" class="holiday-calendar__weekday">
+              <div
+                v-for="day in weekDays"
+                :key="day"
+                class="holiday-calendar__weekday"
+              >
                 {{ day }}
               </div>
             </div>
@@ -370,7 +391,8 @@ defineExpose({
                 :key="formatDateToYmd(day)"
                 class="holiday-calendar__cell"
                 :class="{
-                  'holiday-calendar__cell--disabled': weekendMode || isOtherMonth(day),
+                  'holiday-calendar__cell--disabled':
+                    weekendMode || isOtherMonth(day),
                   'holiday-calendar__cell--other-month': isOtherMonth(day),
                   'holiday-calendar__cell--selected': isSelected(day),
                   'holiday-calendar__cell--today': isToday(day),
@@ -384,11 +406,16 @@ defineExpose({
             </div>
 
             <div class="holiday-calendar__footer">
-              <NButton dashed :disabled="manualDates.size === 0" @click="clearSelection">
+              <NButton
+                dashed
+                :disabled="manualDates.size === 0"
+                @click="clearSelection"
+              >
                 Xóa ngày chọn thủ công
               </NButton>
               <span v-if="weekendMode" class="holiday-calendar__hint">
-                Đang bật chọn nhanh cuối tuần, không thể chọn thủ công trên lịch.
+                Đang bật chọn nhanh cuối tuần, không thể chọn thủ công trên
+                lịch.
               </span>
             </div>
           </div>
@@ -402,7 +429,7 @@ defineExpose({
             type="info"
             @close="removeDate(date)"
           >
-            {{ formatDate(date, "DD-MM-YYYY") }}
+            {{ formatDate(date, 'DD-MM-YYYY') }}
           </NTag>
         </div>
 
@@ -506,7 +533,8 @@ defineExpose({
   background-color: var(--primary-color);
 }
 
-.holiday-calendar__cell--today:not(.holiday-calendar__cell--selected) .holiday-calendar__date {
+.holiday-calendar__cell--today:not(.holiday-calendar__cell--selected)
+  .holiday-calendar__date {
   font-weight: 700;
   color: var(--primary-color);
   box-shadow: inset 0 0 0 1px var(--primary-color);

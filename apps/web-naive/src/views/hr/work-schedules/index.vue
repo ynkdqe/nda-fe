@@ -1,27 +1,31 @@
 <script lang="ts" setup>
-import type { VbenFormProps } from "#/adapter/form";
-import type { VxeGridProps } from "#/adapter/vxe-table";
-import type { WorkScheduleApi } from "#/models/hr/work-schedule";
+import type { VbenFormProps } from '#/adapter/form';
+import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { WorkScheduleApi } from '#/models/hr/work-schedule';
 
-import { markRaw } from "vue";
+import { markRaw } from 'vue';
 
-import { Page, useVbenDrawer } from "@vben/common-ui";
-import { IconifyIcon } from "@vben/icons";
-import { formatDate } from "@vben/utils";
+import { Page, useVbenDrawer } from '@vben/common-ui';
+import { IconifyIcon } from '@vben/icons';
+import { formatDate } from '@vben/utils';
 
-import { NButton, NPopconfirm, NSpace, NSwitch, NTooltip } from "naive-ui";
+import { NButton, NPopconfirm, NSpace, NSwitch, NTooltip } from 'naive-ui';
 
-import { message } from "#/adapter/naive";
-import { useVbenVxeGrid } from "#/adapter/vxe-table";
-import { createWorkScheduleApi, deleteWorkScheduleApi, getWorkScheduleListApi } from "#/api";
-import EmployeeSearchSelect from "#/components/EmployeeSearchSelect.vue";
+import { message } from '#/adapter/naive';
+import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import {
+  createWorkScheduleApi,
+  deleteWorkScheduleApi,
+  getWorkScheduleListApi,
+} from '#/api';
+import EmployeeSearchSelect from '#/components/EmployeeSearchSelect.vue';
 
-import WorkScheduleForm from "./WorkScheduleForm.vue";
+import WorkScheduleForm from './WorkScheduleForm.vue';
 
 const DEFAULT_PAGE_SIZE = 10;
 
 function formatScheduleDate(value?: null | string) {
-  return value ? formatDate(value, "DD-MM-YYYY") : "-";
+  return value ? formatDate(value, 'DD-MM-YYYY') : '-';
 }
 
 function normalizeEmployeeIds(value: unknown) {
@@ -29,12 +33,12 @@ function normalizeEmployeeIds(value: unknown) {
     return value.length > 0 ? value : undefined;
   }
 
-  if (typeof value !== "string") {
+  if (typeof value !== 'string') {
     return undefined;
   }
 
   const ids = value
-    .split(",")
+    .split(',')
     .map((item) => item.trim())
     .filter(Boolean);
 
@@ -43,13 +47,13 @@ function normalizeEmployeeIds(value: unknown) {
 
 function formatDateToYmd(date: Date) {
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
 
 function normalizeDate(value: unknown) {
-  if (value === null || value === undefined || value === "") {
+  if (value === null || value === undefined || value === '') {
     return undefined;
   }
 
@@ -57,12 +61,12 @@ function normalizeDate(value: unknown) {
     return formatDateToYmd(value);
   }
 
-  if (typeof value === "number") {
+  if (typeof value === 'number') {
     const date = new Date(value);
     return Number.isNaN(date.getTime()) ? undefined : formatDateToYmd(date);
   }
 
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     const ymdMatch = /^\d{4}-\d{2}-\d{2}/.exec(value);
     if (ymdMatch) {
       return ymdMatch[0];
@@ -83,8 +87,12 @@ function normalizeDate(value: unknown) {
 function normalizeFormValues(formValues?: Record<string, any>) {
   const ids = normalizeEmployeeIds(formValues?.ids ?? formValues?.employeeIds);
   const dateRange = formValues?.dateRange;
-  const startDate = Array.isArray(dateRange) ? normalizeDate(dateRange[0]) : undefined;
-  const endDate = Array.isArray(dateRange) ? normalizeDate(dateRange[1]) : undefined;
+  const startDate = Array.isArray(dateRange)
+    ? normalizeDate(dateRange[0])
+    : undefined;
+  const endDate = Array.isArray(dateRange)
+    ? normalizeDate(dateRange[1])
+    : undefined;
 
   return {
     ...(ids ? { ids } : {}),
@@ -99,24 +107,24 @@ const formOptions: VbenFormProps = {
     {
       component: markRaw(EmployeeSearchSelect),
       componentProps: {
-        mode: "multiple",
-        placeholder: "Chọn nhân viên",
-        style: { minWidth: "240px" },
+        mode: 'multiple',
+        placeholder: 'Chọn nhân viên',
+        style: { minWidth: '240px' },
       },
-      fieldName: "ids",
-      label: "Nhân viên",
-      modelPropName: "modelValue",
+      fieldName: 'ids',
+      label: 'Nhân viên',
+      modelPropName: 'modelValue',
     },
     {
-      component: "DatePicker",
+      component: 'DatePicker',
       componentProps: {
         clearable: true,
-        format: "dd-MM-yyyy",
-        type: "daterange",
-        valueFormat: "yyyy-MM-dd",
+        format: 'dd-MM-yyyy',
+        type: 'daterange',
+        valueFormat: 'yyyy-MM-dd',
       },
-      fieldName: "dateRange",
-      label: "Ngày",
+      fieldName: 'dateRange',
+      label: 'Ngày',
     },
   ],
   showCollapseButton: false,
@@ -125,50 +133,50 @@ const formOptions: VbenFormProps = {
 };
 
 const gridOptions: VxeGridProps<WorkScheduleApi.WorkScheduleItem> = {
-  border: "full",
+  border: 'full',
   checkboxConfig: {
     highlight: true,
-    labelField: "employee",
+    labelField: 'employee',
   },
   columns: [
-    { title: "#", type: "seq", width: 50 },
+    { title: '#', type: 'seq', width: 50 },
     {
-      field: "date",
+      field: 'date',
       formatter: ({ cellValue }: any) => formatScheduleDate(cellValue),
-      title: "Ngày",
+      title: 'Ngày',
       width: 140,
     },
     {
-      field: "employee",
+      field: 'employee',
       minWidth: 180,
-      title: "Nhân viên",
+      title: 'Nhân viên',
     },
     {
-      field: "isApplyAll",
-      slots: { default: "applyAllCell" },
-      title: "Áp dụng tất cả",
+      field: 'isApplyAll',
+      slots: { default: 'applyAllCell' },
+      title: 'Áp dụng tất cả',
       width: 140,
     },
     {
-      field: "workshift",
+      field: 'workshift',
       minWidth: 220,
-      title: "Ca làm việc",
+      title: 'Ca làm việc',
     },
     {
-      field: "description",
+      field: 'description',
       minWidth: 180,
-      title: "Mô tả",
+      title: 'Mô tả',
     },
     {
-      field: "source",
-      title: "Nguồn",
+      field: 'source',
+      title: 'Nguồn',
       width: 140,
     },
     {
-      align: "center",
-      fixed: "right",
-      slots: { default: "actions" },
-      title: "Hành động",
+      align: 'center',
+      fixed: 'right',
+      slots: { default: 'actions' },
+      title: 'Hành động',
       width: 120,
     },
   ],
@@ -224,7 +232,7 @@ async function handleDelete(row: WorkScheduleApi.WorkScheduleItem) {
   }
 
   await deleteWorkScheduleApi(row.id);
-  message.success("Xóa lịch làm việc thành công");
+  message.success('Xóa lịch làm việc thành công');
   await gridApi.query();
 }
 
@@ -233,12 +241,12 @@ async function handleFormSubmit(
   original?: null | WorkScheduleApi.WorkScheduleItem,
 ) {
   if (original?.id) {
-    message.warning("Không cho phép cập nhật lịch làm việc");
+    message.warning('Không cho phép cập nhật lịch làm việc');
     return;
   }
 
   await createWorkScheduleApi(payload);
-  message.success("Tạo lịch làm việc thành công");
+  message.success('Tạo lịch làm việc thành công');
 
   drawerApi.close();
   await gridApi.query();

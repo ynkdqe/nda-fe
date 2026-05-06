@@ -1,26 +1,26 @@
 <script lang="ts" setup>
-import type { VbenFormProps } from "#/adapter/form";
-import type { VxeGridProps } from "#/adapter/vxe-table";
-import type { HolidayApi, HolidayTypeOption } from "#/models/hr/holiday";
+import type { VbenFormProps } from '#/adapter/form';
+import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { HolidayApi, HolidayTypeOption } from '#/models/hr/holiday';
 
-import { onMounted, ref } from "vue";
+import { onMounted, ref } from 'vue';
 
-import { Page, useVbenDrawer } from "@vben/common-ui";
-import { IconifyIcon } from "@vben/icons";
-import { formatDate } from "@vben/utils";
+import { Page, useVbenDrawer } from '@vben/common-ui';
+import { IconifyIcon } from '@vben/icons';
+import { formatDate } from '@vben/utils';
 
-import { NButton, NPopconfirm, NSpace, NTag, NTooltip } from "naive-ui";
+import { NButton, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui';
 
-import { message } from "#/adapter/naive";
-import { useVbenVxeGrid } from "#/adapter/vxe-table";
+import { message } from '#/adapter/naive';
+import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import {
   createHolidayApi,
   deleteHolidayApi,
   getHolidayListApi,
   getHolidayTypeOptionsApi,
-} from "#/api";
+} from '#/api';
 
-import HolidayForm from "./HolidayForm.vue";
+import HolidayForm from './HolidayForm.vue';
 
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -65,19 +65,22 @@ async function loadHolidayTypes() {
 }
 
 function formatHolidayDate(value?: null | string) {
-  return value ? formatDate(value, "DD-MM-YYYY") : "-";
+  return value ? formatDate(value, 'DD-MM-YYYY') : '-';
 }
 
 function formatHolidayDateTime(value?: null | string) {
-  return value ? formatDate(value, "DD-MM-YYYY HH:mm:ss") : "-";
+  return value ? formatDate(value, 'DD-MM-YYYY HH:mm:ss') : '-';
 }
 
 function getHolidayTypeLabel(type?: null | number | string) {
-  if (type === null || type === undefined || type === "") {
-    return "-";
+  if (type === null || type === undefined || type === '') {
+    return '-';
   }
 
-  return holidayTypes.value.find((item) => String(item.value) === String(type))?.label ?? "-";
+  return (
+    holidayTypes.value.find((item) => String(item.value) === String(type))
+      ?.label ?? '-'
+  );
 }
 
 function normalizeFormValues(formValues?: Record<string, any>) {
@@ -97,23 +100,23 @@ const formOptions: VbenFormProps = {
   collapsed: false,
   schema: [
     {
-      component: "Input",
+      component: 'Input',
       componentProps: {
-        placeholder: "Nhập tên hoặc mô tả ngày nghỉ",
+        placeholder: 'Nhập tên hoặc mô tả ngày nghỉ',
       },
-      fieldName: "keyword",
-      label: "Từ khóa",
+      fieldName: 'keyword',
+      label: 'Từ khóa',
     },
     {
-      component: "DatePicker",
+      component: 'DatePicker',
       componentProps: {
         clearable: true,
-        format: "dd-MM-yyyy",
-        type: "daterange",
-        valueFormat: "yyyy-MM-dd",
+        format: 'dd-MM-yyyy',
+        type: 'daterange',
+        valueFormat: 'yyyy-MM-dd',
       },
-      fieldName: "rangeDate",
-      label: "Khoảng ngày",
+      fieldName: 'rangeDate',
+      label: 'Khoảng ngày',
     },
   ],
   showCollapseButton: false,
@@ -122,42 +125,42 @@ const formOptions: VbenFormProps = {
 };
 
 const gridOptions: VxeGridProps<HolidayApi.HolidayItem> = {
-  border: "full",
+  border: 'full',
   columns: [
-    { align: "center", title: "#", type: "seq", width: 60 },
+    { align: 'center', title: '#', type: 'seq', width: 60 },
     {
-      field: "name",
+      field: 'name',
       minWidth: 160,
-      title: "Tên ngày nghỉ",
+      title: 'Tên ngày nghỉ',
     },
     {
-      field: "type",
-      slots: { default: "typeCell" },
-      title: "Loại",
+      field: 'type',
+      slots: { default: 'typeCell' },
+      title: 'Loại',
       width: 160,
     },
     {
-      field: "date",
+      field: 'date',
       formatter: ({ cellValue }: any) => formatHolidayDate(cellValue),
-      title: "Ngày",
+      title: 'Ngày',
       width: 140,
     },
     {
-      field: "description",
+      field: 'description',
       minWidth: 180,
-      title: "Mô tả",
+      title: 'Mô tả',
     },
     {
-      field: "creationTime",
+      field: 'creationTime',
       formatter: ({ cellValue }: any) => formatHolidayDateTime(cellValue),
-      title: "Ngày tạo",
+      title: 'Ngày tạo',
       width: 180,
     },
     {
-      align: "center",
-      fixed: "right",
-      slots: { default: "actions" },
-      title: "Hành động",
+      align: 'center',
+      fixed: 'right',
+      slots: { default: 'actions' },
+      title: 'Hành động',
       width: 100,
     },
   ],
@@ -210,10 +213,10 @@ function handleAdd() {
 
 async function handleFormSubmit(payload: Record<string, any>) {
   if (currentEditId.value) {
-    message.info("Chưa có API cập nhật ngày nghỉ");
+    message.info('Chưa có API cập nhật ngày nghỉ');
   } else {
     await createHolidayApi(payload);
-    message.success("Tạo ngày nghỉ thành công");
+    message.success('Tạo ngày nghỉ thành công');
   }
 
   drawerApi.close();
@@ -226,7 +229,7 @@ async function handleDelete(row: HolidayApi.HolidayItem) {
   }
 
   await deleteHolidayApi(row.id);
-  message.success("Xóa ngày nghỉ thành công");
+  message.success('Xóa ngày nghỉ thành công');
   await gridApi.query();
 }
 

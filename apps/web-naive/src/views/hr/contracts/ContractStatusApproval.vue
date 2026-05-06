@@ -6,11 +6,11 @@ import type {
   ContractStatusValue,
   EmployeeModelValue,
   EmployeeSelectValue,
-} from "#/models/hr/contract";
+} from '#/models/hr/contract';
 
-import { NDivider, NFormItem, NInput, NSelect } from "naive-ui";
+import { NDivider, NFormItem, NInput, NSelect } from 'naive-ui';
 
-import EmployeeSearchSelect from "#/components/EmployeeSearchSelect.vue";
+import EmployeeSearchSelect from '#/components/EmployeeSearchSelect.vue';
 
 const props = defineProps<{
   form: ContractStatusApprovalForm;
@@ -18,14 +18,14 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  "update:form": [value: ContractStatusApprovalForm];
+  'update:form': [value: ContractStatusApprovalForm];
 }>();
 
 function updateField(
   field: ContractStatusField,
   value: ContractStatusValue | EmployeeSelectValue[],
 ) {
-  emit("update:form", {
+  emit('update:form', {
     ...props.form,
     [field]: value,
   });
@@ -36,14 +36,14 @@ function getStatusValue() {
   return value === null || value === undefined ? null : value;
 }
 
-function getEmployeeValue(field: "approver" | "checkers"): EmployeeModelValue {
+function getEmployeeValue(field: 'approver' | 'checkers'): EmployeeModelValue {
   const value = props.form[field];
 
   if (Array.isArray(value)) {
     return value;
   }
 
-  if (typeof value === "number" || typeof value === "string") {
+  if (typeof value === 'number' || typeof value === 'string') {
     return value;
   }
 
@@ -52,7 +52,7 @@ function getEmployeeValue(field: "approver" | "checkers"): EmployeeModelValue {
 
 function getNotesValue() {
   const value = props.form.notes;
-  return typeof value === "string" ? value : "";
+  return typeof value === 'string' ? value : '';
 }
 </script>
 
