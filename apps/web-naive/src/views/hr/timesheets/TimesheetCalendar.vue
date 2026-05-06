@@ -1,33 +1,14 @@
 <script lang="ts" setup>
-import type { TimesheetApi } from '#/api';
+import type {
+  TimesheetApi,
+  TimesheetCalendarBadge,
+  TimesheetCalendarDay,
+  TimesheetCalendarEntryType,
+} from "#/models/hr/timesheet";
 
-import { computed } from 'vue';
+import { computed } from "vue";
 
-import { NButton, NCard, NSpin } from 'naive-ui';
-
-type EntryType = 'absent' | 'holiday' | 'late' | 'missing' | 'work';
-
-export interface TimesheetCalendarEntry {
-  label?: string;
-  note?: string;
-  timeRange: string;
-  type: EntryType;
-}
-
-export interface TimesheetCalendarBadge {
-  text: string;
-  type?: 'danger' | 'default' | 'primary' | 'purple' | 'success' | 'warning';
-}
-
-export interface TimesheetCalendarDay {
-  badges?: TimesheetCalendarBadge[];
-  date: string;
-  entries: TimesheetCalendarEntry[];
-  highlight?: {
-    type?: 'danger' | 'primary' | 'success' | 'warning';
-    value: string;
-  };
-}
+import { NButton, NCard, NSpin } from "naive-ui";
 
 const props = defineProps<{
   loading?: boolean;
@@ -39,18 +20,18 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  'update:modelValue': [string];
-  'update:selectedDate': [string];
+  "update:modelValue": [string];
+  "update:selectedDate": [string];
 }>();
 
-const weekDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+const weekDays = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
 
 function pad(value: number) {
-  return String(value).padStart(2, '0');
+  return String(value).padStart(2, "0");
 }
 
 function toDateKey(value: Date | string) {
-  const date = typeof value === 'string' ? new Date(value) : value;
+  const date = typeof value === "string" ? new Date(value) : value;
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
@@ -59,13 +40,13 @@ function parseDateKey(value?: string) {
     return new Date();
   }
 
-  const [year, month, day] = value.split('-').map(Number);
+  const [year, month, day] = value.split("-").map(Number);
   return new Date(year || new Date().getFullYear(), (month || 1) - 1, day || 1);
 }
 
 function formatTime(value?: null | string) {
   if (!value) {
-    return '--:--';
+    return "--:--";
   }
 
   const date = new Date(value);
@@ -78,15 +59,15 @@ function isSameDay(left: string, right: string) {
 
 const calendarValue = computed({
   get: () => props.modelValue ?? toDateKey(new Date()),
-  set: (value: string) => emit('update:modelValue', value),
+  set: (value: string) => emit("update:modelValue", value),
 });
 
 const calendarDate = computed(() => parseDateKey(calendarValue.value));
 
 const monthLabel = computed(() => {
-  return new Intl.DateTimeFormat('vi-VN', {
-    month: 'long',
-    year: 'numeric',
+  return new Intl.DateTimeFormat("vi-VN", {
+    month: "long",
+    year: "numeric",
   }).format(calendarDate.value);
 });
 
@@ -101,43 +82,42 @@ const calendarData = computed(() => {
     const dateKey = toDateKey(record.dateSheet);
     const isHoliday = !!record.holiday;
     const badges: TimesheetCalendarBadge[] = [];
-    let entryType: EntryType = 'work';
+    let entryType: TimesheetCalendarEntryType = "work";
 
     if (isHoliday) {
-      entryType = 'holiday';
-      badges.push({ text: 'Ngày nghỉ', type: 'purple' });
+      entryType = "holiday";
+      badges.push({ text: "Ngày nghỉ", type: "purple" });
     } else if (record.isAbsent) {
-      entryType = 'absent';
-      badges.push({ text: 'Vắng', type: 'danger' });
+      entryType = "absent";
+      badges.push({ text: "Vắng", type: "danger" });
     } else if (record.isMissing) {
-      entryType = 'missing';
-      badges.push({ text: 'Thiếu công', type: 'danger' });
+      entryType = "missing";
+      badges.push({ text: "Thiếu công", type: "danger" });
     } else if (record.isLate) {
-      entryType = 'late';
-      badges.push({ text: 'Đi muộn', type: 'warning' });
+      entryType = "late";
+      badges.push({ text: "Đi muộn", type: "warning" });
     }
 
     const workPoint = record.workshift?.workPoint ?? 1;
     const actualPoint = record.actualPoint ?? 0;
-    let highlightType: 'danger' | 'primary' | 'success' | 'warning' = 'primary';
+    let highlightType: "danger" | "primary" | "success" | "warning" = "primary";
 
     if (actualPoint === 0) {
-      highlightType = 'danger';
+      highlightType = "danger";
     } else if (actualPoint === workPoint) {
-      highlightType = 'success';
+      highlightType = "success";
     } else if (actualPoint > 0 && actualPoint < workPoint) {
-      highlightType = 'warning';
+      highlightType = "warning";
     } else if (isHoliday) {
-      highlightType = 'warning';
+      highlightType = "warning";
     }
 
-    const holidayLabel =
-      record.holiday?.holidayTypeName ?? record.holiday?.name ?? 'Ngày nghỉ';
+    const holidayLabel = record.holiday?.holidayTypeName ?? record.holiday?.name ?? "Ngày nghỉ";
     const isUnpaidHoliday = isHoliday && record.holiday?.isPaid === false;
 
     result[dateKey] = isUnpaidHoliday
       ? {
-          badges: [{ text: holidayLabel, type: 'default' }],
+          badges: [{ text: holidayLabel, type: "default" }],
           date: dateKey,
           entries: [],
         }
@@ -148,16 +128,15 @@ const calendarData = computed(() => {
             ? [
                 {
                   label: holidayLabel,
-                  note: record.holiday?.description ?? record.description ?? '',
-                  timeRange: '',
-                  type: 'holiday',
+                  note: record.holiday?.description ?? record.description ?? "",
+                  timeRange: "",
+                  type: "holiday",
                 },
               ]
             : [
                 {
-                  label:
-                    record.workshift?.nameAscii ?? record.workshift?.name ?? '',
-                  note: record.description ?? '',
+                  label: record.workshift?.nameAscii ?? record.workshift?.name ?? "",
+                  note: record.description ?? "",
                   timeRange: `${formatTime(record.checkIn)} - ${formatTime(record.checkOut)}`,
                   type: entryType,
                 },
@@ -173,11 +152,7 @@ const calendarData = computed(() => {
 });
 
 const monthDays = computed(() => {
-  const firstDay = new Date(
-    calendarDate.value.getFullYear(),
-    calendarDate.value.getMonth(),
-    1,
-  );
+  const firstDay = new Date(calendarDate.value.getFullYear(), calendarDate.value.getMonth(), 1);
   const mondayOffset = (firstDay.getDay() + 6) % 7;
   const start = new Date(firstDay);
   start.setDate(firstDay.getDate() - mondayOffset);
@@ -221,7 +196,7 @@ function changeMonth(offset: number) {
   date.setMonth(date.getMonth() + offset, 1);
   const next = toDateKey(date);
   calendarValue.value = next;
-  emit('update:selectedDate', next);
+  emit("update:selectedDate", next);
 }
 
 function getDay(value: Date) {
@@ -245,19 +220,19 @@ function selectDate(value: Date) {
     return;
   }
 
-  emit('update:selectedDate', toDateKey(value));
+  emit("update:selectedDate", toDateKey(value));
 }
 
-function entryClass(type: EntryType) {
+function entryClass(type: TimesheetCalendarEntryType) {
   return `calendar-entry--${type}`;
 }
 
 function highlightClass(type?: string) {
-  return type ? `calendar-highlight--${type}` : 'calendar-highlight--primary';
+  return type ? `calendar-highlight--${type}` : "calendar-highlight--primary";
 }
 
 function badgeClass(type?: string) {
-  return type ? `calendar-badge--${type}` : 'calendar-badge--default';
+  return type ? `calendar-badge--${type}` : "calendar-badge--default";
 }
 </script>
 
@@ -265,21 +240,11 @@ function badgeClass(type?: string) {
   <NCard class="calendar-card" :bordered="false">
     <template #header>
       <div class="calendar-toolbar">
-        <NButton
-          size="small"
-          quaternary
-          :disabled="!canGoMonth(-1)"
-          @click="changeMonth(-1)"
-        >
+        <NButton size="small" quaternary :disabled="!canGoMonth(-1)" @click="changeMonth(-1)">
           Tháng trước
         </NButton>
         <div class="calendar-title">{{ monthLabel }}</div>
-        <NButton
-          size="small"
-          quaternary
-          :disabled="!canGoMonth(1)"
-          @click="changeMonth(1)"
-        >
+        <NButton size="small" quaternary :disabled="!canGoMonth(1)" @click="changeMonth(1)">
           Tháng sau
         </NButton>
       </div>
@@ -326,10 +291,7 @@ function badgeClass(type?: string) {
               <div v-if="entry.timeRange" class="calendar-entry__time">
                 {{ entry.timeRange }}
               </div>
-              <div
-                v-if="entry.type !== 'holiday'"
-                class="calendar-entry__label"
-              >
+              <div v-if="entry.type !== 'holiday'" class="calendar-entry__label">
                 {{ entry.label }}
               </div>
               <div v-if="entry.note" class="calendar-entry__note">
@@ -338,10 +300,7 @@ function badgeClass(type?: string) {
             </div>
           </div>
 
-          <div
-            v-if="(getDay(day)?.badges ?? []).length > 0"
-            class="calendar-cell__badges"
-          >
+          <div v-if="(getDay(day)?.badges ?? []).length > 0" class="calendar-cell__badges">
             <span
               v-for="badge in getDay(day)?.badges ?? []"
               :key="badge.text + badge.type"

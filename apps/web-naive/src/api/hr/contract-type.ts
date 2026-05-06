@@ -1,54 +1,6 @@
+import type { ContractTypeApi } from "#/models/hr/contract-type";
+
 import { requestClient } from "#/api/request";
-
-export namespace ContractTypeApi {
-  export interface DurationItem {
-    description?: null | string;
-    duration?: null | number;
-    id?: null | number | string;
-    name?: null | string;
-    unit?: null | string;
-  }
-
-  export interface ContractTypeItem {
-    businessHealthInsurancePercent?: null | number | string;
-    businessOccAccInsurancePercent?: null | number | string;
-    businessSocialInsurancePercent?: null | number | string;
-    businessUnemploymentInsurancePercent?: null | number | string;
-    code?: null | string;
-    creationTime?: null | string;
-    durations?: DurationItem[];
-    employeeHealthInsurancePercent?: null | number | string;
-    employeeMinTaxSalary?: null | number | string;
-    employeeSocialInsurancePercent?: null | number | string;
-    employeeUnionPercent?: null | number | string;
-    employeeUnemployeeInsurancePercent?: null | number | string;
-
-    hasSocialInsurance?: boolean | null;
-    id: number | string;
-    isTaxFixed?: boolean | null;
-    minInsuranceSalary?: null | number | string;
-    modificationTime?: null | string;
-    name?: null | string;
-    taxPercent?: null | number | string;
-  }
-
-  export interface ContractTypeListParams {
-    keyword?: string;
-    page: number;
-    pageSize: number;
-  }
-
-  export interface ContractTypeListResult {
-    current?: number;
-    data?: ContractTypeItem[];
-    dataExtend?: unknown;
-    items?: ContractTypeItem[];
-    message?: null | string;
-    pageSize?: number;
-    success?: boolean;
-    total?: number;
-  }
-}
 
 export async function getContractTypeListApi(params: ContractTypeApi.ContractTypeListParams) {
   return requestClient.get<ContractTypeApi.ContractTypeListResult>("/api/hrms/contract-type", {

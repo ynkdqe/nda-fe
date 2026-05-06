@@ -1,15 +1,15 @@
 <script lang="ts" setup>
-import type { VbenFormProps } from '#/adapter/form';
-import type { VxeGridProps } from '#/adapter/vxe-table';
-import type { ContractTypeApi } from '#/api';
+import type { VbenFormProps } from "#/adapter/form";
+import type { VxeGridProps } from "#/adapter/vxe-table";
+import type { ContractTypeApi } from "#/models/hr/contract-type";
 
-import { Page, useVbenDrawer, useVbenModal } from '@vben/common-ui';
-import { IconifyIcon } from '@vben/icons';
+import { Page, useVbenDrawer, useVbenModal } from "@vben/common-ui";
+import { IconifyIcon } from "@vben/icons";
 
-import { NButton, NPopconfirm, NSpace, NSwitch, NTooltip } from 'naive-ui';
+import { NButton, NPopconfirm, NSpace, NSwitch, NTooltip } from "naive-ui";
 
-import { message } from '#/adapter/naive';
-import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { message } from "#/adapter/naive";
+import { useVbenVxeGrid } from "#/adapter/vxe-table";
 import {
   createContractTypeApi,
   deleteContractTypeApi,
@@ -17,26 +17,26 @@ import {
   getContractTypeListApi,
   updateContractTypeApi,
   updateContractTypeDurationsApi,
-} from '#/api';
+} from "#/api";
 
-import ContractTypeForm from './ContractTypeForm.vue';
-import DurationsModal from './DurationsModal.vue';
+import ContractTypeForm from "./ContractTypeForm.vue";
+import DurationsModal from "./DurationsModal.vue";
 
 const DEFAULT_PAGE_SIZE = 10;
 
 function numberFormatter(value?: null | number | string) {
-  if (value === null || value === undefined || value === '') {
-    return '-';
+  if (value === null || value === undefined || value === "") {
+    return "-";
   }
 
-  const normalized = String(value).replaceAll(',', '');
+  const normalized = String(value).replaceAll(",", "");
   const numberValue = Number(normalized);
 
   if (Number.isNaN(numberValue)) {
-    return '-';
+    return "-";
   }
 
-  return normalized.replaceAll(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return normalized.replaceAll(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 function normalizeFormValues(formValues?: Record<string, any>) {
@@ -49,80 +49,80 @@ function normalizeFormValues(formValues?: Record<string, any>) {
 
 const formOptions: VbenFormProps = {
   collapsed: false,
-  resetButtonOptions: { content: 'Đặt lại' },
+  resetButtonOptions: { content: "Đặt lại" },
   schema: [
     {
-      component: 'Input',
+      component: "Input",
       componentProps: {
-        placeholder: 'Nhập mã hoặc tên loại hợp đồng',
+        placeholder: "Nhập mã hoặc tên loại hợp đồng",
       },
-      fieldName: 'keyword',
-      label: 'Từ khóa',
+      fieldName: "keyword",
+      label: "Từ khóa",
     },
   ],
   showCollapseButton: true,
-  submitButtonOptions: { content: 'Tìm kiếm' },
+  submitButtonOptions: { content: "Tìm kiếm" },
   submitOnChange: false,
   submitOnEnter: true,
 };
 
 const gridOptions: VxeGridProps<ContractTypeApi.ContractTypeItem> = {
-  border: 'full',
+  border: "full",
   columns: [
-    { align: 'center', title: '#', type: 'seq', width: 60 },
+    { align: "center", title: "#", type: "seq", width: 60 },
     {
-      field: 'code',
-      title: 'Mã',
+      field: "code",
+      title: "Mã",
       width: 140,
     },
     {
-      field: 'name',
+      field: "name",
       minWidth: 220,
-      title: 'Tên loại hợp đồng',
+      title: "Tên loại hợp đồng",
     },
     {
-      field: 'hasSocialInsurance',
-      slots: { default: 'hasSICell' },
-      title: 'Đóng BHXH',
+      field: "hasSocialInsurance",
+      slots: { default: "hasSICell" },
+      title: "Đóng BHXH",
       width: 120,
     },
     {
-      field: 'isTaxFixed',
-      slots: { default: 'isTaxFixedCell' },
-      title: 'Thuế cố định',
+      field: "isTaxFixed",
+      slots: { default: "isTaxFixedCell" },
+      title: "Thuế cố định",
       width: 120,
     },
     {
-      field: 'taxPercent',
-      title: 'Thuế (%)',
+      field: "taxPercent",
+      title: "Thuế (%)",
       width: 120,
     },
     {
-      field: 'employeeSocialInsurancePercent',
-      title: 'BHXH NV (%)',
+      field: "employeeSocialInsurancePercent",
+      title: "BHXH NV (%)",
       width: 150,
     },
     {
-      field: 'employeeHealthInsurancePercent',
-      title: 'BHYT NV (%)',
+      field: "employeeHealthInsurancePercent",
+      title: "BHYT NV (%)",
       width: 150,
     },
     {
-      field: 'employeeUnemployeeInsurancePercent',
-      title: 'BHTN NV (%)',
+      field: "employeeUnemployeeInsurancePercent",
+      title: "BHTN NV (%)",
       width: 150,
     },
     {
-      field: 'minInsuranceSalary',
+      field: "minInsuranceSalary",
       formatter: ({ cellValue }: any) => numberFormatter(cellValue),
-      title: 'Lương BH tối thiểu',
+      title: "Lương BH tối thiểu",
       width: 170,
     },
     {
-      align: 'center',
-      fixed: 'right',
-      slots: { default: 'actions' },
-      title: 'Hành động',
+      align: "center",
+      fixed: "right",
+      slots: { default: "actions" },
+      title: "Hành động",
       width: 140,
     },
   ],
@@ -189,10 +189,10 @@ function openDurationsModal(row: ContractTypeApi.ContractTypeItem) {
 async function handleFormSubmit(payload: Record<string, any>) {
   if (payload?.id) {
     await updateContractTypeApi(payload.id, payload);
-    message.success('Cập nhật loại hợp đồng thành công');
+    message.success("Cập nhật loại hợp đồng thành công");
   } else {
     await createContractTypeApi(payload);
-    message.success('Tạo loại hợp đồng thành công');
+    message.success("Tạo loại hợp đồng thành công");
   }
 
   drawerApi.close();
@@ -204,7 +204,7 @@ async function handleDurationSubmit(data: {
   durations: ContractTypeApi.DurationItem[];
 }) {
   await updateContractTypeDurationsApi(data.contractTypeId, data.durations);
-  message.success('Lưu thời hạn hợp đồng thành công');
+  message.success("Lưu thời hạn hợp đồng thành công");
   modalApi.close();
   await gridApi.query();
 }
@@ -215,7 +215,7 @@ async function onDelete(row: ContractTypeApi.ContractTypeItem) {
   }
 
   await deleteContractTypeApi(row.id);
-  message.success('Xóa loại hợp đồng thành công');
+  message.success("Xóa loại hợp đồng thành công");
   await gridApi.query();
 }
 </script>
@@ -244,13 +244,7 @@ async function onDelete(row: ContractTypeApi.ContractTypeItem) {
         <NSpace justify="center" :size="4">
           <NTooltip trigger="hover">
             <template #trigger>
-              <NButton
-                circle
-                quaternary
-                size="small"
-                type="primary"
-                @click="handleEdit(row)"
-              >
+              <NButton circle quaternary size="small" type="primary" @click="handleEdit(row)">
                 <template #icon>
                   <IconifyIcon class="size-4" icon="lucide:pencil" />
                 </template>
@@ -261,13 +255,7 @@ async function onDelete(row: ContractTypeApi.ContractTypeItem) {
 
           <NTooltip trigger="hover">
             <template #trigger>
-              <NButton
-                circle
-                quaternary
-                size="small"
-                type="info"
-                @click="openDurationsModal(row)"
-              >
+              <NButton circle quaternary size="small" type="info" @click="openDurationsModal(row)">
                 <template #icon>
                   <IconifyIcon class="size-4" icon="lucide:clock" />
                 </template>

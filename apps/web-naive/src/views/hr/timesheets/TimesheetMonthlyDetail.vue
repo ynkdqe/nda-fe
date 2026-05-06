@@ -1,22 +1,12 @@
 <script lang="ts" setup>
-import { computed } from 'vue';
+import type {
+  TimesheetOverviewItem,
+  TimesheetStatisticItem,
+} from "#/models/hr/timesheet";
 
-import { NCard, NDivider, NProgress, NTag } from 'naive-ui';
+import { computed } from "vue";
 
-export interface TimesheetOverviewItem {
-  color?: 'danger' | 'primary' | 'success' | 'warning';
-  label: string;
-  total: number;
-  unit?: string;
-  value: number;
-}
-
-export interface TimesheetStatisticItem {
-  hint?: string;
-  label: string;
-  trend?: 'down' | 'up';
-  value: number | string;
-}
+import { NCard, NDivider, NProgress, NTag } from "naive-ui";
 
 const props = defineProps<{
   monthLabel: string;
@@ -26,27 +16,25 @@ const props = defineProps<{
 
 function overviewColor(item: TimesheetOverviewItem) {
   switch (item.color) {
-    case 'danger': {
-      return '#ff4d4f';
+    case "danger": {
+      return "#ff4d4f";
     }
-    case 'success': {
-      return '#52c41a';
+    case "success": {
+      return "#52c41a";
     }
-    case 'warning': {
-      return '#faad14';
+    case "warning": {
+      return "#faad14";
     }
     default: {
-      return '#1677ff';
+      return "#1677ff";
     }
   }
 }
 
 const normalizedOverview = computed(() => {
   return props.overview.map((item) => {
-    const percent = item.total
-      ? Math.min((item.value / item.total) * 100, 100)
-      : 0;
-    const text = `${item.value}${item.unit ?? ''}/${item.total}${item.unit ?? ''}`;
+    const percent = item.total ? Math.min((item.value / item.total) * 100, 100) : 0;
+    const text = `${item.value}${item.unit ?? ""}/${item.total}${item.unit ?? ""}`;
 
     return { ...item, percent, text };
   });
@@ -57,9 +45,7 @@ const normalizedOverview = computed(() => {
   <NCard class="timesheet-monthly-detail" :bordered="false">
     <div class="monthly-detail__header">
       <h3 class="monthly-detail__title">Tổng quan tháng {{ monthLabel }}</h3>
-      <p class="monthly-detail__subtitle">
-        Theo dõi công, giờ làm và trạng thái chấm công
-      </p>
+      <p class="monthly-detail__subtitle">Theo dõi công, giờ làm và trạng thái chấm công</p>
     </div>
 
     <div class="monthly-detail__overview">
@@ -81,18 +67,11 @@ const normalizedOverview = computed(() => {
     <NDivider class="monthly-detail__divider">Ngày công</NDivider>
 
     <div class="monthly-detail__stats">
-      <div
-        v-for="stat in statistics"
-        :key="stat.label"
-        class="monthly-detail__stat-item"
-      >
+      <div v-for="stat in statistics" :key="stat.label" class="monthly-detail__stat-item">
         <div class="monthly-detail__stat-label">{{ stat.label }}</div>
         <div class="monthly-detail__stat-value">{{ stat.value }}</div>
-        <NTag
-          v-if="stat.trend"
-          :type="stat.trend === 'up' ? 'success' : 'warning'"
-        >
-          {{ stat.trend === 'up' ? 'Tăng' : 'Cần chú ý' }}
+        <NTag v-if="stat.trend" :type="stat.trend === 'up' ? 'success' : 'warning'">
+          {{ stat.trend === "up" ? "Tăng" : "Cần chú ý" }}
         </NTag>
       </div>
     </div>

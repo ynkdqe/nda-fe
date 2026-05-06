@@ -1,38 +1,16 @@
 <script setup lang="ts">
-import type { SelectOption } from 'naive-ui';
+import type { SelectOption } from "naive-ui";
 
-import { computed } from 'vue';
+import type {
+  ContractEmployeeCostField,
+  ContractEmployeeCostsForm,
+  ContractEmployeeCostValue,
+  ContractEmployeeFeeItem,
+} from "#/models/hr/contract";
 
-import {
-  NCollapse,
-  NCollapseItem,
-  NDivider,
-  NFormItem,
-  NInputNumber,
-  NSelect,
-} from 'naive-ui';
+import { computed } from "vue";
 
-type ContractEmployeeCostValue = null | number | string | undefined;
-type ContractEmployeeCostField =
-  | 'employeeHealthInsuranceFee'
-  | 'employeeSocialInsuranceFee'
-  | 'employeeUnemploymentInsuranceFee'
-  | 'employeeUnionFee'
-  | 'insuranceSalary'
-  | 'insuranceType'
-  | 'insuranceValue'
-  | 'taxFee';
-
-type ContractEmployeeCostsForm = Partial<
-  Record<ContractEmployeeCostField, ContractEmployeeCostValue>
-> &
-  Record<string, unknown>;
-
-interface FeeItem {
-  field: ContractEmployeeCostField;
-  label: string;
-  placeholder?: string;
-}
+import { NCollapse, NCollapseItem, NDivider, NFormItem, NInputNumber, NSelect } from "naive-ui";
 
 const props = defineProps<{
   feesTotal: number;
@@ -44,41 +22,38 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   insuranceValueChange: [value: number];
-  'update:form': [value: ContractEmployeeCostsForm];
+  "update:form": [value: ContractEmployeeCostsForm];
 }>();
 
 const insuranceSalaryHelpText = computed(() => {
-  if (
-    props.form.insuranceSalary === undefined ||
-    props.form.insuranceSalary === null
-  ) {
+  if (props.form.insuranceSalary === undefined || props.form.insuranceSalary === null) {
     return undefined;
   }
 
   return `Lương đóng bảo hiểm: ${props.numberFormatter(props.form.insuranceSalary)}`;
 });
 
-const feeItems: FeeItem[] = [
+const feeItems: ContractEmployeeFeeItem[] = [
   {
-    field: 'employeeSocialInsuranceFee',
-    label: 'BHXH nhân viên',
-    placeholder: 'Xã hội',
+    field: "employeeSocialInsuranceFee",
+    label: "BHXH nhân viên",
+    placeholder: "Xã hội",
   },
   {
-    field: 'employeeHealthInsuranceFee',
-    label: 'BHYT nhân viên',
+    field: "employeeHealthInsuranceFee",
+    label: "BHYT nhân viên",
   },
   {
-    field: 'employeeUnemploymentInsuranceFee',
-    label: 'BHTN nhân viên',
+    field: "employeeUnemploymentInsuranceFee",
+    label: "BHTN nhân viên",
   },
   {
-    field: 'employeeUnionFee',
-    label: 'Phí công đoàn',
+    field: "employeeUnionFee",
+    label: "Phí công đoàn",
   },
   {
-    field: 'taxFee',
-    label: 'Thuế TNCN',
+    field: "taxFee",
+    label: "Thuế TNCN",
   },
 ];
 
@@ -90,11 +65,11 @@ function getSelectValue(field: ContractEmployeeCostField) {
 function getNumberValue(field: ContractEmployeeCostField) {
   const value = props.form[field];
 
-  if (typeof value === 'number' && Number.isFinite(value)) {
+  if (typeof value === "number" && Number.isFinite(value)) {
     return value;
   }
 
-  if (typeof value === 'string' && value.trim()) {
+  if (typeof value === "string" && value.trim()) {
     const numericValue = Number(value);
     return Number.isNaN(numericValue) ? null : numericValue;
   }
@@ -105,11 +80,11 @@ function getNumberValue(field: ContractEmployeeCostField) {
 function parseNumber(value: string) {
   const parsedValue = props.numberParser(value);
 
-  if (typeof parsedValue === 'number' && Number.isFinite(parsedValue)) {
+  if (typeof parsedValue === "number" && Number.isFinite(parsedValue)) {
     return parsedValue;
   }
 
-  if (typeof parsedValue === 'string' && parsedValue.trim()) {
+  if (typeof parsedValue === "string" && parsedValue.trim()) {
     const numericValue = Number(parsedValue);
     return Number.isNaN(numericValue) ? null : numericValue;
   }
@@ -117,17 +92,14 @@ function parseNumber(value: string) {
   return null;
 }
 
-function updateField(
-  field: ContractEmployeeCostField,
-  value: ContractEmployeeCostValue,
-) {
-  emit('update:form', {
+function updateField(field: ContractEmployeeCostField, value: ContractEmployeeCostValue) {
+  emit("update:form", {
     ...props.form,
     [field]: value,
   });
 
-  if (field === 'insuranceValue' && typeof value === 'number') {
-    emit('insuranceValueChange', value);
+  if (field === "insuranceValue" && typeof value === "number") {
+    emit("insuranceValueChange", value);
   }
 }
 
@@ -175,11 +147,7 @@ function getFeesHeader() {
         <NCollapse :bordered="false">
           <NCollapseItem :title="getFeesHeader()" name="fees">
             <div class="-mx-1 flex w-full flex-wrap">
-              <div
-                v-for="item in feeItems"
-                :key="item.field"
-                class="w-full px-1 md:w-1/5"
-              >
+              <div v-for="item in feeItems" :key="item.field" class="w-full px-1 md:w-1/5">
                 <div class="mb-1 text-xs text-gray-500">{{ item.label }}</div>
                 <NInputNumber
                   :format="numberFormatter"

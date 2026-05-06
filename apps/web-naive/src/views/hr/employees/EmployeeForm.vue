@@ -5,7 +5,7 @@ import type { EmployeeApi } from '#/api';
 import type {
   EmployeeBankFormItem,
   EmployeeFormData,
-} from '#/models/hr/employee/employee';
+} from '#/models/hr/employee';
 
 import { computed, nextTick, reactive, ref, watch } from 'vue';
 

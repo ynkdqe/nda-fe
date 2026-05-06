@@ -1,4 +1,4 @@
-import type { NullableSelectValue, NullableString } from '#/utils/normalize';
+import type { NullableSelectValue, NullableString } from "#/utils/normalize";
 
 export interface EmployeeBankFormItem {
   accountName: string;
