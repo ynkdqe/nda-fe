@@ -9,22 +9,22 @@ import type {
   NullableNumber,
   SalaryConfig,
   UnknownRecord,
-} from "#/models/hr/contract";
+} from '#/models/hr/contract';
 
-import { computed, reactive, ref, watch } from "vue";
+import { computed, reactive, ref, watch } from 'vue';
 
-import { useVbenDrawer } from "@vben/common-ui";
-import { formatDate } from "@vben/utils";
+import { useVbenDrawer } from '@vben/common-ui';
+import { formatDate } from '@vben/utils';
 
-import { NDatePicker, NForm, NFormItem, NSelect } from "naive-ui";
+import { NDatePicker, NForm, NFormItem, NSelect } from 'naive-ui';
 
-import { message } from "#/adapter/naive";
+import { message } from '#/adapter/naive';
 
-import ContractEmployerCosts from "./ContractBusinessCosts.vue";
-import ContractEmployeeCosts from "./ContractEmployeeCosts.vue";
-import ContractEmployeeInfo from "./ContractEmployeeInfo.vue";
-import ContractSalaryInfo from "./ContractSalaryInfo.vue";
-import ContractStatusApproval from "./ContractStatusApproval.vue";
+import ContractEmployerCosts from './ContractBusinessCosts.vue';
+import ContractEmployeeCosts from './ContractEmployeeCosts.vue';
+import ContractEmployeeInfo from './ContractEmployeeInfo.vue';
+import ContractSalaryInfo from './ContractSalaryInfo.vue';
+import ContractStatusApproval from './ContractStatusApproval.vue';
 
 const props = withDefaults(
   defineProps<{
@@ -46,7 +46,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   cancel: [];
   submit: [value: UnknownRecord];
-  "update:modelValue": [value: Partial<ContractFormModel>];
+  'update:modelValue': [value: Partial<ContractFormModel>];
 }>();
 
 function createInitialForm(): ContractFormModel {
@@ -99,11 +99,13 @@ const statusOptions = ref<ContractSelectOption[]>([]);
 const insuranceValueUserEdited = ref(false);
 
 const defaultInsuranceTypes = computed<ContractSelectOption[]>(() => [
-  { label: "Cố định", value: 1 },
-  { label: "%", value: 2 },
+  { label: 'Cố định', value: 1 },
+  { label: '%', value: 2 },
 ]);
 
-const insuranceTypes = computed(() => props.insuranceTypeOptions ?? defaultInsuranceTypes.value);
+const insuranceTypes = computed(
+  () => props.insuranceTypeOptions ?? defaultInsuranceTypes.value,
+);
 
 const durationsOptions = computed<ContractSelectOption[]>(() => {
   if (!form.contractTypeId) {
@@ -118,7 +120,7 @@ const durationsOptions = computed<ContractSelectOption[]>(() => {
   return durations.map((duration) => {
     const value = toNumber(duration.duration, 0);
     return {
-      label: duration.name ?? String(duration.duration ?? ""),
+      label: duration.name ?? String(duration.duration ?? ''),
       value,
     };
   });
@@ -133,18 +135,18 @@ const feesTotal = computed(() => {
   );
 });
 
-const title = computed(() => (form.id ? "Sửa hợp đồng" : "Tạo hợp đồng"));
+const title = computed(() => (form.id ? 'Sửa hợp đồng' : 'Tạo hợp đồng'));
 
 function isRecord(value: unknown): value is UnknownRecord {
-  return Boolean(value && typeof value === "object" && !Array.isArray(value));
+  return Boolean(value && typeof value === 'object' && !Array.isArray(value));
 }
 
 function toNumber(value: unknown, fallback = 0) {
-  if (typeof value === "number" && Number.isFinite(value)) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
     return value;
   }
 
-  if (typeof value === "string" && value.trim()) {
+  if (typeof value === 'string' && value.trim()) {
     const numericValue = Number(value);
     return Number.isNaN(numericValue) ? fallback : numericValue;
   }
@@ -153,15 +155,15 @@ function toNumber(value: unknown, fallback = 0) {
 }
 
 function toTimestamp(value: unknown): NullableNumber {
-  if (value === null || value === undefined || value === "") {
+  if (value === null || value === undefined || value === '') {
     return null;
   }
 
-  if (typeof value === "number" && Number.isFinite(value)) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
     return value;
   }
 
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     const timestamp = new Date(value).getTime();
     return Number.isNaN(timestamp) ? null : timestamp;
   }
@@ -171,7 +173,7 @@ function toTimestamp(value: unknown): NullableNumber {
 
 function toDateString(value: unknown) {
   const timestamp = toTimestamp(value) ?? Date.now();
-  return formatDate(timestamp, "YYYY-MM-DD");
+  return formatDate(timestamp, 'YYYY-MM-DD');
 }
 
 function getRecordValue(record: UnknownRecord, key: string) {
@@ -180,13 +182,13 @@ function getRecordValue(record: UnknownRecord, key: string) {
 
 function getStringValue(record: UnknownRecord, key: string) {
   const value = getRecordValue(record, key);
-  return typeof value === "string" ? value : null;
+  return typeof value === 'string' ? value : null;
 }
 
 function getIdValue(record: UnknownRecord, key: string): Id | undefined {
   const value = getRecordValue(record, key);
 
-  if (typeof value === "number" || typeof value === "string") {
+  if (typeof value === 'number' || typeof value === 'string') {
     return value;
   }
 
@@ -196,7 +198,7 @@ function getIdValue(record: UnknownRecord, key: string): Id | undefined {
 function getNumberValue(record: UnknownRecord, key: string): NullableNumber {
   const value = getRecordValue(record, key);
 
-  if (value === null || value === undefined || value === "") {
+  if (value === null || value === undefined || value === '') {
     return null;
   }
 
@@ -204,7 +206,10 @@ function getNumberValue(record: UnknownRecord, key: string): NullableNumber {
 }
 
 function normalizeRecord(
-  record?: null | Partial<ContractApi.ContractItem> | Partial<ContractFormModel>,
+  record?:
+    | null
+    | Partial<ContractApi.ContractItem>
+    | Partial<ContractFormModel>,
 ) {
   const initialValue = createInitialForm();
 
@@ -215,27 +220,34 @@ function normalizeRecord(
   return {
     ...initialValue,
     ...record,
-    allowance: getNumberValue(record, "allowance"),
-    approver: getIdValue(record, "approver"),
-    basicSalary: getNumberValue(record, "basicSalary"),
-    birthDate: getStringValue(record, "birthDate"),
-    checkers: Array.isArray(getRecordValue(record, "checkers"))
-      ? (getRecordValue(record, "checkers") as Id[])
+    allowance: getNumberValue(record, 'allowance'),
+    approver: getIdValue(record, 'approver'),
+    basicSalary: getNumberValue(record, 'basicSalary'),
+    birthDate: getStringValue(record, 'birthDate'),
+    checkers: Array.isArray(getRecordValue(record, 'checkers'))
+      ? (getRecordValue(record, 'checkers') as Id[])
       : [],
-    contractName: getStringValue(record, "contractName") ?? getStringValue(record, "name"),
-    contractTypeId: getIdValue(record, "contractTypeId") ?? getIdValue(record, "contractType"),
+    contractName:
+      getStringValue(record, 'contractName') ?? getStringValue(record, 'name'),
+    contractTypeId:
+      getIdValue(record, 'contractTypeId') ??
+      getIdValue(record, 'contractType'),
     effectiveDate: toTimestamp(record.effectiveDate),
-    employeeCode: getStringValue(record, "employeeCode"),
-    employeeId: getIdValue(record, "employeeId"),
-    employeeName: getStringValue(record, "employeeName"),
+    employeeCode: getStringValue(record, 'employeeCode'),
+    employeeId: getIdValue(record, 'employeeId'),
+    employeeName: getStringValue(record, 'employeeName'),
     expiryDate: toTimestamp(record.expiryDate),
-    insuranceType: getIdValue(record, "insuranceType") ?? 1,
-    insuranceValue: getNumberValue(record, "insuranceValue") ?? getNumberValue(record, "insurance"),
-    kpi: getNumberValue(record, "kpi"),
-    notes: getStringValue(record, "notes") ?? getStringValue(record, "note"),
-    salaryGross: getNumberValue(record, "salaryGross") ?? getNumberValue(record, "totalSalary"),
-    status: getIdValue(record, "status") ?? 1,
-    totalCost: getNumberValue(record, "totalCost"),
+    insuranceType: getIdValue(record, 'insuranceType') ?? 1,
+    insuranceValue:
+      getNumberValue(record, 'insuranceValue') ??
+      getNumberValue(record, 'insurance'),
+    kpi: getNumberValue(record, 'kpi'),
+    notes: getStringValue(record, 'notes') ?? getStringValue(record, 'note'),
+    salaryGross:
+      getNumberValue(record, 'salaryGross') ??
+      getNumberValue(record, 'totalSalary'),
+    status: getIdValue(record, 'status') ?? 1,
+    totalCost: getNumberValue(record, 'totalCost'),
   } satisfies ContractFormModel;
 }
 
@@ -253,16 +265,24 @@ function getContractDurations(contractType?: ContractTypeItem | null) {
   return Array.isArray(durations) ? durations : [];
 }
 
-function mapContractTypeToSalaryConfig(contractType: ContractTypeItem | null): SalaryConfig {
+function mapContractTypeToSalaryConfig(
+  contractType: ContractTypeItem | null,
+): SalaryConfig {
   return {
-    bHealthInsurance: toNumber(contractType?.businessHealthInsurancePercent, 0) / 100,
-    bOccAccInsurance: toNumber(contractType?.businessOccAccInsurancePercent, 0) / 100,
-    bSocialInsurance: toNumber(contractType?.businessSocialInsurancePercent, 0) / 100,
-    bUnemploymentInsurance: toNumber(contractType?.businessUnemploymentInsurancePercent, 0) / 100,
-    eHealthInsurancePercent: toNumber(contractType?.employeeHealthInsurancePercent, 0) / 100,
+    bHealthInsurance:
+      toNumber(contractType?.businessHealthInsurancePercent, 0) / 100,
+    bOccAccInsurance:
+      toNumber(contractType?.businessOccAccInsurancePercent, 0) / 100,
+    bSocialInsurance:
+      toNumber(contractType?.businessSocialInsurancePercent, 0) / 100,
+    bUnemploymentInsurance:
+      toNumber(contractType?.businessUnemploymentInsurancePercent, 0) / 100,
+    eHealthInsurancePercent:
+      toNumber(contractType?.employeeHealthInsurancePercent, 0) / 100,
     eIsTaxFixed: Boolean(contractType?.isTaxFixed),
     eMinTaxSalary: toNumber(contractType?.employeeMinTaxSalary, 0),
-    eSocialInsurancePercent: toNumber(contractType?.employeeSocialInsurancePercent, 0) / 100,
+    eSocialInsurancePercent:
+      toNumber(contractType?.employeeSocialInsurancePercent, 0) / 100,
     eTaxPercent: toNumber(contractType?.taxPercent, 0) / 100,
     eUnemployeeInsurancePercent:
       toNumber(contractType?.employeeUnemployeeInsurancePercent, 0) / 100,
@@ -274,13 +294,18 @@ function calculateInsuranceFee(insuranceSalary: number, percent: number) {
   return Number((insuranceSalary * percent).toFixed(2));
 }
 
-function calculateTaxFee(gross: number, taxValue: number, config: SalaryConfig) {
+function calculateTaxFee(
+  gross: number,
+  taxValue: number,
+  config: SalaryConfig,
+) {
   if (config.eIsTaxFixed) {
     return Number(taxValue.toFixed(2));
   }
 
   const taxableSalary = Math.max(gross - config.eMinTaxSalary, 0);
-  const percent = taxValue > 1 ? taxValue / 100 : taxValue || config.eTaxPercent;
+  const percent =
+    taxValue > 1 ? taxValue / 100 : taxValue || config.eTaxPercent;
   return Number((taxableSalary * percent).toFixed(2));
 }
 
@@ -293,25 +318,30 @@ function syncSelectedDurationFromContractName() {
   const contractName = String(form.contractName).trim();
   const durations = getContractDurations(selectedContractType.value);
   const matchedDuration = durations.find((duration) => {
-    const durationName = String(duration.name ?? "").trim();
-    return durationName === contractName || String(duration.duration ?? "") === contractName;
+    const durationName = String(duration.name ?? '').trim();
+    return (
+      durationName === contractName ||
+      String(duration.duration ?? '') === contractName
+    );
   });
 
-  selectedDurationValue.value = matchedDuration ? toNumber(matchedDuration.duration, 0) : null;
+  selectedDurationValue.value = matchedDuration
+    ? toNumber(matchedDuration.duration, 0)
+    : null;
 }
 
 function mapToOptions(list: UnknownRecord[]): ContractSelectOption[] {
   const options: ContractSelectOption[] = [];
 
   for (const item of list) {
-    const value = getIdValue(item, "id");
+    const value = getIdValue(item, 'id');
 
     if (value === undefined) {
       continue;
     }
 
     options.push({
-      label: getStringValue(item, "name") ?? String(value),
+      label: getStringValue(item, 'name') ?? String(value),
       value,
     });
   }
@@ -325,7 +355,9 @@ async function loadContractTypes() {
 
   contractTypeItems.value = list;
   contractTypes.value =
-    apiOptions.length > 0 ? apiOptions : (props.contractTypeOptions ?? contractTypes.value);
+    apiOptions.length > 0
+      ? apiOptions
+      : (props.contractTypeOptions ?? contractTypes.value);
 
   if (form.contractTypeId) {
     await loadSelectedContractType(form.contractTypeId);
@@ -343,15 +375,15 @@ async function loadSelectedContractType(contractTypeId?: Id) {
 }
 
 function numberFormatter(value: unknown) {
-  if (value === null || value === undefined || value === "") {
-    return "";
+  if (value === null || value === undefined || value === '') {
+    return '';
   }
 
-  return String(value).replaceAll(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return String(value).replaceAll(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 function numberParser(value: string) {
-  return value ? value.replaceAll(",", "") : value;
+  return value ? value.replaceAll(',', '') : value;
 }
 
 function markInsuranceValueEdited() {
@@ -360,7 +392,9 @@ function markInsuranceValueEdited() {
 
 function syncSelectedContractType() {
   selectedContractType.value =
-    contractTypeItems.value.find((item) => String(item.id) === String(form.contractTypeId)) ?? null;
+    contractTypeItems.value.find(
+      (item) => String(item.id) === String(form.contractTypeId),
+    ) ?? null;
 }
 
 async function onContractTypeChange(value: Id | null) {
@@ -396,13 +430,14 @@ function onEmployeeChange(value: EmployeeUpdateValue, option?: unknown) {
   form.employeeId = employeeId;
 
   if (isRecord(selectedOption)) {
-    form.employeeName = getStringValue(selectedOption, "name") ?? "";
-    form.employeeCode = getStringValue(selectedOption, "userName") ?? "";
-    form.email = getStringValue(selectedOption, "email") ?? "";
-    form.phone = getStringValue(selectedOption, "phone") ?? "";
-    form.identification = getStringValue(selectedOption, "identification") ?? "";
-    form.birthDate = getStringValue(selectedOption, "birthDate");
-    form.tax = getNumberValue(selectedOption, "taxCode");
+    form.employeeName = getStringValue(selectedOption, 'name') ?? '';
+    form.employeeCode = getStringValue(selectedOption, 'userName') ?? '';
+    form.email = getStringValue(selectedOption, 'email') ?? '';
+    form.phone = getStringValue(selectedOption, 'phone') ?? '';
+    form.identification =
+      getStringValue(selectedOption, 'identification') ?? '';
+    form.birthDate = getStringValue(selectedOption, 'birthDate');
+    form.tax = getNumberValue(selectedOption, 'taxCode');
   }
 }
 
@@ -415,7 +450,9 @@ function onDurationChange(value: null | number) {
   }
 
   const durations = getContractDurations(selectedContractType.value);
-  const duration = durations.find((item) => toNumber(item.duration, 0) === Number(value));
+  const duration = durations.find(
+    (item) => toNumber(item.duration, 0) === Number(value),
+  );
 
   form.contractName = duration?.name ?? String(value);
   applyDuration(value);
@@ -427,7 +464,7 @@ function applyDuration(months: number) {
 
   if (months === 0) {
     form.expiryDate = null;
-    message.success("Đã đặt hiệu lực hôm nay, vô thời hạn");
+    message.success('Đã đặt hiệu lực hôm nay, vô thời hạn');
     return;
   }
 
@@ -442,10 +479,12 @@ function handleSubmit() {
     allowance: form.allowance ?? 0,
     approver: form.approver,
     basicSalary: form.basicSalary ?? 0,
-    businessCalculateOccAccInsuranceFee: form.businessCalculateOccAccInsuranceFee ?? 0,
+    businessCalculateOccAccInsuranceFee:
+      form.businessCalculateOccAccInsuranceFee ?? 0,
     businessHealthInsuranceFee: form.businessHealthInsuranceFee ?? 0,
     businessSocialInsuranceFee: form.businessSocialInsuranceFee ?? 0,
-    businessUnemploymentInsuranceFee: form.businessUnemploymentInsuranceFee ?? 0,
+    businessUnemploymentInsuranceFee:
+      form.businessUnemploymentInsuranceFee ?? 0,
     checkers: form.checkers,
     contractName: form.contractName,
     contractTypeId: form.contractTypeId,
@@ -457,7 +496,7 @@ function handleSubmit() {
     insuranceSalary: form.insuranceSalary ?? 0,
     insuranceType: form.insuranceType,
     kpi: form.kpi ?? 0,
-    note: form.notes ?? "",
+    note: form.notes ?? '',
     salaryNet: form.salaryNet ?? 0,
     status: form.status,
     tax: form.tax ?? 0,
@@ -466,18 +505,20 @@ function handleSubmit() {
     totalSalary: form.salaryGross ?? 0,
   };
 
-  emit("submit", payload);
-  emit("update:modelValue", { ...form });
+  emit('submit', payload);
+  emit('update:modelValue', { ...form });
 }
 
-function resetFormWithRecord(record?: null | Partial<ContractApi.ContractItem>) {
+function resetFormWithRecord(
+  record?: null | Partial<ContractApi.ContractItem>,
+) {
   Object.assign(form, normalizeRecord(record));
   syncSelectedContractType();
 }
 
 const [Drawer, drawerApi] = useVbenDrawer({
   onCancel() {
-    emit("cancel");
+    emit('cancel');
     drawerApi.close();
   },
   onConfirm: handleSubmit,
@@ -556,13 +597,20 @@ watch(
 );
 
 watch(
-  () => [form.basicSalary, form.kpi, form.allowance, form.insuranceValue, form.taxFee],
+  () => [
+    form.basicSalary,
+    form.kpi,
+    form.allowance,
+    form.insuranceValue,
+    form.taxFee,
+  ],
   () => {
     const basic = toNumber(form.basicSalary, 0);
     const kpi = toNumber(form.kpi, 0);
     const allowance = toNumber(form.allowance, 0);
     const gross = Number((basic + kpi + allowance).toFixed(2));
-    const deductions = toNumber(form.insuranceValue, 0) + toNumber(form.taxFee, 0);
+    const deductions =
+      toNumber(form.insuranceValue, 0) + toNumber(form.taxFee, 0);
 
     form.salaryGross = gross;
     form.salaryNet = Number((gross - deductions).toFixed(2));
@@ -588,7 +636,12 @@ watch(
 );
 
 watch(
-  () => [form.insuranceSalary, form.contractTypeId, form.tax, selectedContractType.value],
+  () => [
+    form.insuranceSalary,
+    form.contractTypeId,
+    form.tax,
+    selectedContractType.value,
+  ],
   () => {
     const insuranceSalary = toNumber(form.insuranceSalary, 0);
     const gross = toNumber(form.salaryGross, 0);
@@ -644,7 +697,9 @@ watch(
       toNumber(form.businessHealthInsuranceFee, 0) +
       toNumber(form.businessUnemploymentInsuranceFee, 0);
 
-    form.totalCost = Number((toNumber(form.salaryGross, 0) + businessFeeTotal).toFixed(2));
+    form.totalCost = Number(
+      (toNumber(form.salaryGross, 0) + businessFeeTotal).toFixed(2),
+    );
   },
 );
 
@@ -668,7 +723,10 @@ watch(
   () => {
     insuranceValueUserEdited.value = false;
 
-    if (Number(form.insuranceType) === 1 && toNumber(form.insuranceValue, 0) === 0) {
+    if (
+      Number(form.insuranceType) === 1 &&
+      toNumber(form.insuranceValue, 0) === 0
+    ) {
       form.insuranceValue = Number(toNumber(form.basicSalary, 0).toFixed(2));
     }
   },
