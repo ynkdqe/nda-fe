@@ -257,8 +257,6 @@ function onDetail(row: EmployeeApi.EmployeeItem) {
 }
 
 function onFormSubmit(_formData: Record<string, any>) {
-  message.success('Lưu thông tin nhân viên thành công');
-  drawerApi.close();
   gridApi.query();
 }
 </script>

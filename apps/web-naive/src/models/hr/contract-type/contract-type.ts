@@ -53,6 +53,12 @@ export namespace ContractTypeApi {
     success?: boolean;
     total?: number;
   }
+
+  export type ContractTypeDetailResult =
+    | ContractTypeItem
+    | {
+        data?: ContractTypeItem;
+      };
 }
 
 export type ContractDurationItem = ContractTypeApi.DurationItem;

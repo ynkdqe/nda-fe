@@ -19,6 +19,7 @@ const routes: RouteRecordRaw[] = [
         meta: {
           icon: "lucide:calendar-check",
           title: $t("page.hr.attendance"),
+          keepAlive: true,
         },
       },
       {
@@ -28,6 +29,7 @@ const routes: RouteRecordRaw[] = [
         meta: {
           icon: "lucide:user-round",
           title: $t("page.hr.employees"),
+          keepAlive: true,
         },
       },
       {
@@ -37,6 +39,7 @@ const routes: RouteRecordRaw[] = [
         meta: {
           icon: "lucide:calculator",
           title: $t("page.hr.payroll"),
+          keepAlive: true,
         },
       },
       {
@@ -46,6 +49,7 @@ const routes: RouteRecordRaw[] = [
         meta: {
           icon: "lucide:file-signature",
           title: $t("page.hr.contracts"),
+          keepAlive: true,
         },
       },
       {
@@ -55,6 +59,7 @@ const routes: RouteRecordRaw[] = [
         meta: {
           icon: "lucide:files",
           title: $t("page.hr.contractTypes"),
+          keepAlive: true,
         },
       },
       {
@@ -64,6 +69,7 @@ const routes: RouteRecordRaw[] = [
         meta: {
           icon: "lucide:clock-3",
           title: $t("page.hr.workShifts"),
+          keepAlive: true,
         },
       },
       {
@@ -73,6 +79,7 @@ const routes: RouteRecordRaw[] = [
         meta: {
           icon: "lucide:calendar-days",
           title: $t("page.hr.workSchedules"),
+          keepAlive: true,
         },
       },
       {
@@ -82,6 +89,7 @@ const routes: RouteRecordRaw[] = [
         meta: {
           icon: "lucide:calendar-x",
           title: $t("page.hr.dayOffs"),
+          keepAlive: true,
         },
       },
     ],

@@ -1,7 +1,11 @@
 <script lang="ts" setup>
 import type { VbenFormProps } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
-import type { ContractApi, ContractSelectOption } from '#/models/hr/contract';
+import type {
+  ContractApi,
+  ContractSelectOption,
+  ContractTypeItem,
+} from '#/models/hr/contract';
 
 import { onMounted, ref, watch } from 'vue';
 
@@ -18,7 +22,7 @@ import {
   deleteContractApi,
   getContractListApi,
   getContractStatusOptionsApi,
-  getContractTypeOptionsApi,
+  getContractTypeListApi,
   updateContractApi,
 } from '#/api';
 
@@ -31,6 +35,7 @@ const DEFAULT_PAGE_SIZE = 10;
 const statusOptions = ref<SelectOption[]>([]);
 const statusMap = ref<Record<string, string>>({});
 const contractTypes = ref<SelectOption[]>([]);
+const contractTypeList = ref<ContractTypeItem[]>([]);
 const currentRecord = ref<ContractApi.ContractItem | null>(null);
 
 function extractOptions(
@@ -67,10 +72,25 @@ async function loadStatuses() {
   }
 }
 
+function mapContractTypeOptions(list: ContractTypeItem[]): SelectOption[] {
+  return list.map((item) => ({
+    label: item.name ?? String(item.id),
+    value: item.id,
+  }));
+}
+
 async function loadContractTypes() {
   try {
-    contractTypes.value = extractOptions(await getContractTypeOptionsApi());
+    const response = await getContractTypeListApi({
+      page: 1,
+      pageSize: 1000,
+    });
+    const list = response.data ?? response.items ?? [];
+
+    contractTypeList.value = list;
+    contractTypes.value = mapContractTypeOptions(list);
   } catch {
+    contractTypeList.value = [];
     contractTypes.value = [];
   }
 }
@@ -354,6 +374,7 @@ function syncFormSelectOptions() {
 function openCreate() {
   currentRecord.value = null;
   drawerApi.setData({
+    contractTypeList: contractTypeList.value,
     contractTypes: contractTypes.value,
     record: null,
     statusOptions: statusOptions.value,
@@ -364,6 +385,7 @@ function openCreate() {
 function onEdit(row: ContractApi.ContractItem) {
   currentRecord.value = row;
   drawerApi.setData({
+    contractTypeList: contractTypeList.value,
     contractTypes: contractTypes.value,
     record: row,
     statusOptions: statusOptions.value,

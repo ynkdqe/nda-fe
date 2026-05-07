@@ -60,6 +60,18 @@ function getTodayTimestamp() {
   return today.getTime();
 }
 
+function generateUuid() {
+  if (globalThis.crypto?.randomUUID) {
+    return globalThis.crypto.randomUUID();
+  }
+
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replaceAll(/[xy]/g, (char) => {
+    const random = Math.floor(Math.random() * 16);
+    const value = char === 'x' ? random : (random & 0x3) | 0x8;
+    return value.toString(16);
+  });
+}
+
 function createBankItem(
   item?: Partial<EmployeeApi.EmployeeBankItem>,
 ): EmployeeBankFormItem {
@@ -74,6 +86,7 @@ function createBankItem(
     accountName: bankItem?.accountName ?? '',
     accountNo: bankItem?.accountNo ?? bankItem?.accountNumber ?? '',
     bankId: bankItem?.bankId ?? bankItem?.bank ?? null,
+    id: bankItem?.id ?? generateUuid(),
     key: ++bankItemSeed,
   };
 }
@@ -93,7 +106,6 @@ function resetForm(): EmployeeFormData {
     identification: null,
     maritalStatus: null,
     name: '',
-    national: null,
     phone: '',
     position: null,
     resignationDate: null,
@@ -115,15 +127,6 @@ const positionLoading = ref(false);
 const bankOptions = ref<SelectOption[]>([]);
 const bankLoading = ref(false);
 const bankOptionsLoaded = ref(false);
-
-const nationalOptions: SelectOption[] = [
-  { label: 'Việt Nam', value: 'Việt Nam' },
-  { label: 'Trung Quốc', value: 'Trung Quốc' },
-  { label: 'Mỹ', value: 'Mỹ' },
-  { label: 'Nhật Bản', value: 'Nhật Bản' },
-  { label: 'Hàn Quốc', value: 'Hàn Quốc' },
-  { label: 'Khác', value: 'Khác' },
-];
 
 const formRules: FormRules = {
   name: [
@@ -189,6 +192,7 @@ function normalizeBankPayload() {
       accountName: normalizeText(item.accountName),
       accountNo: normalizeText(item.accountNo),
       bankId: normalizeNumberValue(item.bankId),
+      id: item.id,
     }))
     .filter((item) => item.accountName || item.accountNo || item.bankId);
 
@@ -419,6 +423,17 @@ async function loadBankOptions() {
   }
 }
 
+function loadBankOptionsForSelectedBanks() {
+  const hasSelectedBank = formData.banks.some(
+    (item) =>
+      item.bankId !== null && item.bankId !== undefined && item.bankId !== '',
+  );
+
+  if (hasSelectedBank) {
+    void loadBankOptions();
+  }
+}
+
 function addBankItem() {
   formData.banks.push(createBankItem());
 }
@@ -453,7 +468,6 @@ function normalizeRecord(
     identification: record.identification ?? null,
     maritalStatus: normalizeNumberValue(record.maritalStatus),
     name: record.name ?? '',
-    national: record.national ?? null,
     phone: record.phone ?? '',
     position: record.position ?? null,
     resignationDate: toTimestamp(record.resignationDate),
@@ -478,7 +492,6 @@ function buildPayload(): EmployeeApi.EmployeeMutationPayload {
     identification: normalizeText(formData.identification),
     maritalStatus: normalizeNumberValue(formData.maritalStatus),
     name: formData.name.trim(),
-    national: normalizeSelectValue(formData.national),
     phone: formData.phone.trim(),
     position: normalizeSelectValue(formData.position),
     resignationDate: toApiDate(formData.resignationDate),
@@ -515,6 +528,12 @@ watch(
 async function handleSubmit() {
   try {
     await formRef.value?.validate();
+  } catch {
+    message.error('Vui lòng kiểm tra lại thông tin');
+    return;
+  }
+
+  try {
     const payload = buildPayload();
 
     await (formData.id
@@ -525,7 +544,7 @@ async function handleSubmit() {
     emit('submit', payload);
     drawerApi.close();
   } catch {
-    message.error('Vui lòng kiểm tra lại thông tin');
+    // Request errors are already handled by the global request interceptor.
   }
 }
 
@@ -536,6 +555,7 @@ function handleReset() {
   Object.assign(formData, normalizeRecord(data.record));
   syncSelectedUserFromRecord(data.record);
   syncPositionOptionFromRole(data.record);
+  loadBankOptionsForSelectedBanks();
   void nextTick(() => formRef.value?.restoreValidation());
 }
 
@@ -552,6 +572,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
       Object.assign(formData, normalizeRecord(data.record));
       syncSelectedUserFromRecord(data.record);
       syncPositionOptionFromRole(data.record);
+      loadBankOptionsForSelectedBanks();
       void nextTick(() => formRef.value?.restoreValidation());
       void loadPositionOptions();
       return;
@@ -646,7 +667,9 @@ defineExpose({
           label="Vị trí"
           path="position"
           :feedback="
-            isEditMode ? 'thay đổi trong quản lý người dùng.' : undefined
+            isEditMode
+              ? 'Thay đổi trong Quản lý người dùng/Vai trò.'
+              : undefined
           "
         >
           <NSelect
@@ -687,13 +710,12 @@ defineExpose({
           />
         </NFormItemGi>
 
-        <NFormItemGi label="Quốc tịch" path="national">
+        <NFormItemGi label="Trạng thái" path="status">
           <NSelect
-            v-model:value="formData.national"
+            v-model:value="formData.status"
             clearable
-            filterable
-            :options="nationalOptions"
-            placeholder="Chọn quốc tịch"
+            :options="employeeStatusOptions"
+            placeholder="Chọn trạng thái"
           />
         </NFormItemGi>
 
@@ -807,17 +829,6 @@ defineExpose({
             placeholder="Chọn ngày nghỉ việc"
             style="width: 100%"
             type="date"
-          />
-        </NFormItemGi>
-      </NGrid>
-
-      <NGrid :cols="2" :x-gap="16">
-        <NFormItemGi label="Trạng thái" path="status">
-          <NSelect
-            v-model:value="formData.status"
-            clearable
-            :options="employeeStatusOptions"
-            placeholder="Chọn trạng thái"
           />
         </NFormItemGi>
       </NGrid>

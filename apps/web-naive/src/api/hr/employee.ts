@@ -20,6 +20,7 @@ export namespace EmployeeApi {
     accountName?: null | string;
     accountNo?: null | string;
     bankId?: null | number | string;
+    id?: null | string;
   }
 
   export interface EmployeeItem {
