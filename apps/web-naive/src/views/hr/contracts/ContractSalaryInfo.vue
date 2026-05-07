@@ -3,9 +3,9 @@ import type {
   ContractSalaryField,
   ContractSalaryForm,
   ContractSalaryValue,
-} from "#/models/hr/contract";
+} from '#/models/hr/contract';
 
-import { NDivider, NFormItem, NInput } from "naive-ui";
+import { NDivider, NFormItem, NInput } from 'naive-ui';
 
 const props = defineProps<{
   form: ContractSalaryForm;
@@ -20,11 +20,11 @@ const emit = defineEmits<{
 function getNumberValue(field: ContractSalaryField) {
   const value = props.form[field];
 
-  if (typeof value === "number" && Number.isFinite(value)) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
     return value;
   }
 
-  if (typeof value === "string" && value.trim()) {
+  if (typeof value === 'string' && value.trim()) {
     const numericValue = Number(value);
     return Number.isNaN(numericValue) ? null : numericValue;
   }
@@ -35,11 +35,11 @@ function getNumberValue(field: ContractSalaryField) {
 function parseMoneyValue(value: string) {
   const parsedValue = props.numberParser(value);
 
-  if (typeof parsedValue === "number" && Number.isFinite(parsedValue)) {
+  if (typeof parsedValue === 'number' && Number.isFinite(parsedValue)) {
     return parsedValue;
   }
 
-  if (typeof parsedValue === "string" && parsedValue.trim()) {
+  if (typeof parsedValue === 'string' && parsedValue.trim()) {
     const numericValue = Number(parsedValue);
     return Number.isNaN(numericValue) ? null : numericValue;
   }
@@ -52,7 +52,7 @@ function getFormattedValue(field: ContractSalaryField) {
 }
 
 function updateField(field: ContractSalaryField, value: null | number) {
-  emit("salaryFieldChange", field, value);
+  emit('salaryFieldChange', field, value);
 }
 
 function updateMoneyField(field: ContractSalaryField, value: string) {

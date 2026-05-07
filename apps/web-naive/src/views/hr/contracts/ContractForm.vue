@@ -9,27 +9,27 @@ import type {
   Id,
   NullableNumber,
   UnknownRecord,
-} from "#/models/hr/contract";
-import type { ContractSalaryChangedField } from "#/utils/contract-salary";
+} from '#/models/hr/contract';
+import type { ContractSalaryChangedField } from '#/utils/contract-salary';
 
-import { computed, reactive, ref, watch } from "vue";
+import { computed, reactive, ref, watch } from 'vue';
 
-import { useVbenDrawer } from "@vben/common-ui";
-import { formatDate } from "@vben/utils";
+import { useVbenDrawer } from '@vben/common-ui';
+import { formatDate } from '@vben/utils';
 
-import { NDatePicker, NForm, NFormItem, NSelect } from "naive-ui";
+import { NDatePicker, NForm, NFormItem, NSelect } from 'naive-ui';
 
-import { message } from "#/adapter/naive";
+import { message } from '#/adapter/naive';
 import {
   calculateContractSalaryState,
   isContractSocialInsuranceEnabled,
-} from "#/utils/contract-salary";
+} from '#/utils/contract-salary';
 
-import ContractEmployerCosts from "./ContractBusinessCosts.vue";
-import ContractEmployeeCosts from "./ContractEmployeeCosts.vue";
-import ContractEmployeeInfo from "./ContractEmployeeInfo.vue";
-import ContractSalaryInfo from "./ContractSalaryInfo.vue";
-import ContractStatusApproval from "./ContractStatusApproval.vue";
+import ContractEmployerCosts from './ContractBusinessCosts.vue';
+import ContractEmployeeCosts from './ContractEmployeeCosts.vue';
+import ContractEmployeeInfo from './ContractEmployeeInfo.vue';
+import ContractSalaryInfo from './ContractSalaryInfo.vue';
+import ContractStatusApproval from './ContractStatusApproval.vue';
 
 const props = withDefaults(
   defineProps<{
@@ -51,7 +51,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   cancel: [];
   submit: [value: UnknownRecord];
-  "update:modelValue": [value: Partial<ContractFormModel>];
+  'update:modelValue': [value: Partial<ContractFormModel>];
 }>();
 
 function createInitialForm(): ContractFormModel {
@@ -102,20 +102,27 @@ const contractTypeItems = ref<ContractTypeItem[]>([]);
 const selectedContractType = ref<ContractTypeItem | null>(null);
 const selectedDurationValue = ref<null | number>(null);
 const statusOptions = ref<ContractSelectOption[]>([]);
-const lastManualSalaryComponent = ref<"allowance" | "kpi" | null>(null);
+const lastManualSalaryComponent = ref<'allowance' | 'kpi' | null>(null);
 const FIXED_INSURANCE_PERCENT = 100;
 const FIXED_INSURANCE_TYPE = 2;
 
 const defaultInsuranceTypes = computed<ContractSelectOption[]>(() => [
-  { label: "Cố định", value: 1 },
-  { label: "%", value: 2 },
+  { label: 'Cố định', value: 1 },
+  { label: '%', value: 2 },
 ]);
 
-const insuranceTypes = computed(() => props.insuranceTypeOptions ?? defaultInsuranceTypes.value);
-const hasSocialInsurance = computed(() =>
-  isContractSocialInsuranceEnabled(selectedContractType.value, form.salaryGross),
+const insuranceTypes = computed(
+  () => props.insuranceTypeOptions ?? defaultInsuranceTypes.value,
 );
-const isTaxFixed = computed(() => Boolean(selectedContractType.value?.isTaxFixed));
+const hasSocialInsurance = computed(() =>
+  isContractSocialInsuranceEnabled(
+    selectedContractType.value,
+    form.salaryGross,
+  ),
+);
+const isTaxFixed = computed(() =>
+  Boolean(selectedContractType.value?.isTaxFixed),
+);
 
 const durationsOptions = computed<ContractSelectOption[]>(() => {
   if (!form.contractTypeId) {
@@ -130,7 +137,7 @@ const durationsOptions = computed<ContractSelectOption[]>(() => {
   return durations.map((duration) => {
     const value = toNumber(duration.duration, 0);
     return {
-      label: duration.name ?? String(duration.duration ?? ""),
+      label: duration.name ?? String(duration.duration ?? ''),
       value,
     };
   });
@@ -145,18 +152,18 @@ const feesTotal = computed(() => {
   );
 });
 
-const title = computed(() => (form.id ? "Sửa hợp đồng" : "Tạo hợp đồng"));
+const title = computed(() => (form.id ? 'Sửa hợp đồng' : 'Tạo hợp đồng'));
 
 function isRecord(value: unknown): value is UnknownRecord {
-  return Boolean(value && typeof value === "object" && !Array.isArray(value));
+  return Boolean(value && typeof value === 'object' && !Array.isArray(value));
 }
 
 function toNumber(value: unknown, fallback = 0) {
-  if (typeof value === "number" && Number.isFinite(value)) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
     return value;
   }
 
-  if (typeof value === "string" && value.trim()) {
+  if (typeof value === 'string' && value.trim()) {
     const numericValue = Number(value);
     return Number.isNaN(numericValue) ? fallback : numericValue;
   }
@@ -165,15 +172,15 @@ function toNumber(value: unknown, fallback = 0) {
 }
 
 function toTimestamp(value: unknown): NullableNumber {
-  if (value === null || value === undefined || value === "") {
+  if (value === null || value === undefined || value === '') {
     return null;
   }
 
-  if (typeof value === "number" && Number.isFinite(value)) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
     return value;
   }
 
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     const timestamp = new Date(value).getTime();
     return Number.isNaN(timestamp) ? null : timestamp;
   }
@@ -183,7 +190,7 @@ function toTimestamp(value: unknown): NullableNumber {
 
 function toDateString(value: unknown) {
   const timestamp = toTimestamp(value) ?? Date.now();
-  return formatDate(timestamp, "YYYY-MM-DD");
+  return formatDate(timestamp, 'YYYY-MM-DD');
 }
 
 function getRecordValue(record: UnknownRecord, key: string) {
@@ -192,13 +199,13 @@ function getRecordValue(record: UnknownRecord, key: string) {
 
 function getStringValue(record: UnknownRecord, key: string) {
   const value = getRecordValue(record, key);
-  return typeof value === "string" ? value : null;
+  return typeof value === 'string' ? value : null;
 }
 
 function getIdValue(record: UnknownRecord, key: string): Id | undefined {
   const value = getRecordValue(record, key);
 
-  if (typeof value === "number" || typeof value === "string") {
+  if (typeof value === 'number' || typeof value === 'string') {
     return value;
   }
 
@@ -208,7 +215,7 @@ function getIdValue(record: UnknownRecord, key: string): Id | undefined {
 function getNumberValue(record: UnknownRecord, key: string): NullableNumber {
   const value = getRecordValue(record, key);
 
-  if (value === null || value === undefined || value === "") {
+  if (value === null || value === undefined || value === '') {
     return null;
   }
 
@@ -216,7 +223,10 @@ function getNumberValue(record: UnknownRecord, key: string): NullableNumber {
 }
 
 function normalizeRecord(
-  record?: null | Partial<ContractApi.ContractItem> | Partial<ContractFormModel>,
+  record?:
+    | null
+    | Partial<ContractApi.ContractItem>
+    | Partial<ContractFormModel>,
 ) {
   const initialValue = createInitialForm();
 
@@ -227,31 +237,36 @@ function normalizeRecord(
   return {
     ...initialValue,
     ...record,
-    allowance: getNumberValue(record, "allowance"),
-    approver: getIdValue(record, "approver"),
-    basicSalary: getNumberValue(record, "basicSalary"),
-    birthDate: getStringValue(record, "birthDate"),
-    checkers: Array.isArray(getRecordValue(record, "checkers"))
-      ? (getRecordValue(record, "checkers") as Id[])
+    allowance: getNumberValue(record, 'allowance'),
+    approver: getIdValue(record, 'approver'),
+    basicSalary: getNumberValue(record, 'basicSalary'),
+    birthDate: getStringValue(record, 'birthDate'),
+    checkers: Array.isArray(getRecordValue(record, 'checkers'))
+      ? (getRecordValue(record, 'checkers') as Id[])
       : [],
-    contractName: getStringValue(record, "contractName") ?? getStringValue(record, "name"),
-    contractTypeId: getIdValue(record, "contractTypeId") ?? getIdValue(record, "contractType"),
+    contractName:
+      getStringValue(record, 'contractName') ?? getStringValue(record, 'name'),
+    contractTypeId:
+      getIdValue(record, 'contractTypeId') ??
+      getIdValue(record, 'contractType'),
     effectiveDate: toTimestamp(record.effectiveDate),
-    employeeCode: getStringValue(record, "employeeCode"),
-    employeeId: getIdValue(record, "employeeId"),
-    employeeName: getStringValue(record, "employeeName"),
+    employeeCode: getStringValue(record, 'employeeCode'),
+    employeeId: getIdValue(record, 'employeeId'),
+    employeeName: getStringValue(record, 'employeeName'),
     expiryDate: toTimestamp(record.expiryDate),
-    insuranceType: getIdValue(record, "insuranceType") ?? FIXED_INSURANCE_TYPE,
+    insuranceType: getIdValue(record, 'insuranceType') ?? FIXED_INSURANCE_TYPE,
     insuranceValue:
-      getNumberValue(record, "insuranceValue") ??
-      getNumberValue(record, "insurance") ??
+      getNumberValue(record, 'insuranceValue') ??
+      getNumberValue(record, 'insurance') ??
       FIXED_INSURANCE_PERCENT,
-    kpi: getNumberValue(record, "kpi"),
-    notes: getStringValue(record, "notes") ?? getStringValue(record, "note"),
-    salaryGross: getNumberValue(record, "salaryGross") ?? getNumberValue(record, "totalSalary"),
-    status: getIdValue(record, "status") ?? 1,
-    taxCode: getNumberValue(record, "taxCode"),
-    totalCost: getNumberValue(record, "totalCost"),
+    kpi: getNumberValue(record, 'kpi'),
+    notes: getStringValue(record, 'notes') ?? getStringValue(record, 'note'),
+    salaryGross:
+      getNumberValue(record, 'salaryGross') ??
+      getNumberValue(record, 'totalSalary'),
+    status: getIdValue(record, 'status') ?? 1,
+    taxCode: getNumberValue(record, 'taxCode'),
+    totalCost: getNumberValue(record, 'totalCost'),
   } satisfies ContractFormModel;
 }
 
@@ -278,25 +293,30 @@ function syncSelectedDurationFromContractName() {
   const contractName = String(form.contractName).trim();
   const durations = getContractDurations(selectedContractType.value);
   const matchedDuration = durations.find((duration) => {
-    const durationName = String(duration.name ?? "").trim();
-    return durationName === contractName || String(duration.duration ?? "") === contractName;
+    const durationName = String(duration.name ?? '').trim();
+    return (
+      durationName === contractName ||
+      String(duration.duration ?? '') === contractName
+    );
   });
 
-  selectedDurationValue.value = matchedDuration ? toNumber(matchedDuration.duration, 0) : null;
+  selectedDurationValue.value = matchedDuration
+    ? toNumber(matchedDuration.duration, 0)
+    : null;
 }
 
 function mapToOptions(list: UnknownRecord[]): ContractSelectOption[] {
   const options: ContractSelectOption[] = [];
 
   for (const item of list) {
-    const value = getIdValue(item, "id");
+    const value = getIdValue(item, 'id');
 
     if (value === undefined) {
       continue;
     }
 
     options.push({
-      label: getStringValue(item, "name") ?? String(value),
+      label: getStringValue(item, 'name') ?? String(value),
       value,
     });
   }
@@ -310,11 +330,13 @@ async function loadContractTypes() {
 
   contractTypeItems.value = list;
   contractTypes.value =
-    apiOptions.length > 0 ? apiOptions : (props.contractTypeOptions ?? contractTypes.value);
+    apiOptions.length > 0
+      ? apiOptions
+      : (props.contractTypeOptions ?? contractTypes.value);
 
   if (form.contractTypeId) {
     await loadSelectedContractType(form.contractTypeId);
-    syncSalaryStructure("contractType");
+    syncSalaryStructure('contractType');
     syncSelectedDurationFromContractName();
   }
 }
@@ -329,18 +351,20 @@ async function loadSelectedContractType(contractTypeId?: Id) {
 }
 
 function numberFormatter(value: unknown) {
-  if (value === null || value === undefined || value === "") {
-    return "";
+  if (value === null || value === undefined || value === '') {
+    return '';
   }
 
-  return String(value).replaceAll(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return String(value).replaceAll(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 function numberParser(value: string) {
-  return value ? value.replaceAll(",", "") : value;
+  return value ? value.replaceAll(',', '') : value;
 }
 
-function syncSalaryStructure(changedField: ContractSalaryChangedField = "init") {
+function syncSalaryStructure(
+  changedField: ContractSalaryChangedField = 'init',
+) {
   const result = calculateContractSalaryState({
     changedField,
     contractType: selectedContractType.value,
@@ -351,25 +375,28 @@ function syncSalaryStructure(changedField: ContractSalaryChangedField = "init") 
   Object.assign(form, result.form);
 }
 
-function handleSalaryFieldChange(field: ContractSalaryField, value: null | number) {
+function handleSalaryFieldChange(
+  field: ContractSalaryField,
+  value: null | number,
+) {
   form[field] = value;
 
-  if (field === "allowance" || field === "kpi") {
+  if (field === 'allowance' || field === 'kpi') {
     lastManualSalaryComponent.value = field;
   }
 
-  if (["allowance", "kpi", "salaryGross"].includes(field)) {
+  if (['allowance', 'kpi', 'salaryGross'].includes(field)) {
     syncSalaryStructure(field);
   }
 }
 
 function handleEmployeeCostsUpdate(value: Record<string, unknown>) {
-  let changedField: ContractSalaryChangedField = "insuranceValue";
+  let changedField: ContractSalaryChangedField = 'insuranceValue';
 
   if (value.tax !== form.tax) {
-    changedField = "tax";
+    changedField = 'tax';
   } else if (value.insuranceType !== form.insuranceType) {
-    changedField = "insuranceType";
+    changedField = 'insuranceType';
   }
 
   Object.assign(form, value);
@@ -378,7 +405,9 @@ function handleEmployeeCostsUpdate(value: Record<string, unknown>) {
 
 function syncSelectedContractType() {
   selectedContractType.value =
-    contractTypeItems.value.find((item) => String(item.id) === String(form.contractTypeId)) ?? null;
+    contractTypeItems.value.find(
+      (item) => String(item.id) === String(form.contractTypeId),
+    ) ?? null;
 }
 
 async function onContractTypeChange(value: Id | null) {
@@ -386,7 +415,7 @@ async function onContractTypeChange(value: Id | null) {
   form.contractName = null;
   selectedDurationValue.value = null;
   await loadSelectedContractType(form.contractTypeId);
-  syncSalaryStructure("contractType");
+  syncSalaryStructure('contractType');
   syncSelectedDurationFromContractName();
 }
 
@@ -416,13 +445,14 @@ function onEmployeeChange(value: EmployeeUpdateValue, option?: unknown) {
   form.employeeId = employeeId;
 
   if (isRecord(selectedOption)) {
-    form.employeeName = getStringValue(selectedOption, "name") ?? "";
-    form.employeeCode = getStringValue(selectedOption, "userName") ?? "";
-    form.email = getStringValue(selectedOption, "email") ?? "";
-    form.phone = getStringValue(selectedOption, "phone") ?? "";
-    form.identification = getStringValue(selectedOption, "identification") ?? "";
-    form.birthDate = getStringValue(selectedOption, "birthDate");
-    form.taxCode = getNumberValue(selectedOption, "taxCode");
+    form.employeeName = getStringValue(selectedOption, 'name') ?? '';
+    form.employeeCode = getStringValue(selectedOption, 'userName') ?? '';
+    form.email = getStringValue(selectedOption, 'email') ?? '';
+    form.phone = getStringValue(selectedOption, 'phone') ?? '';
+    form.identification =
+      getStringValue(selectedOption, 'identification') ?? '';
+    form.birthDate = getStringValue(selectedOption, 'birthDate');
+    form.taxCode = getNumberValue(selectedOption, 'taxCode');
   }
 }
 
@@ -435,7 +465,9 @@ function onDurationChange(value: null | number) {
   }
 
   const durations = getContractDurations(selectedContractType.value);
-  const duration = durations.find((item) => toNumber(item.duration, 0) === Number(value));
+  const duration = durations.find(
+    (item) => toNumber(item.duration, 0) === Number(value),
+  );
 
   form.contractName = duration?.name ?? String(value);
   applyDuration(value);
@@ -447,7 +479,7 @@ function applyDuration(months: number) {
 
   if (months === 0) {
     form.expiryDate = null;
-    message.success("Đã đặt hiệu lực hôm nay, vô thời hạn");
+    message.success('Đã đặt hiệu lực hôm nay, vô thời hạn');
     return;
   }
 
@@ -462,10 +494,12 @@ function handleSubmit() {
     allowance: form.allowance ?? 0,
     approver: form.approver,
     basicSalary: form.basicSalary ?? 0,
-    businessCalculateOccAccInsuranceFee: form.businessCalculateOccAccInsuranceFee ?? 0,
+    businessCalculateOccAccInsuranceFee:
+      form.businessCalculateOccAccInsuranceFee ?? 0,
     businessHealthInsuranceFee: form.businessHealthInsuranceFee ?? 0,
     businessSocialInsuranceFee: form.businessSocialInsuranceFee ?? 0,
-    businessUnemploymentInsuranceFee: form.businessUnemploymentInsuranceFee ?? 0,
+    businessUnemploymentInsuranceFee:
+      form.businessUnemploymentInsuranceFee ?? 0,
     checkers: form.checkers,
     contractName: form.contractName,
     contractTypeId: form.contractTypeId,
@@ -478,7 +512,7 @@ function handleSubmit() {
     insuranceType: form.insuranceType,
     insuranceValue: form.insuranceValue ?? 0,
     kpi: form.kpi ?? 0,
-    note: form.notes ?? "",
+    note: form.notes ?? '',
     salaryNet: form.salaryNet ?? 0,
     status: form.status,
     tax: form.tax ?? 0,
@@ -488,20 +522,22 @@ function handleSubmit() {
     totalSalary: form.salaryGross ?? 0,
   };
 
-  emit("submit", payload);
-  emit("update:modelValue", { ...form });
+  emit('submit', payload);
+  emit('update:modelValue', { ...form });
 }
 
-function resetFormWithRecord(record?: null | Partial<ContractApi.ContractItem>) {
+function resetFormWithRecord(
+  record?: null | Partial<ContractApi.ContractItem>,
+) {
   lastManualSalaryComponent.value = null;
   Object.assign(form, normalizeRecord(record));
   syncSelectedContractType();
-  syncSalaryStructure("init");
+  syncSalaryStructure('init');
 }
 
 const [Drawer, drawerApi] = useVbenDrawer({
   onCancel() {
-    emit("cancel");
+    emit('cancel');
     drawerApi.close();
   },
   onConfirm: handleSubmit,
@@ -547,7 +583,7 @@ watch(
       lastManualSalaryComponent.value = null;
       Object.assign(form, normalizeRecord(value));
       syncSelectedContractType();
-      syncSalaryStructure("init");
+      syncSalaryStructure('init');
     }
   },
   { deep: true, immediate: true },

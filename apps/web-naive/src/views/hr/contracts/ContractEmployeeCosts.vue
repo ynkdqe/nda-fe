@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import type { SelectOption } from "naive-ui";
+import type { SelectOption } from 'naive-ui';
 
 import type {
   ContractEmployeeCostField,
   ContractEmployeeCostsForm,
   ContractEmployeeCostValue,
   ContractEmployeeFeeItem,
-} from "#/models/hr/contract";
+} from '#/models/hr/contract';
 
-import { computed } from "vue";
+import { computed } from 'vue';
 
-import { NDivider, NFormItem, NInput, NSelect } from "naive-ui";
+import { NDivider, NFormItem, NInput, NSelect } from 'naive-ui';
 
 const props = defineProps<{
   feesTotal: number;
@@ -24,11 +24,14 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   insuranceValueChange: [value: number];
-  "update:form": [value: ContractEmployeeCostsForm];
+  'update:form': [value: ContractEmployeeCostsForm];
 }>();
 
 const insuranceSalaryHelpText = computed(() => {
-  if (props.form.insuranceSalary === undefined || props.form.insuranceSalary === null) {
+  if (
+    props.form.insuranceSalary === undefined ||
+    props.form.insuranceSalary === null
+  ) {
     return undefined;
   }
 
@@ -37,26 +40,26 @@ const insuranceSalaryHelpText = computed(() => {
 
 const feeItems: ContractEmployeeFeeItem[] = [
   {
-    field: "employeeSocialInsuranceFee",
-    label: "BHXH nhân viên",
-    placeholder: "Xã hội",
+    field: 'employeeSocialInsuranceFee',
+    label: 'BHXH nhân viên',
+    placeholder: 'Xã hội',
   },
   {
-    field: "employeeHealthInsuranceFee",
-    label: "BHYT nhân viên",
+    field: 'employeeHealthInsuranceFee',
+    label: 'BHYT nhân viên',
   },
   {
-    field: "employeeUnemploymentInsuranceFee",
-    label: "BHTN nhân viên",
+    field: 'employeeUnemploymentInsuranceFee',
+    label: 'BHTN nhân viên',
   },
 
   {
-    field: "tax",
-    label: "Thuế",
+    field: 'tax',
+    label: 'Thuế',
   },
   {
-    field: "taxFee",
-    label: "Thuế TNCN",
+    field: 'taxFee',
+    label: 'Thuế TNCN',
   },
 ];
 
@@ -68,11 +71,11 @@ function getSelectValue(field: ContractEmployeeCostField) {
 function getNumberValue(field: ContractEmployeeCostField) {
   const value = props.form[field];
 
-  if (typeof value === "number" && Number.isFinite(value)) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
     return value;
   }
 
-  if (typeof value === "string" && value.trim()) {
+  if (typeof value === 'string' && value.trim()) {
     const numericValue = Number(value);
     return Number.isNaN(numericValue) ? null : numericValue;
   }
@@ -83,11 +86,11 @@ function getNumberValue(field: ContractEmployeeCostField) {
 function parseNumber(value: string) {
   const parsedValue = props.numberParser(value);
 
-  if (typeof parsedValue === "number" && Number.isFinite(parsedValue)) {
+  if (typeof parsedValue === 'number' && Number.isFinite(parsedValue)) {
     return parsedValue;
   }
 
-  if (typeof parsedValue === "string" && parsedValue.trim()) {
+  if (typeof parsedValue === 'string' && parsedValue.trim()) {
     const numericValue = Number(parsedValue);
     return Number.isNaN(numericValue) ? null : numericValue;
   }
@@ -96,7 +99,7 @@ function parseNumber(value: string) {
 }
 
 function getFeeLabel(item: ContractEmployeeFeeItem) {
-  if (item.field === "tax" && !props.isTaxFixed) {
+  if (item.field === 'tax' && !props.isTaxFixed) {
     return `${item.label} (Lũy tiến)`;
   }
 
@@ -107,16 +110,19 @@ function getFormattedValue(field: ContractEmployeeCostField) {
   return props.numberFormatter(getNumberValue(field));
 }
 
-function updateField(field: ContractEmployeeCostField, value: ContractEmployeeCostValue) {
+function updateField(
+  field: ContractEmployeeCostField,
+  value: ContractEmployeeCostValue,
+) {
   const nextForm = {
     ...props.form,
-    [field]: field === "tax" && !props.isTaxFixed ? 0 : value,
+    [field]: field === 'tax' && !props.isTaxFixed ? 0 : value,
   };
 
-  emit("update:form", nextForm);
+  emit('update:form', nextForm);
 
-  if (field === "insuranceValue" && typeof value === "number") {
-    emit("insuranceValueChange", value);
+  if (field === 'insuranceValue' && typeof value === 'number') {
+    emit('insuranceValueChange', value);
   }
 }
 
@@ -126,9 +132,9 @@ function updateMoneyField(field: ContractEmployeeCostField, value: string) {
 
 function isReadonlyFeeField(field: ContractEmployeeCostField) {
   return [
-    "employeeHealthInsuranceFee",
-    "employeeSocialInsuranceFee",
-    "employeeUnemploymentInsuranceFee",
+    'employeeHealthInsuranceFee',
+    'employeeSocialInsuranceFee',
+    'employeeUnemploymentInsuranceFee',
   ].includes(field);
 }
 </script>
@@ -162,20 +168,27 @@ function isReadonlyFeeField(field: ContractEmployeeCostField) {
               placeholder="Mức đóng bảo hiểm"
               style="width: 100%"
               :value="getFormattedValue('insuranceValue')"
-              @update:value="(value) => updateMoneyField('insuranceValue', value)"
+              @update:value="
+                (value) => updateMoneyField('insuranceValue', value)
+              "
             />
           </div>
         </div>
       </NFormItem>
 
-      <NFormItem class="md:col-span-2" :feedback="`Tổng: ${numberFormatter(feesTotal)}`">
+      <NFormItem
+        class="md:col-span-2"
+        :feedback="`Tổng: ${numberFormatter(feesTotal)}`"
+      >
         <template #label>
           <span>Các khoản phí nhân viên</span>
         </template>
 
         <div class="grid w-full grid-cols-1 gap-3 md:grid-cols-5">
           <div v-for="item in feeItems" :key="item.field">
-            <div class="mb-1 text-xs text-gray-500">{{ getFeeLabel(item) }}</div>
+            <div class="mb-1 text-xs text-gray-500">
+              {{ getFeeLabel(item) }}
+            </div>
             <NInput
               inputmode="decimal"
               :disabled="item.field === 'tax' && !isTaxFixed"
