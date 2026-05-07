@@ -3,34 +3,26 @@ import type {
   ContractEmployeeInfoField,
   ContractEmployeeInfoForm,
   ContractEmployeeInfoValue,
-} from '#/models/hr/contract';
+} from "#/models/hr/contract";
 
-import { formatDate } from '@vben/utils';
+import { formatDate } from "@vben/utils";
 
-import { NDivider, NFormItem, NInput, NInputNumber } from 'naive-ui';
+import { NDivider, NFormItem, NInput } from "naive-ui";
 
-import EmployeeSearchSelect from '#/components/EmployeeSearchSelect.vue';
+import EmployeeSearchSelect from "#/components/EmployeeSearchSelect.vue";
 
 const props = defineProps<{
   form: ContractEmployeeInfoForm;
 }>();
 
 const emit = defineEmits<{
-  change: [
-    value: ContractEmployeeInfoValue | ContractEmployeeInfoValue[],
-    option?: unknown,
-  ];
-  'update:form': [value: ContractEmployeeInfoForm];
-  'update:modelValue': [
-    value: ContractEmployeeInfoValue | ContractEmployeeInfoValue[],
-  ];
+  change: [value: ContractEmployeeInfoValue | ContractEmployeeInfoValue[], option?: unknown];
+  "update:form": [value: ContractEmployeeInfoForm];
+  "update:modelValue": [value: ContractEmployeeInfoValue | ContractEmployeeInfoValue[]];
 }>();
 
-function updateField(
-  field: ContractEmployeeInfoField,
-  value: ContractEmployeeInfoValue,
-) {
-  emit('update:form', {
+function updateField(field: ContractEmployeeInfoField, value: ContractEmployeeInfoValue) {
+  emit("update:form", {
     ...props.form,
     [field]: value,
   });
@@ -38,22 +30,43 @@ function updateField(
 
 function getTextValue(field: ContractEmployeeInfoField) {
   const value = props.form[field];
-  return value === null || value === undefined ? '' : String(value);
+  return value === null || value === undefined ? "" : String(value);
 }
 
 function getNumberValue(field: ContractEmployeeInfoField) {
   const value = props.form[field];
 
-  if (typeof value === 'number' && Number.isFinite(value)) {
+  if (typeof value === "number" && Number.isFinite(value)) {
     return value;
   }
 
-  if (typeof value === 'string' && value.trim()) {
-    const numericValue = Number(value);
+  if (typeof value === "string" && value.trim()) {
+    const numericValue = Number(value.replaceAll(",", ""));
     return Number.isNaN(numericValue) ? null : numericValue;
   }
 
   return null;
+}
+
+function formatNumber(value?: null | number) {
+  if (value === null || value === undefined) {
+    return "";
+  }
+
+  return String(value).replaceAll(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function parseNumber(value: string) {
+  if (!value) {
+    return null;
+  }
+
+  const numericValue = Number(value.replaceAll(",", ""));
+  return Number.isNaN(numericValue) ? null : numericValue;
+}
+
+function getFormattedNumberValue(field: ContractEmployeeInfoField) {
+  return formatNumber(getNumberValue(field));
 }
 
 function getEmployeeIdValue() {
@@ -69,25 +82,23 @@ function getEmployeeIdValue() {
 function formatBirthDate() {
   const value = props.form.birthDate;
 
-  if (value === null || value === undefined || value === '') {
-    return '';
+  if (value === null || value === undefined || value === "") {
+    return "";
   }
 
-  return formatDate(value, 'DD/MM/YYYY');
+  return formatDate(value, "DD/MM/YYYY");
 }
 
 function onEmployeeChange(
   value: ContractEmployeeInfoValue | ContractEmployeeInfoValue[],
   option?: unknown,
 ) {
-  emit('change', value, option);
+  emit("change", value, option);
 }
 
-function onEmployeeModelUpdate(
-  value: ContractEmployeeInfoValue | ContractEmployeeInfoValue[],
-) {
-  emit('update:modelValue', value);
-  updateField('employeeId', Array.isArray(value) ? value[0] : value);
+function onEmployeeModelUpdate(value: ContractEmployeeInfoValue | ContractEmployeeInfoValue[]) {
+  emit("update:modelValue", value);
+  updateField("employeeId", Array.isArray(value) ? value[0] : value);
 }
 </script>
 
@@ -123,12 +134,11 @@ function onEmployeeModelUpdate(
       </NFormItem>
 
       <NFormItem label="Mã số thuế">
-        <NInputNumber
-          :min="0"
-          :show-button="false"
+        <NInput
+          inputmode="decimal"
           style="width: 100%"
-          :value="getNumberValue('tax')"
-          @update:value="(value) => updateField('tax', value)"
+          :value="getFormattedNumberValue('taxCode')"
+          @update:value="(value) => updateField('taxCode', parseNumber(value))"
         />
       </NFormItem>
     </div>

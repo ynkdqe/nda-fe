@@ -3,9 +3,9 @@ import type {
   ContractSalaryField,
   ContractSalaryForm,
   ContractSalaryValue,
-} from '#/models/hr/contract';
+} from "#/models/hr/contract";
 
-import { NDivider, NFormItem, NInput } from 'naive-ui';
+import { NDivider, NFormItem, NInput } from "naive-ui";
 
 const props = defineProps<{
   form: ContractSalaryForm;
@@ -14,17 +14,17 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  'update:form': [value: ContractSalaryForm];
+  salaryFieldChange: [field: ContractSalaryField, value: null | number];
 }>();
 
 function getNumberValue(field: ContractSalaryField) {
   const value = props.form[field];
 
-  if (typeof value === 'number' && Number.isFinite(value)) {
+  if (typeof value === "number" && Number.isFinite(value)) {
     return value;
   }
 
-  if (typeof value === 'string' && value.trim()) {
+  if (typeof value === "string" && value.trim()) {
     const numericValue = Number(value);
     return Number.isNaN(numericValue) ? null : numericValue;
   }
@@ -35,11 +35,11 @@ function getNumberValue(field: ContractSalaryField) {
 function parseMoneyValue(value: string) {
   const parsedValue = props.numberParser(value);
 
-  if (typeof parsedValue === 'number' && Number.isFinite(parsedValue)) {
+  if (typeof parsedValue === "number" && Number.isFinite(parsedValue)) {
     return parsedValue;
   }
 
-  if (typeof parsedValue === 'string' && parsedValue.trim()) {
+  if (typeof parsedValue === "string" && parsedValue.trim()) {
     const numericValue = Number(parsedValue);
     return Number.isNaN(numericValue) ? null : numericValue;
   }
@@ -52,10 +52,7 @@ function getFormattedValue(field: ContractSalaryField) {
 }
 
 function updateField(field: ContractSalaryField, value: null | number) {
-  emit('update:form', {
-    ...props.form,
-    [field]: value,
-  });
+  emit("salaryFieldChange", field, value);
 }
 
 function updateMoneyField(field: ContractSalaryField, value: string) {
@@ -68,13 +65,22 @@ function updateMoneyField(field: ContractSalaryField, value: string) {
     <NDivider title-placement="left">Thông tin lương</NDivider>
 
     <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-      <NFormItem label="Lương cơ bản">
+      <NFormItem label="Lương gross">
         <NInput
           inputmode="decimal"
-          placeholder="Lương cơ bản"
+          placeholder="Lương gross"
+          style="width: 100%"
+          :value="getFormattedValue('salaryGross')"
+          @update:value="(value) => updateMoneyField('salaryGross', value)"
+        />
+      </NFormItem>
+
+      <NFormItem label="Lương cơ bản">
+        <NInput
+          disabled
+          placeholder="Tự tính theo mức đóng bảo hiểm"
           style="width: 100%"
           :value="getFormattedValue('basicSalary')"
-          @update:value="(value) => updateMoneyField('basicSalary', value)"
         />
       </NFormItem>
 
@@ -95,14 +101,6 @@ function updateMoneyField(field: ContractSalaryField, value: string) {
             @update:value="(value) => updateMoneyField('kpi', value)"
           />
         </div>
-      </NFormItem>
-
-      <NFormItem label="Lương gross">
-        <NInput
-          disabled
-          style="width: 100%"
-          :value="getFormattedValue('salaryGross')"
-        />
       </NFormItem>
     </div>
   </div>

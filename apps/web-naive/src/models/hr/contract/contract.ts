@@ -77,6 +77,12 @@ export namespace ContractApi {
     total?: number;
   }
 
+  export type ContractDetailResult =
+    | ContractItem
+    | {
+        data?: ContractItem;
+      };
+
   export interface ContractOptionItem {
     id: Id;
     name?: null | string;
@@ -139,6 +145,7 @@ export interface ContractFormModel extends UnknownRecord {
   salaryNet?: NullableNumber;
   status?: Id;
   tax?: NullableNumber;
+  taxCode?: NullableNumber;
   taxFee?: NullableNumber;
   totalCost?: NullableNumber;
 }
@@ -168,6 +175,7 @@ export type ContractEmployeeCostField =
   | "insuranceSalary"
   | "insuranceType"
   | "insuranceValue"
+  | "tax"
   | "taxFee";
 export type ContractEmployeeCostsForm = Partial<
   Record<ContractEmployeeCostField, ContractEmployeeCostValue>
@@ -186,7 +194,7 @@ export type ContractEmployeeInfoField =
   | "employeeId"
   | "identification"
   | "phone"
-  | "tax";
+  | "taxCode";
 export type ContractEmployeeInfoForm = Partial<
   Record<ContractEmployeeInfoField, ContractEmployeeInfoValue>
 > &

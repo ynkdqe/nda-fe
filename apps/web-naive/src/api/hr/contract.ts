@@ -9,6 +9,12 @@ export async function getContractListApi(params: ContractApi.ContractListParams)
   });
 }
 
+export async function getContractByIdApi(id: number | string) {
+  return requestClient.get<ContractApi.ContractDetailResult>(`/api/hrms/contract/${id}`, {
+    responseReturn: "body",
+  });
+}
+
 export async function createContractApi(data: Record<string, any>) {
   return requestClient.post("/api/hrms/contract", data, {
     responseReturn: "body",

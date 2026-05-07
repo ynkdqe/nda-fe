@@ -4,9 +4,9 @@ import type {
   ContractBusinessCostItem,
   ContractBusinessCostsForm,
   ContractBusinessCostValue,
-} from '#/models/hr/contract';
+} from "#/models/hr/contract";
 
-import { NDivider, NFormItem, NInputNumber } from 'naive-ui';
+import { NDivider, NFormItem, NInput } from "naive-ui";
 
 const props = defineProps<{
   form: ContractBusinessCostsForm;
@@ -15,40 +15,40 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  'update:form': [value: ContractBusinessCostsForm];
+  "update:form": [value: ContractBusinessCostsForm];
 }>();
 
 const costItems: ContractBusinessCostItem[] = [
   {
-    field: 'businessSocialInsuranceFee',
-    label: 'BHXH doanh nghiệp',
+    field: "businessSocialInsuranceFee",
+    label: "BHXH doanh nghiệp",
   },
   {
-    field: 'businessCalculateOccAccInsuranceFee',
-    label: 'BHTNLĐ-BNN doanh nghiệp',
+    field: "businessCalculateOccAccInsuranceFee",
+    label: "BHTNLĐ-BNN doanh nghiệp",
   },
   {
-    field: 'businessHealthInsuranceFee',
-    label: 'BHYT doanh nghiệp',
+    field: "businessHealthInsuranceFee",
+    label: "BHYT doanh nghiệp",
   },
   {
-    field: 'businessUnemploymentInsuranceFee',
-    label: 'BHTN doanh nghiệp',
+    field: "businessUnemploymentInsuranceFee",
+    label: "BHTN doanh nghiệp",
   },
   {
-    field: 'totalCost',
-    label: 'Tổng chi phí',
+    field: "totalCost",
+    label: "Tổng chi phí",
   },
 ];
 
 function getNumberValue(field: ContractBusinessCostField) {
   const value = props.form[field];
 
-  if (typeof value === 'number' && Number.isFinite(value)) {
+  if (typeof value === "number" && Number.isFinite(value)) {
     return value;
   }
 
-  if (typeof value === 'string' && value.trim()) {
+  if (typeof value === "string" && value.trim()) {
     const numericValue = Number(value);
     return Number.isNaN(numericValue) ? null : numericValue;
   }
@@ -59,11 +59,11 @@ function getNumberValue(field: ContractBusinessCostField) {
 function parseNumber(value: string) {
   const parsedValue = props.numberParser(value);
 
-  if (typeof parsedValue === 'number' && Number.isFinite(parsedValue)) {
+  if (typeof parsedValue === "number" && Number.isFinite(parsedValue)) {
     return parsedValue;
   }
 
-  if (typeof parsedValue === 'string' && parsedValue.trim()) {
+  if (typeof parsedValue === "string" && parsedValue.trim()) {
     const numericValue = Number(parsedValue);
     return Number.isNaN(numericValue) ? null : numericValue;
   }
@@ -71,11 +71,19 @@ function parseNumber(value: string) {
   return null;
 }
 
+function getFormattedValue(field: ContractBusinessCostField) {
+  return props.numberFormatter(getNumberValue(field));
+}
+
 function updateField(field: ContractBusinessCostField, value: null | number) {
-  emit('update:form', {
+  emit("update:form", {
     ...props.form,
     [field]: value,
   });
+}
+
+function updateMoneyField(field: ContractBusinessCostField, value: string) {
+  updateField(field, parseNumber(value));
 }
 </script>
 
@@ -84,20 +92,12 @@ function updateField(field: ContractBusinessCostField, value: null | number) {
     <NDivider title-placement="left">Chi phí doanh nghiệp</NDivider>
 
     <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-      <NFormItem
-        v-for="item in costItems"
-        :key="item.field"
-        :label="item.label"
-      >
-        <NInputNumber
-          :format="numberFormatter"
-          :min="0"
-          :parse="parseNumber"
-          :show-button="false"
-          :update-value-on-input="true"
+      <NFormItem v-for="item in costItems" :key="item.field" :label="item.label">
+        <NInput
+          inputmode="decimal"
           style="width: 100%"
-          :value="getNumberValue(item.field)"
-          @update:value="(value) => updateField(item.field, value)"
+          :value="getFormattedValue(item.field)"
+          @update:value="(value) => updateMoneyField(item.field, value)"
         />
       </NFormItem>
     </div>
