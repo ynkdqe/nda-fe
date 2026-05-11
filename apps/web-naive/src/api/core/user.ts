@@ -17,7 +17,15 @@ export namespace AccountApi {
  * 获取用户信息
  */
 export async function getUserInfoApi() {
-  return requestClient.get<AccountApi.Profile>('/api/account/profile', {
+  const response = await requestClient.get<any>('/api/account/profile', {
     responseReturn: 'body',
   });
+  return response.data as AccountApi.Profile;
+}
+
+/**
+ * 更新用户信息
+ */
+export async function updateUserInfoApi(data: any) {
+  return requestClient.put('/api/account/profile', data);
 }
