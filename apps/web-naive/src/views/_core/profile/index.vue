@@ -2,8 +2,9 @@
 import { ref } from 'vue';
 
 import { Profile } from '@vben/common-ui';
-import { $t } from '#/locales';
 import { useUserStore } from '@vben/stores';
+
+import { $t } from '#/locales';
 
 import ProfileBase from './base-setting.vue';
 import ProfileNotificationSetting from './notification-setting.vue';

@@ -106,7 +106,9 @@ async function customUploadRequest({
         }
       });
 
-      xhr.addEventListener('error', () => reject(new Error('Lỗi kết nối mạng')));
+      xhr.addEventListener('error', () =>
+        reject(new Error('Lỗi kết nối mạng')),
+      );
       xhr.addEventListener('abort', () => reject(new Error('Upload bị hủy')));
 
       xhr.send(formData);

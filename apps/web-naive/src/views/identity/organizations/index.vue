@@ -45,9 +45,12 @@ const isTree = computed<boolean>({
 async function loadOrgs() {
   loading.value = true;
   try {
-    const res = await requestClient.get<any>('/api/identity/organization-unit', {
-      responseReturn: 'body',
-    });
+    const res = await requestClient.get<any>(
+      '/api/identity/organization-unit',
+      {
+        responseReturn: 'body',
+      },
+    );
     const items = res?.data ?? res ?? [];
     dataSource.value = items.map((i: any) => ({
       code: i.code,
@@ -134,13 +137,15 @@ const gridOptions: VxeGridProps<OrgRow> = {
           : raw;
         const total = filtered.length;
         const start = (current - 1) * pageSize;
-        const pageItems = filtered.slice(start, start + pageSize).map((i: any) => ({
-          code: i.code,
-          displayName: i.displayName,
-          id: i.id,
-          parentId: i.parentId,
-          userCount: i.userCount,
-        }));
+        const pageItems = filtered
+          .slice(start, start + pageSize)
+          .map((i: any) => ({
+            code: i.code,
+            displayName: i.displayName,
+            id: i.id,
+            parentId: i.parentId,
+            userCount: i.userCount,
+          }));
         return { items: pageItems, total } as any;
       },
     },
@@ -170,7 +175,9 @@ async function handleDeleteOrg(row: OrgRow) {
     gridApi?.query?.();
   } catch (error: any) {
     message.error(
-      error?.message ?? error?.response?.data?.message ?? 'Xóa tổ chức thất bại',
+      error?.message ??
+        error?.response?.data?.message ??
+        'Xóa tổ chức thất bại',
     );
   }
 }
@@ -225,12 +232,7 @@ async function handleDeleteOrg(row: OrgRow) {
               <!-- Delete with confirm -->
               <NPopconfirm @positive-click="() => handleDeleteOrg(row)">
                 <template #trigger>
-                  <NButton
-                    quaternary
-                    size="tiny"
-                    type="error"
-                    :title="'Xóa'"
-                  >
+                  <NButton quaternary size="tiny" type="error" :title="'Xóa'">
                     <template #icon>
                       <IconifyIcon icon="lucide:trash-2" />
                     </template>

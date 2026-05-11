@@ -39,7 +39,9 @@ const formSchema = computed((): VbenFormSchema[] => {
         rules(values) {
           const { newPassword } = values;
           return z
-            .string({ required_error: $t('page.profile.confirmPasswordPlaceholder') })
+            .string({
+              required_error: $t('page.profile.confirmPasswordPlaceholder'),
+            })
             .min(1, { message: $t('page.profile.confirmPasswordPlaceholder') })
             .refine((value) => value === newPassword, {
               message: $t('page.profile.passwordMismatch'),

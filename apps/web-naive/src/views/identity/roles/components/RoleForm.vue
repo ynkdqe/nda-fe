@@ -33,7 +33,11 @@ const form = reactive<RoleFormModel>({
 const rules: FormRules = {
   name: [
     { message: 'Tên vai trò là bắt buộc', required: true, trigger: 'blur' },
-    { max: 64, message: 'Tên vai trò không được vượt quá 64 ký tự', trigger: 'input' },
+    {
+      max: 64,
+      message: 'Tên vai trò không được vượt quá 64 ký tự',
+      trigger: 'input',
+    },
   ],
 };
 

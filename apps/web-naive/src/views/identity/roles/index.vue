@@ -32,8 +32,6 @@ interface RoleItem {
 
 type DropdownKey = 'delete' | 'edit' | 'permission';
 
-
-
 const dropdownOptions: Array<{ key: DropdownKey; label: string }> = [
   { key: 'edit', label: 'Sửa' },
   { key: 'permission', label: 'Quyền' },
@@ -109,7 +107,8 @@ const gridOptions: VxeGridProps<RoleItem> = {
           responseReturn: 'body',
         });
         const items = res?.items ?? res?.data?.items ?? res ?? [];
-        const total = res?.totalCount ?? res?.data?.totalCount ?? items.length ?? 0;
+        const total =
+          res?.totalCount ?? res?.data?.totalCount ?? items.length ?? 0;
         return { items, total } as any;
       },
     },
@@ -192,7 +191,9 @@ async function onFormSubmit(formData: RoleFormModel) {
 
   drawerApi.setState({ confirmLoading: true });
   try {
-    await (id ? editRole(id, { ...payload, concurrencyStamp }) : createRole(payload));
+    await (id
+      ? editRole(id, { ...payload, concurrencyStamp })
+      : createRole(payload));
     message.success('Thao tác thành công');
     drawerApi.close();
     gridApi.query();

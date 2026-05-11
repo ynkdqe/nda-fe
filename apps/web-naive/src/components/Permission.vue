@@ -1,11 +1,5 @@
 <script lang="ts" setup>
-import {
-  computed,
-  onMounted,
-  onUnmounted,
-  ref,
-  watch,
-} from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
 import {
   NButton,
@@ -49,7 +43,7 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  'save': [payload: { granted: string[] }];
+  save: [payload: { granted: string[] }];
   'update:modelValue': [value: boolean];
 }>();
 
@@ -112,7 +106,9 @@ function isPermissionEditable(p: ApiPermission) {
 }
 
 const anyEditablePermissions = computed(() =>
-  groups.value.flatMap((g) => g.permissions).some((p) => isPermissionEditable(p)),
+  groups.value
+    .flatMap((g) => g.permissions)
+    .some((p) => isPermissionEditable(p)),
 );
 
 const currentEditableCount = computed(
@@ -121,7 +117,9 @@ const currentEditableCount = computed(
 
 const groupAllChecked = computed({
   get: () => {
-    const perms = currentPermissions.value.filter((p) => isPermissionEditable(p));
+    const perms = currentPermissions.value.filter((p) =>
+      isPermissionEditable(p),
+    );
     return perms.length > 0 && perms.every((p) => checked.value[p.name]);
   },
   set: (v: boolean) => {
@@ -136,14 +134,18 @@ const groupAllChecked = computed({
 const grantAll = computed({
   get() {
     const editable = Object.keys(checked.value).filter((k) => {
-      const perm = groups.value.flatMap((g) => g.permissions).find((p) => p.name === k);
+      const perm = groups.value
+        .flatMap((g) => g.permissions)
+        .find((p) => p.name === k);
       return perm ? isPermissionEditable(perm) : false;
     });
     return editable.length > 0 && editable.every((k) => checked.value[k]);
   },
   set(v: boolean) {
     Object.keys(checked.value).forEach((k) => {
-      const p = groups.value.flatMap((g) => g.permissions).find((perm) => perm.name === k);
+      const p = groups.value
+        .flatMap((g) => g.permissions)
+        .find((perm) => perm.name === k);
       if (p ? isPermissionEditable(p) : false) {
         checked.value[k] = v;
       }
@@ -177,7 +179,11 @@ async function fetchPermissions(providerName: string, providerKey: string) {
     selectedGroup.value = apiGroups[0]?.name ?? '';
 
     const map: Record<string, boolean> = {};
-    apiGroups.forEach((g) => g.permissions.forEach((p) => { map[p.name] = p.isGranted; }));
+    apiGroups.forEach((g) =>
+      g.permissions.forEach((p) => {
+        map[p.name] = p.isGranted;
+      }),
+    );
     checked.value = map;
     initialChecked.value = { ...map };
   } catch (error: any) {
@@ -212,11 +218,18 @@ async function onSave() {
     return;
   }
 
-  const perms = changed.map((name) => ({ isGranted: !!checked.value[name], name }));
+  const perms = changed.map((name) => ({
+    isGranted: !!checked.value[name],
+    name,
+  }));
   loading.value = true;
   try {
     const url = `/api/permission-management/permissions?providerName=${encodeURIComponent(String(props.providerName))}&providerKey=${encodeURIComponent(String(props.providerKey))}`;
-    await requestClient.put(url, { permissions: perms }, { responseReturn: 'body' });
+    await requestClient.put(
+      url,
+      { permissions: perms },
+      { responseReturn: 'body' },
+    );
     message.success('Lưu quyền thành công');
     emit('save', { granted: changed });
     visible.value = false;
@@ -282,7 +295,9 @@ function onPermissionToggle(p: ApiPermission, v: boolean) {
           </div>
 
           <!-- Right: Permission list -->
-          <div class="min-w-0 flex-1 border-t pt-4 md:border-l md:border-t-0 md:pl-5 md:pt-0">
+          <div
+            class="min-w-0 flex-1 border-t pt-4 md:border-l md:border-t-0 md:pl-5 md:pt-0"
+          >
             <!-- Select all in group -->
             <div class="mb-3 flex items-center gap-2">
               <NCheckbox
@@ -313,7 +328,10 @@ function onPermissionToggle(p: ApiPermission, v: boolean) {
                 </span>
               </div>
 
-              <div v-if="filteredPermissions.length === 0" class="py-4 text-center text-sm text-gray-400">
+              <div
+                v-if="filteredPermissions.length === 0"
+                class="py-4 text-center text-sm text-gray-400"
+              >
                 Không tìm thấy quyền nào
               </div>
             </div>
@@ -325,7 +343,9 @@ function onPermissionToggle(p: ApiPermission, v: boolean) {
       <template #footer>
         <div class="flex justify-end gap-3">
           <NButton @click="close">Hủy</NButton>
-          <NButton type="primary" :loading="loading" @click="onSave">Lưu</NButton>
+          <NButton type="primary" :loading="loading" @click="onSave"
+            >Lưu</NButton
+          >
         </div>
       </template>
     </NDrawerContent>

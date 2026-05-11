@@ -278,15 +278,27 @@ onMounted(() => {
       :avatar="userStore.userInfo?.avatar || preferences.app.defaultAvatar"
     >
       <template #title>
-        {{ $t('page.dashboard.workspace.welcomeTitle', [userStore.userInfo?.realName]) }}
+        {{
+          $t('page.dashboard.workspace.welcomeTitle', [
+            userStore.userInfo?.realName,
+          ])
+        }}
       </template>
       <template #description> {{ weatherDesc }} </template>
     </WorkbenchHeader>
 
     <div class="mt-5 flex flex-col lg:flex-row">
       <div class="mr-4 w-full lg:w-3/5">
-        <WorkbenchProject :items="projectItems" :title="$t('page.dashboard.workspace.projects')" @click="navTo" />
-        <WorkbenchTrends :items="trendItems" class="mt-5" :title="$t('page.dashboard.workspace.latestDynamic')" />
+        <WorkbenchProject
+          :items="projectItems"
+          :title="$t('page.dashboard.workspace.projects')"
+          @click="navTo"
+        />
+        <WorkbenchTrends
+          :items="trendItems"
+          class="mt-5"
+          :title="$t('page.dashboard.workspace.latestDynamic')"
+        />
       </div>
       <div class="w-full lg:w-2/5">
         <WorkbenchQuickNav
@@ -295,8 +307,15 @@ onMounted(() => {
           :title="$t('page.dashboard.workspace.quickNav')"
           @click="navTo"
         />
-        <WorkbenchTodo :items="todoItems" class="mt-5" :title="$t('page.dashboard.workspace.todoItems')" />
-        <AnalysisChartCard class="mt-5" :title="$t('page.dashboard.workspace.accessSource')">
+        <WorkbenchTodo
+          :items="todoItems"
+          class="mt-5"
+          :title="$t('page.dashboard.workspace.todoItems')"
+        />
+        <AnalysisChartCard
+          class="mt-5"
+          :title="$t('page.dashboard.workspace.accessSource')"
+        >
           <AnalyticsVisitsSource />
         </AnalysisChartCard>
       </div>
