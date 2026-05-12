@@ -43,7 +43,11 @@ const tabsValue = defineModel<string>('modelValue');
           </span>
         </div>
         <Separator class="my-0" />
-        <Tabs v-model="tabsValue" orientation="vertical" class="mx-4 mb-0 mt-0 md:mt-4">
+        <Tabs
+          v-model="tabsValue"
+          orientation="vertical"
+          class="mx-4 mb-0 mt-0 md:mt-4"
+        >
           <TabsList
             class="flex flex-row md:grid md:grid-cols-1 justify-start w-full h-auto bg-card gap-1 overflow-x-auto overflow-y-hidden p-1"
           >
