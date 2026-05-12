@@ -53,11 +53,6 @@ const formSchema = computed((): VbenFormSchema[] => {
       component: 'DatePicker',
       label: $t('page.profile.birthday'),
     },
-    {
-      fieldName: 'introduction',
-      component: 'Textarea',
-      label: $t('page.profile.bio'),
-    },
   ];
 });
 
