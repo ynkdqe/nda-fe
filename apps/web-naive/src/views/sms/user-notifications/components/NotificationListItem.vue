@@ -58,7 +58,12 @@ const tagType = computed(() => (props.isRead ? 'default' : 'info'));
     </div>
 
     <NSpace vertical size="small">
-      <NButton quaternary size="small" type="primary" @click="emit('toggleRead')">
+      <NButton
+        quaternary
+        size="small"
+        type="primary"
+        @click="emit('toggleRead')"
+      >
         {{
           isRead
             ? t('page.sms.notification.personalPage.actions.markUnread')

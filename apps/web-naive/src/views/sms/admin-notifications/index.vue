@@ -1,61 +1,65 @@
 <script setup lang="ts">
-import type { VbenFormProps } from "#/adapter/form";
-import type { VxeGridProps } from "#/adapter/vxe-table";
-import type { SmsNotificationApi } from "#/api";
+import type { VbenFormProps } from '#/adapter/form';
+import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { SmsNotificationApi } from '#/api';
 
-import { computed, reactive, ref } from "vue";
+import { computed, reactive, ref } from 'vue';
 
-import { Page } from "@vben/common-ui";
-import { useI18n } from "@vben/locales";
-import { formatDate } from "@vben/utils";
+import { Page } from '@vben/common-ui';
+import { useI18n } from '@vben/locales';
+import { formatDate } from '@vben/utils';
 
-import { NButton, NDataTable, NInput, NModal, NTag } from "naive-ui";
+import { NButton, NDataTable, NInput, NModal, NTag } from 'naive-ui';
 
-import { message } from "#/adapter/naive";
-import { useVbenVxeGrid } from "#/adapter/vxe-table";
-import { createNotification, fetchAdminNotificationList } from "#/api";
+import { message } from '#/adapter/naive';
+import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { createNotification, fetchAdminNotificationList } from '#/api';
 
-import AdminNotificationForm from "./components/AdminNotificationForm.vue";
+import AdminNotificationForm from './components/AdminNotificationForm.vue';
 
 const { t } = useI18n();
 
 const formOptions: VbenFormProps = {
   collapsed: false,
   resetButtonOptions: {
-    content: t("page.sms.notification.administrationPage.filter.reset"),
+    content: t('page.sms.notification.administrationPage.filter.reset'),
   },
   schema: [
     {
-      component: "Input",
+      component: 'Input',
       componentProps: {
-        placeholder: t("page.sms.notification.administrationPage.filter.keywordPlaceholder"),
+        placeholder: t(
+          'page.sms.notification.administrationPage.filter.keywordPlaceholder',
+        ),
       },
-      fieldName: "keyword",
-      label: t("page.sms.notification.administrationPage.filter.keyword"),
+      fieldName: 'keyword',
+      label: t('page.sms.notification.administrationPage.filter.keyword'),
     },
     {
-      component: "Select",
+      component: 'Select',
       componentProps: {
         clearable: true,
         options: [
           {
-            label: t("page.sms.notification.administrationPage.filter.private"),
-            value: "0",
+            label: t('page.sms.notification.administrationPage.filter.private'),
+            value: '0',
           },
           {
-            label: t("page.sms.notification.administrationPage.filter.public"),
-            value: "1",
+            label: t('page.sms.notification.administrationPage.filter.public'),
+            value: '1',
           },
         ],
-        placeholder: t("page.sms.notification.administrationPage.filter.statusPlaceholder"),
+        placeholder: t(
+          'page.sms.notification.administrationPage.filter.statusPlaceholder',
+        ),
       },
-      fieldName: "status",
-      label: t("page.sms.notification.administrationPage.filter.status"),
+      fieldName: 'status',
+      label: t('page.sms.notification.administrationPage.filter.status'),
     },
   ],
   showCollapseButton: true,
   submitButtonOptions: {
-    content: t("page.sms.notification.administrationPage.filter.search"),
+    content: t('page.sms.notification.administrationPage.filter.search'),
   },
   submitOnChange: false,
   submitOnEnter: true,
@@ -65,43 +69,43 @@ const toolbarConfig = {
   custom: true,
   export: true,
   search: true,
-} as VxeGridProps<SmsNotificationApi.NotificationItem>["toolbarConfig"];
+} as VxeGridProps<SmsNotificationApi.NotificationItem>['toolbarConfig'];
 
 const gridOptions: VxeGridProps<SmsNotificationApi.NotificationItem> = {
-  border: "full",
+  border: 'full',
   columns: [
     {
-      title: "#",
-      type: "seq",
+      title: '#',
+      type: 'seq',
       width: 70,
     },
     {
-      field: "title",
+      field: 'title',
       minWidth: 240,
-      showOverflow: "tooltip",
-      title: t("page.sms.notification.administrationPage.table.title"),
+      showOverflow: 'tooltip',
+      title: t('page.sms.notification.administrationPage.table.title'),
     },
     {
-      field: "type",
-      slots: { default: "typeCell" },
-      title: t("page.sms.notification.administrationPage.table.type"),
+      field: 'type',
+      slots: { default: 'typeCell' },
+      title: t('page.sms.notification.administrationPage.table.type'),
       width: 160,
     },
     {
-      field: "senderName",
-      title: t("page.sms.notification.administrationPage.table.sender"),
+      field: 'senderName',
+      title: t('page.sms.notification.administrationPage.table.sender'),
       width: 180,
     },
     {
-      field: "notificationReceivers",
+      field: 'notificationReceivers',
       minWidth: 220,
-      slots: { default: "recipientsCell" },
-      title: t("page.sms.notification.administrationPage.table.recipients"),
+      slots: { default: 'recipientsCell' },
+      title: t('page.sms.notification.administrationPage.table.recipients'),
     },
     {
-      field: "creationTime",
-      slots: { default: "creationCell" },
-      title: t("page.sms.notification.administrationPage.table.creationTime"),
+      field: 'creationTime',
+      slots: { default: 'creationCell' },
+      title: t('page.sms.notification.administrationPage.table.creationTime'),
       width: 200,
     },
   ],
@@ -141,25 +145,25 @@ const sendVisible = ref(false);
 const sendSubmitting = ref(false);
 const sendFormRef = ref();
 const sendForm = reactive({
-  icon: "",
+  icon: '',
   isSystem: false,
-  message: "",
+  message: '',
   recipientIds: [] as string[],
   senderId: undefined as string | undefined,
-  title: "",
+  title: '',
   type: 0 as NotificationType,
-  url: "",
+  url: '',
 });
 
 function resetSendForm() {
-  sendForm.icon = "";
+  sendForm.icon = '';
   sendForm.isSystem = false;
-  sendForm.message = "";
+  sendForm.message = '';
   sendForm.recipientIds = [];
   sendForm.senderId = undefined;
-  sendForm.title = "";
+  sendForm.title = '';
   sendForm.type = 0;
-  sendForm.url = "";
+  sendForm.url = '';
 }
 
 function openSendModal() {
@@ -179,7 +183,9 @@ async function handleSend() {
       icon: sendForm.icon || null,
       isSystem: !!sendForm.isSystem,
       message: sendForm.message,
-      receiverIds: Array.isArray(sendForm.recipientIds) ? sendForm.recipientIds : [],
+      receiverIds: Array.isArray(sendForm.recipientIds)
+        ? sendForm.recipientIds
+        : [],
       senderId: sendForm.senderId || null,
       title: sendForm.title,
       type: sendForm.type,
@@ -188,12 +194,14 @@ async function handleSend() {
 
     if ((response as any)?.success === false) {
       throw new Error(
-        (response as any)?.message || t("page.sms.notification.administrationPage.sendFailed"),
+        (response as any)?.message ||
+          t('page.sms.notification.administrationPage.sendFailed'),
       );
     }
 
     message.success(
-      (response as any)?.message || t("page.sms.notification.administrationPage.sendSuccess"),
+      (response as any)?.message ||
+        t('page.sms.notification.administrationPage.sendSuccess'),
     );
     closeSendModal();
     await gridApi.query();
@@ -208,18 +216,20 @@ async function handleSend() {
 
 function formatDateTime(value?: string) {
   if (!value) {
-    return "";
+    return '';
   }
 
-  return formatDate(value, "DD-MM-YYYY HH:mm:ss");
+  return formatDate(value, 'DD-MM-YYYY HH:mm:ss');
 }
 
 const recipientsVisible = ref(false);
-const recipientsQuery = ref("");
+const recipientsQuery = ref('');
 const recipientsData = ref<SmsNotificationApi.NotificationReceiver[]>([]);
 
 function getReceivers(row: SmsNotificationApi.NotificationItem) {
-  return Array.isArray(row.notificationReceivers) ? row.notificationReceivers : [];
+  return Array.isArray(row.notificationReceivers)
+    ? row.notificationReceivers
+    : [];
 }
 
 function openRecipientsModal(row: SmsNotificationApi.NotificationItem) {
@@ -228,7 +238,7 @@ function openRecipientsModal(row: SmsNotificationApi.NotificationItem) {
     id: receiver.id ?? receiver.userId,
     name: receiver.name,
     readAt: receiver.readAt ?? null,
-    status: receiver.status ?? (receiver.readAt ? "read" : "unread"),
+    status: receiver.status ?? (receiver.readAt ? 'read' : 'unread'),
     userId: receiver.userId,
     userName: receiver.userName,
   }));
@@ -246,32 +256,36 @@ const filteredRecipients = computed(() => {
   }
 
   return recipientsData.value.filter((receiver) => {
-    const name = (receiver.name || "").toLowerCase();
-    const userName = (receiver.userName || "").toLowerCase();
-    const email = (receiver.email || "").toLowerCase();
-    return name.includes(keyword) || userName.includes(keyword) || email.includes(keyword);
+    const name = (receiver.name || '').toLowerCase();
+    const userName = (receiver.userName || '').toLowerCase();
+    const email = (receiver.email || '').toLowerCase();
+    return (
+      name.includes(keyword) ||
+      userName.includes(keyword) ||
+      email.includes(keyword)
+    );
   });
 });
 
 const recipientsColumns = computed(() => [
   {
-    key: "name",
-    title: t("page.sms.notification.administrationPage.recipients.fullName"),
+    key: 'name',
+    title: t('page.sms.notification.administrationPage.recipients.fullName'),
     width: 220,
   },
   {
-    key: "userName",
-    title: t("page.sms.notification.administrationPage.recipients.account"),
+    key: 'userName',
+    title: t('page.sms.notification.administrationPage.recipients.account'),
     width: 160,
   },
   {
-    key: "status",
-    title: t("page.sms.notification.administrationPage.recipients.status"),
+    key: 'status',
+    title: t('page.sms.notification.administrationPage.recipients.status'),
     width: 120,
   },
   {
-    key: "readAt",
-    title: t("page.sms.notification.administrationPage.recipients.viewedAt"),
+    key: 'readAt',
+    title: t('page.sms.notification.administrationPage.recipients.viewedAt'),
     width: 180,
   },
 ]);
@@ -282,7 +296,7 @@ const recipientsColumns = computed(() => [
     <Grid>
       <template #toolbar-actions>
         <NButton type="primary" @click="openSendModal">
-          {{ t("page.sms.notification.administrationPage.actions.send") }}
+          {{ t('page.sms.notification.administrationPage.actions.send') }}
         </NButton>
       </template>
 
@@ -290,19 +304,25 @@ const recipientsColumns = computed(() => [
         <NTag :bordered="false" :type="row.type === 1 ? 'info' : 'success'">
           {{
             row.type === 1
-              ? t("page.sms.notification.administrationPage.table.public")
-              : t("page.sms.notification.administrationPage.table.private")
+              ? t('page.sms.notification.administrationPage.table.public')
+              : t('page.sms.notification.administrationPage.table.private')
           }}
         </NTag>
       </template>
 
       <template #recipientsCell="{ row }">
         <div v-if="row.type === 1" class="font-medium text-blue-600">
-          {{ t("page.sms.notification.administrationPage.recipients.allUsers") }}
+          {{
+            t('page.sms.notification.administrationPage.recipients.allUsers')
+          }}
         </div>
-        <div v-else-if="getReceivers(row).length > 0" class="whitespace-normal break-words text-sm">
+        <div
+          v-else-if="getReceivers(row).length > 0"
+          class="whitespace-normal break-words text-sm"
+        >
           <template v-if="getReceivers(row).length === 1">
-            {{ getReceivers(row)[0]?.name }} ( {{ getReceivers(row)[0]?.userName }} )
+            {{ getReceivers(row)[0]?.name }} (
+            {{ getReceivers(row)[0]?.userName }} )
           </template>
           <template v-else>
             <a
@@ -310,7 +330,7 @@ const recipientsColumns = computed(() => [
               @click.prevent="openRecipientsModal(row)"
             >
               {{
-                t("page.sms.notification.administrationPage.recipients.view", {
+                t('page.sms.notification.administrationPage.recipients.view', {
                   count: getReceivers(row).length,
                 })
               }}
@@ -318,7 +338,7 @@ const recipientsColumns = computed(() => [
           </template>
         </div>
         <div v-else class="text-gray-400">
-          {{ t("page.sms.notification.administrationPage.recipients.empty") }}
+          {{ t('page.sms.notification.administrationPage.recipients.empty') }}
         </div>
       </template>
 
@@ -356,7 +376,11 @@ const recipientsColumns = computed(() => [
       <NInput
         v-model:value="recipientsQuery"
         clearable
-        :placeholder="t('page.sms.notification.administrationPage.recipients.searchPlaceholder')"
+        :placeholder="
+          t(
+            'page.sms.notification.administrationPage.recipients.searchPlaceholder',
+          )
+        "
         class="mb-3"
       />
 
@@ -372,13 +396,17 @@ const recipientsColumns = computed(() => [
             <NTag :bordered="false" :type="row?.readAt ? 'success' : 'default'">
               {{
                 row?.readAt
-                  ? t("page.sms.notification.administrationPage.recipients.read")
-                  : t("page.sms.notification.administrationPage.recipients.unread")
+                  ? t(
+                      'page.sms.notification.administrationPage.recipients.read',
+                    )
+                  : t(
+                      'page.sms.notification.administrationPage.recipients.unread',
+                    )
               }}
             </NTag>
           </template>
           <template v-else-if="column.key === 'readAt'">
-            {{ row?.readAt ? formatDateTime(row.readAt) : "-" }}
+            {{ row?.readAt ? formatDateTime(row.readAt) : '-' }}
           </template>
         </template>
       </NDataTable>

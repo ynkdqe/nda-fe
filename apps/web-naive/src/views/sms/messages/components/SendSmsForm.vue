@@ -1,16 +1,20 @@
 <script lang="ts" setup>
-import type { FormInst, FormRules } from "naive-ui";
+import type { FormInst, FormRules } from 'naive-ui';
 
-import type { SmsMessageApi } from "#/models/sms";
+import type { SmsMessageApi } from '#/models/sms';
 
-import { computed, onMounted, reactive, ref, watch } from "vue";
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 
-import { useI18n } from "@vben/locales";
+import { useI18n } from '@vben/locales';
 
-import { NForm, NFormItem, NInput, NModal, NSelect, NSpin } from "naive-ui";
+import { NForm, NFormItem, NInput, NModal, NSelect, NSpin } from 'naive-ui';
 
-import { message } from "#/adapter/naive";
-import { fetchSmsProviderList, fetchSmsTemplateList, sendSmsMessage } from "#/api";
+import { message } from '#/adapter/naive';
+import {
+  fetchSmsProviderList,
+  fetchSmsTemplateList,
+  sendSmsMessage,
+} from '#/api';
 
 const props = defineProps({
   visible: { type: Boolean, required: true },
@@ -18,7 +22,7 @@ const props = defineProps({
 
 const emit = defineEmits<{
   sent: [];
-  "update:visible": [value: boolean];
+  'update:visible': [value: boolean];
 }>();
 
 const { t } = useI18n();
@@ -34,9 +38,9 @@ const selectedTemplateId = ref<number | string>();
 const selectedProviderId = ref<number | string>();
 
 const form = reactive({
-  clientId: "nlana",
+  clientId: 'nlana',
   data: {} as Record<string, string>,
-  phoneNumber: "",
+  phoneNumber: '',
   smsProviderId: undefined as number | string | undefined,
   smsTemplateId: undefined as number | string | undefined,
 });
@@ -45,10 +49,10 @@ const rules: FormRules = {
   phoneNumber: [
     {
       required: true,
-      trigger: ["blur", "input"],
+      trigger: ['blur', 'input'],
       validator: (_rule, value) => {
-        if (!String(value ?? "").trim()) {
-          return new Error(t("page.sms.messagePage.form.phonePlaceholder"));
+        if (!String(value ?? '').trim()) {
+          return new Error(t('page.sms.messagePage.form.phonePlaceholder'));
         }
         return true;
       },
@@ -57,10 +61,10 @@ const rules: FormRules = {
   smsTemplateId: [
     {
       required: true,
-      trigger: ["blur", "change"],
+      trigger: ['blur', 'change'],
       validator: (_rule, value) => {
-        if (value === undefined || value === null || value === "") {
-          return new Error(t("page.sms.messagePage.form.templatePlaceholder"));
+        if (value === undefined || value === null || value === '') {
+          return new Error(t('page.sms.messagePage.form.templatePlaceholder'));
         }
         return true;
       },
@@ -70,7 +74,8 @@ const rules: FormRules = {
 
 const templateOptions = computed(() =>
   templates.value.map((item) => ({
-    label: [item.name, item.code].filter(Boolean).join(" - ") || String(item.id),
+    label:
+      [item.name, item.code].filter(Boolean).join(' - ') || String(item.id),
     value: item.id,
   })),
 );
@@ -91,12 +96,15 @@ const templatePreview = computed(() => {
   const templateContent = currentTemplate?.template ?? currentTemplate?.content;
 
   if (!templateContent) {
-    return "";
+    return '';
   }
 
   let content = templateContent;
   for (const [key, value] of Object.entries(form.data)) {
-    content = content.replaceAll(new RegExp(`#${key}#`, "g"), String(value ?? ""));
+    content = content.replaceAll(
+      new RegExp(`#${key}#`, 'g'),
+      String(value ?? ''),
+    );
   }
 
   return content;
@@ -111,7 +119,7 @@ watch(
 );
 
 watch(modalVisible, (value) => {
-  emit("update:visible", value);
+  emit('update:visible', value);
 
   if (value) {
     resetForm();
@@ -122,14 +130,18 @@ watch(selectedTemplateId, (id) => {
   form.smsTemplateId = id;
   form.data = {};
 
-  const currentTemplate = templates.value.find((item) => String(item.id) === String(id));
+  const currentTemplate = templates.value.find(
+    (item) => String(item.id) === String(id),
+  );
   const templateContent = currentTemplate?.template ?? currentTemplate?.content;
 
   if (templateContent) {
-    const parameterKeys = [...templateContent.matchAll(/#(\d+)#/g)].map((match) => match[1]);
+    const parameterKeys = [...templateContent.matchAll(/#(\d+)#/g)].map(
+      (match) => match[1],
+    );
 
     for (const key of parameterKeys) {
-      form.data[String(key)] = "";
+      form.data[String(key)] = '';
     }
   }
 
@@ -170,7 +182,7 @@ onMounted(() => {
 });
 
 function resetForm() {
-  form.phoneNumber = "";
+  form.phoneNumber = '';
   form.smsTemplateId = undefined;
   form.smsProviderId = undefined;
   form.data = {};
@@ -195,11 +207,11 @@ async function handleSend() {
       smsProviderId: form.smsProviderId,
       smsTemplateId: form.smsTemplateId,
     });
-    message.success(t("page.sms.messagePage.form.sendSuccess"));
-    emit("sent");
+    message.success(t('page.sms.messagePage.form.sendSuccess'));
+    emit('sent');
     close();
   } catch (error: any) {
-    message.error(error?.message || t("page.sms.messagePage.form.sendFail"));
+    message.error(error?.message || t('page.sms.messagePage.form.sendFail'));
   } finally {
     loading.value = false;
   }
@@ -222,14 +234,20 @@ async function handleSend() {
   >
     <NSpin :show="optionsLoading">
       <NForm ref="formRef" :model="form" :rules="rules" label-placement="top">
-        <NFormItem :label="t('page.sms.messagePage.form.phoneLabel')" path="phoneNumber">
+        <NFormItem
+          :label="t('page.sms.messagePage.form.phoneLabel')"
+          path="phoneNumber"
+        >
           <NInput
             v-model:value="form.phoneNumber"
             :placeholder="t('page.sms.messagePage.form.phonePlaceholder')"
           />
         </NFormItem>
 
-        <NFormItem :label="t('page.sms.messagePage.form.templateLabel')" path="smsTemplateId">
+        <NFormItem
+          :label="t('page.sms.messagePage.form.templateLabel')"
+          path="smsTemplateId"
+        >
           <NSelect
             v-model:value="selectedTemplateId"
             :options="templateOptions"
@@ -256,12 +274,17 @@ async function handleSend() {
           >
             <NInput
               v-model:value="form.data[key]"
-              :placeholder="t('page.sms.messagePage.form.parameterPlaceholder', { key })"
+              :placeholder="
+                t('page.sms.messagePage.form.parameterPlaceholder', { key })
+              "
             />
           </NFormItem>
         </template>
 
-        <NFormItem v-if="templatePreview" :label="t('page.sms.messagePage.form.previewLabel')">
+        <NFormItem
+          v-if="templatePreview"
+          :label="t('page.sms.messagePage.form.previewLabel')"
+        >
           <NInput
             :value="templatePreview"
             :autosize="{ minRows: 4, maxRows: 8 }"

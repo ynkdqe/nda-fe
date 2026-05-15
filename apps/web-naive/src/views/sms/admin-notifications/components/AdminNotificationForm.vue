@@ -1,13 +1,21 @@
 <script setup lang="ts">
-import type { FormInst, FormRules } from "naive-ui";
+import type { FormInst, FormRules } from 'naive-ui';
 
-import { computed, reactive, ref, watch } from "vue";
+import { computed, reactive, ref, watch } from 'vue';
 
-import { useI18n } from "@vben/locales";
+import { useI18n } from '@vben/locales';
 
-import { NForm, NFormItem, NGrid, NGridItem, NInput, NSelect, NSwitch } from "naive-ui";
+import {
+  NForm,
+  NFormItem,
+  NGrid,
+  NGridItem,
+  NInput,
+  NSelect,
+  NSwitch,
+} from 'naive-ui';
 
-import UserSearchSelect from "#/components/UserSearchSelect.vue";
+import UserSearchSelect from '#/components/UserSearchSelect.vue';
 
 type NotificationType = 0 | 1;
 
@@ -27,7 +35,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  "update:modelValue": [value: FormModel];
+  'update:modelValue': [value: FormModel];
 }>();
 
 const { t } = useI18n();
@@ -38,26 +46,28 @@ const rules: FormRules = {
   message: [
     {
       required: true,
-      trigger: ["blur", "input"],
-      message: t("page.sms.notification.administrationPage.form.messageRequired"),
+      trigger: ['blur', 'input'],
+      message: t(
+        'page.sms.notification.administrationPage.form.messageRequired',
+      ),
     },
   ],
   title: [
     {
       required: true,
-      trigger: ["blur", "input"],
-      message: t("page.sms.notification.administrationPage.form.titleRequired"),
+      trigger: ['blur', 'input'],
+      message: t('page.sms.notification.administrationPage.form.titleRequired'),
     },
   ],
 };
 
 const typeOptions = computed(() => [
   {
-    label: t("page.sms.notification.administrationPage.form.private"),
+    label: t('page.sms.notification.administrationPage.form.private'),
     value: 0,
   },
   {
-    label: t("page.sms.notification.administrationPage.form.public"),
+    label: t('page.sms.notification.administrationPage.form.public'),
     value: 1,
   },
 ]);
@@ -76,7 +86,7 @@ watch(
 watch(
   inner,
   (value) => {
-    emit("update:modelValue", { ...value });
+    emit('update:modelValue', { ...value });
   },
   { deep: true },
 );
@@ -110,43 +120,66 @@ defineExpose({ validate });
   <NForm ref="formRef" :model="inner" :rules="rules" label-placement="top">
     <NGrid :cols="24" :x-gap="16">
       <NGridItem :span="12">
-        <NFormItem :label="t('page.sms.notification.administrationPage.form.system')">
+        <NFormItem
+          :label="t('page.sms.notification.administrationPage.form.system')"
+        >
           <NSwitch v-model:value="inner.isSystem" />
         </NFormItem>
       </NGridItem>
 
       <NGridItem :span="12">
-        <NFormItem :label="t('page.sms.notification.administrationPage.form.type')">
+        <NFormItem
+          :label="t('page.sms.notification.administrationPage.form.type')"
+        >
           <NSelect v-model:value="inner.type" :options="typeOptions" />
         </NFormItem>
       </NGridItem>
 
       <NGridItem :span="24">
-        <NFormItem :label="t('page.sms.notification.administrationPage.form.sender')">
+        <NFormItem
+          :label="t('page.sms.notification.administrationPage.form.sender')"
+        >
           <UserSearchSelect
             v-model="inner.senderId"
             :disabled="disableSender"
-            :placeholder="t('page.sms.notification.administrationPage.form.senderPlaceholder')"
+            :placeholder="
+              t(
+                'page.sms.notification.administrationPage.form.senderPlaceholder',
+              )
+            "
           />
         </NFormItem>
       </NGridItem>
 
       <NGridItem :span="24">
-        <NFormItem :label="t('page.sms.notification.administrationPage.form.recipient')">
+        <NFormItem
+          :label="t('page.sms.notification.administrationPage.form.recipient')"
+        >
           <UserSearchSelect
             v-model="inner.recipientIds"
             :disabled="disableRecipients"
             mode="multiple"
-            :placeholder="t('page.sms.notification.administrationPage.form.recipientPlaceholder')"
+            :placeholder="
+              t(
+                'page.sms.notification.administrationPage.form.recipientPlaceholder',
+              )
+            "
           />
         </NFormItem>
       </NGridItem>
 
       <NGridItem :span="24">
-        <NFormItem path="title" :label="t('page.sms.notification.administrationPage.form.title')">
+        <NFormItem
+          path="title"
+          :label="t('page.sms.notification.administrationPage.form.title')"
+        >
           <NInput
             v-model:value="inner.title"
-            :placeholder="t('page.sms.notification.administrationPage.form.titlePlaceholder')"
+            :placeholder="
+              t(
+                'page.sms.notification.administrationPage.form.titlePlaceholder',
+              )
+            "
           />
         </NFormItem>
       </NGridItem>
@@ -159,26 +192,38 @@ defineExpose({ validate });
           <NInput
             v-model:value="inner.message"
             :autosize="{ minRows: 4, maxRows: 8 }"
-            :placeholder="t('page.sms.notification.administrationPage.form.messagePlaceholder')"
+            :placeholder="
+              t(
+                'page.sms.notification.administrationPage.form.messagePlaceholder',
+              )
+            "
             type="textarea"
           />
         </NFormItem>
       </NGridItem>
 
       <NGridItem :span="12">
-        <NFormItem :label="t('page.sms.notification.administrationPage.form.icon')">
+        <NFormItem
+          :label="t('page.sms.notification.administrationPage.form.icon')"
+        >
           <NInput
             v-model:value="inner.icon"
-            :placeholder="t('page.sms.notification.administrationPage.form.iconPlaceholder')"
+            :placeholder="
+              t('page.sms.notification.administrationPage.form.iconPlaceholder')
+            "
           />
         </NFormItem>
       </NGridItem>
 
       <NGridItem :span="12">
-        <NFormItem :label="t('page.sms.notification.administrationPage.form.url')">
+        <NFormItem
+          :label="t('page.sms.notification.administrationPage.form.url')"
+        >
           <NInput
             v-model:value="inner.url"
-            :placeholder="t('page.sms.notification.administrationPage.form.urlPlaceholder')"
+            :placeholder="
+              t('page.sms.notification.administrationPage.form.urlPlaceholder')
+            "
           />
         </NFormItem>
       </NGridItem>

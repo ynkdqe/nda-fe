@@ -1,20 +1,24 @@
 <script lang="ts" setup>
-import type { VbenFormProps } from "#/adapter/form";
-import type { VxeGridProps } from "#/adapter/vxe-table";
-import type { SmsMessageApi } from "#/models/sms";
+import type { VbenFormProps } from '#/adapter/form';
+import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { SmsMessageApi } from '#/models/sms';
 
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch } from 'vue';
 
-import { Page } from "@vben/common-ui";
-import { IconifyIcon } from "@vben/icons";
-import { formatDate } from "@vben/utils";
+import { Page } from '@vben/common-ui';
+import { IconifyIcon } from '@vben/icons';
+import { formatDate } from '@vben/utils';
 
-import { NButton, NTag } from "naive-ui";
+import { NButton, NTag } from 'naive-ui';
 
-import { useVbenVxeGrid } from "#/adapter/vxe-table";
-import { fetchSmsMessageList, fetchSmsProviderList, fetchSmsTemplateList } from "#/api";
+import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import {
+  fetchSmsMessageList,
+  fetchSmsProviderList,
+  fetchSmsTemplateList,
+} from '#/api';
 
-import SendSmsForm from "./components/SendSmsForm.vue";
+import SendSmsForm from './components/SendSmsForm.vue';
 
 const sendFormVisible = ref(false);
 
@@ -42,7 +46,7 @@ async function loadProviders() {
       value,
     }));
   } catch (error) {
-    console.warn("Failed to load providers", error);
+    console.warn('Failed to load providers', error);
     providerMap.value = {};
     providerOptions.value = [];
   }
@@ -62,7 +66,7 @@ async function loadTemplates() {
       value,
     }));
   } catch (error) {
-    console.warn("Failed to load templates", error);
+    console.warn('Failed to load templates', error);
     templateMap.value = {};
     templateOptions.value = [];
   }
@@ -70,101 +74,101 @@ async function loadTemplates() {
 
 const formOptions: VbenFormProps = {
   collapsed: false,
-  resetButtonOptions: { content: "Đặt lại" },
+  resetButtonOptions: { content: 'Đặt lại' },
   schema: [
     {
-      component: "Input",
+      component: 'Input',
       componentProps: {
-        placeholder: "Nhập mã yêu cầu, số điện thoại hoặc nội dung",
+        placeholder: 'Nhập mã yêu cầu, số điện thoại hoặc nội dung',
       },
-      fieldName: "keyword",
-      label: "Từ khóa",
+      fieldName: 'keyword',
+      label: 'Từ khóa',
     },
     {
-      component: "Select",
+      component: 'Select',
       componentProps: {
         clearable: true,
         options: [
-          { label: "Thành công", value: "1" },
-          { label: "Thất bại", value: "0" },
+          { label: 'Thành công', value: '1' },
+          { label: 'Thất bại', value: '0' },
         ],
-        placeholder: "Tất cả",
+        placeholder: 'Tất cả',
       },
-      fieldName: "status",
-      label: "Trạng thái",
+      fieldName: 'status',
+      label: 'Trạng thái',
     },
     {
-      component: "Select",
+      component: 'Select',
       componentProps: {
         clearable: true,
         options: [],
-        placeholder: "Tất cả",
+        placeholder: 'Tất cả',
       },
-      fieldName: "smsProviderId",
-      label: "Nhà cung cấp",
+      fieldName: 'smsProviderId',
+      label: 'Nhà cung cấp',
     },
     {
-      component: "Select",
+      component: 'Select',
       componentProps: {
         clearable: true,
         options: [],
-        placeholder: "Tất cả",
+        placeholder: 'Tất cả',
       },
-      fieldName: "smsTemplateId",
-      label: "Mẫu tin nhắn",
+      fieldName: 'smsTemplateId',
+      label: 'Mẫu tin nhắn',
     },
   ],
   showCollapseButton: true,
-  submitButtonOptions: { content: "Tìm kiếm" },
+  submitButtonOptions: { content: 'Tìm kiếm' },
   submitOnChange: false,
   submitOnEnter: true,
 };
 
 const gridOptions: VxeGridProps<SmsMessageApi.SmsMessage> = {
-  border: "full",
+  border: 'full',
   columns: [
-    { field: "id", title: "#", width: 80 },
+    { field: 'id', title: '#', width: 80 },
     {
-      field: "requestId",
-      showOverflow: "tooltip",
-      title: "Mã yêu cầu",
+      field: 'requestId',
+      showOverflow: 'tooltip',
+      title: 'Mã yêu cầu',
       width: 260,
     },
     {
-      field: "smsProviderId",
-      slots: { default: "providerCell" },
-      title: "Nhà cung cấp",
+      field: 'smsProviderId',
+      slots: { default: 'providerCell' },
+      title: 'Nhà cung cấp',
       width: 160,
     },
     {
-      field: "smsTemplateId",
-      slots: { default: "templateCell" },
-      title: "Mẫu tin nhắn",
+      field: 'smsTemplateId',
+      slots: { default: 'templateCell' },
+      title: 'Mẫu tin nhắn',
       width: 160,
     },
-    { field: "phoneNumber", title: "Số điện thoại", width: 140 },
+    { field: 'phoneNumber', title: 'Số điện thoại', width: 140 },
     {
-      field: "message",
+      field: 'message',
       minWidth: 220,
-      showOverflow: "tooltip",
-      title: "Nội dung",
+      showOverflow: 'tooltip',
+      title: 'Nội dung',
     },
     {
-      field: "status",
-      slots: { default: "statusCell" },
-      title: "Trạng thái",
+      field: 'status',
+      slots: { default: 'statusCell' },
+      title: 'Trạng thái',
       width: 140,
     },
     {
-      field: "sendedTime",
-      slots: { default: "sendedCell" },
-      title: "Thời gian gửi",
+      field: 'sendedTime',
+      slots: { default: 'sendedCell' },
+      title: 'Thời gian gửi',
       width: 180,
     },
     {
-      field: "creationTime",
-      slots: { default: "creationCell" },
-      title: "Ngày tạo",
+      field: 'creationTime',
+      slots: { default: 'creationCell' },
+      title: 'Ngày tạo',
       width: 180,
     },
   ],
@@ -209,7 +213,7 @@ const [Grid, gridApi] = useVbenVxeGrid<SmsMessageApi.SmsMessage>({
 function syncFormSelectOptions() {
   const current = gridApi.formApi.getState?.();
   const nextSchema = (current?.schema || []).map((item: any) => {
-    if (item.fieldName === "smsProviderId") {
+    if (item.fieldName === 'smsProviderId') {
       return {
         ...item,
         componentProps: {
@@ -219,7 +223,7 @@ function syncFormSelectOptions() {
       };
     }
 
-    if (item.fieldName === "smsTemplateId") {
+    if (item.fieldName === 'smsTemplateId') {
       return {
         ...item,
         componentProps: {
@@ -243,21 +247,21 @@ onMounted(() => {
   syncFormSelectOptions();
 });
 
-function isSuccessStatus(status: SmsMessageApi.SmsMessage["status"]) {
-  if (typeof status === "boolean") {
+function isSuccessStatus(status: SmsMessageApi.SmsMessage['status']) {
+  if (typeof status === 'boolean') {
     return status;
   }
 
-  const value = String(status ?? "").toLowerCase();
+  const value = String(status ?? '').toLowerCase();
   if (!value) {
     return false;
   }
 
-  if (value === "true") {
+  if (value === 'true') {
     return true;
   }
 
-  if (value === "false") {
+  if (value === 'false') {
     return false;
   }
 
@@ -267,10 +271,10 @@ function isSuccessStatus(status: SmsMessageApi.SmsMessage["status"]) {
 
 function formatDateTime(value?: string) {
   if (!value) {
-    return "";
+    return '';
   }
 
-  return formatDate(value, "DD-MM-YYYY HH:mm:ss");
+  return formatDate(value, 'DD-MM-YYYY HH:mm:ss');
 }
 
 function handleSent() {
@@ -291,16 +295,19 @@ function handleSent() {
       </template>
 
       <template #providerCell="{ row }">
-        {{ providerMap[String(row.smsProviderId)] || row.smsProviderId || "-" }}
+        {{ providerMap[String(row.smsProviderId)] || row.smsProviderId || '-' }}
       </template>
 
       <template #templateCell="{ row }">
-        {{ templateMap[String(row.smsTemplateId)] || row.smsTemplateId || "-" }}
+        {{ templateMap[String(row.smsTemplateId)] || row.smsTemplateId || '-' }}
       </template>
 
       <template #statusCell="{ row }">
-        <NTag :bordered="false" :type="isSuccessStatus(row.status) ? 'success' : 'default'">
-          {{ isSuccessStatus(row.status) ? "Thành công" : "Thất bại" }}
+        <NTag
+          :bordered="false"
+          :type="isSuccessStatus(row.status) ? 'success' : 'default'"
+        >
+          {{ isSuccessStatus(row.status) ? 'Thành công' : 'Thất bại' }}
         </NTag>
       </template>
 

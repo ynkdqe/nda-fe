@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { SmsNotificationApi } from "#/api";
+import type { SmsNotificationApi } from '#/api';
 
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from 'vue';
 
-import { Page } from "@vben/common-ui";
-import { useI18n } from "@vben/locales";
-import { formatDate } from "@vben/utils";
+import { Page } from '@vben/common-ui';
+import { useI18n } from '@vben/locales';
+import { formatDate } from '@vben/utils';
 
 import {
   NButton,
@@ -23,17 +23,17 @@ import {
   NSelect,
   NSkeleton,
   NSpace,
-} from "naive-ui";
+} from 'naive-ui';
 
-import { message } from "#/adapter/naive";
+import { message } from '#/adapter/naive';
 import {
   deleteNotification,
   deleteNotifications,
   fetchNotificationList,
   updateNotificationStatus,
-} from "#/api";
+} from '#/api';
 
-import NotificationListItem from "./components/NotificationListItem.vue";
+import NotificationListItem from './components/NotificationListItem.vue';
 
 type UiNotification = {
   avatar?: string;
@@ -55,7 +55,7 @@ const selectedIds = ref<Set<string>>(new Set());
 const searchCollapsed = ref(true);
 const query = reactive({
   dateRange: null as [number, number] | null,
-  keyword: "",
+  keyword: '',
   page: 1,
   pageSize: 20,
   status: undefined as number | string | undefined,
@@ -65,14 +65,14 @@ function mapToUiItem(item: SmsNotificationApi.NotificationUserItem) {
   return {
     avatar: item.icon || undefined,
     date: item.creationTime
-      ? (formatDate(item.creationTime, "DD-MM-YYYY HH:mm:ss") as string) || ""
-      : "",
+      ? (formatDate(item.creationTime, 'DD-MM-YYYY HH:mm:ss') as string) || ''
+      : '',
     id: item.id ?? crypto.randomUUID?.() ?? String(Math.random()),
     isRead: item.status === 1,
-    message: item.message ?? "",
+    message: item.message ?? '',
     raw: item,
     senderName: item.senderName,
-    title: item.title ?? t("page.sms.notification.personalPage.defaultTitle"),
+    title: item.title ?? t('page.sms.notification.personalPage.defaultTitle'),
   } satisfies UiNotification;
 }
 
@@ -95,14 +95,18 @@ async function loadData() {
       keyword: query.keyword?.trim() || undefined,
       page: query.page,
       pageSize: query.pageSize,
-      status: query.status === "" ? undefined : query.status,
+      status: query.status === '' ? undefined : query.status,
       ...getDateParams(),
     });
 
     total.value = response.total ?? 0;
-    list.value = (response.data ?? response.items ?? []).map((item) => mapToUiItem(item));
+    list.value = (response.data ?? response.items ?? []).map((item) =>
+      mapToUiItem(item),
+    );
   } catch (error: any) {
-    message.error(error?.message || t("page.sms.notification.personalPage.loadError"));
+    message.error(
+      error?.message || t('page.sms.notification.personalPage.loadError'),
+    );
   } finally {
     loading.value = false;
   }
@@ -115,7 +119,7 @@ function handleSearch() {
 
 function handleReset() {
   query.dateRange = null;
-  query.keyword = "";
+  query.keyword = '';
   query.page = 1;
   query.pageSize = 20;
   query.status = undefined;
@@ -148,10 +152,15 @@ const hasSelection = computed(() => selectedIds.value.size > 0);
 
 const allSelected = computed({
   get() {
-    return list.value.length > 0 && list.value.every((item) => selectedIds.value.has(item.id));
+    return (
+      list.value.length > 0 &&
+      list.value.every((item) => selectedIds.value.has(item.id))
+    );
   },
   set(value: boolean) {
-    selectedIds.value = value ? new Set(list.value.map((item) => item.id)) : new Set();
+    selectedIds.value = value
+      ? new Set(list.value.map((item) => item.id))
+      : new Set();
   },
 });
 
@@ -162,23 +171,30 @@ async function handleToggleRead(item: UiNotification) {
     item.isRead = !item.isRead;
     message.success(
       item.isRead
-        ? t("page.sms.notification.personalPage.markReadSuccess")
-        : t("page.sms.notification.personalPage.markUnreadSuccess"),
+        ? t('page.sms.notification.personalPage.markReadSuccess')
+        : t('page.sms.notification.personalPage.markUnreadSuccess'),
     );
   } catch (error: any) {
-    message.error(error?.message || t("page.sms.notification.personalPage.updateStatusError"));
+    message.error(
+      error?.message ||
+        t('page.sms.notification.personalPage.updateStatusError'),
+    );
   }
 }
 
 async function handleDeleteOne(item: UiNotification) {
   try {
     await deleteNotification(item.id);
-    list.value = list.value.filter((notification) => notification.id !== item.id);
+    list.value = list.value.filter(
+      (notification) => notification.id !== item.id,
+    );
     total.value = Math.max(0, total.value - 1);
     toggleSelect(item.id, false);
-    message.success(t("page.sms.notification.personalPage.deleteSuccess"));
+    message.success(t('page.sms.notification.personalPage.deleteSuccess'));
   } catch (error: any) {
-    message.error(error?.message || t("page.sms.notification.personalPage.deleteError"));
+    message.error(
+      error?.message || t('page.sms.notification.personalPage.deleteError'),
+    );
   }
 }
 
@@ -193,9 +209,14 @@ async function handleDeleteSelected() {
     list.value = list.value.filter((item) => !selectedIds.value.has(item.id));
     total.value = Math.max(0, total.value - ids.length);
     selectedIds.value = new Set();
-    message.success(t("page.sms.notification.personalPage.deleteSelectedSuccess"));
+    message.success(
+      t('page.sms.notification.personalPage.deleteSelectedSuccess'),
+    );
   } catch (error: any) {
-    message.error(error?.message || t("page.sms.notification.personalPage.deleteSelectedError"));
+    message.error(
+      error?.message ||
+        t('page.sms.notification.personalPage.deleteSelectedError'),
+    );
   }
 }
 
@@ -214,11 +235,14 @@ async function handleMarkSelected(status: 0 | 1) {
     );
     message.success(
       status === 1
-        ? t("page.sms.notification.personalPage.markReadSuccess")
-        : t("page.sms.notification.personalPage.markUnreadSuccess"),
+        ? t('page.sms.notification.personalPage.markReadSuccess')
+        : t('page.sms.notification.personalPage.markUnreadSuccess'),
     );
   } catch (error: any) {
-    message.error(error?.message || t("page.sms.notification.personalPage.updateStatusError"));
+    message.error(
+      error?.message ||
+        t('page.sms.notification.personalPage.updateStatusError'),
+    );
   }
 }
 </script>
@@ -229,36 +253,50 @@ async function handleMarkSelected(status: 0 | 1) {
       <NCard :bordered="false" class="shadow-sm">
         <div class="flex items-center justify-between gap-2">
           <div class="font-semibold">
-            {{ t("page.sms.notification.personalPage.filter.title") }}
+            {{ t('page.sms.notification.personalPage.filter.title') }}
           </div>
-          <NButton text type="primary" @click="searchCollapsed = !searchCollapsed">
+          <NButton
+            text
+            type="primary"
+            @click="searchCollapsed = !searchCollapsed"
+          >
             {{
               searchCollapsed
-                ? t("page.sms.notification.personalPage.filter.expand")
-                : t("page.sms.notification.personalPage.filter.collapse")
+                ? t('page.sms.notification.personalPage.filter.expand')
+                : t('page.sms.notification.personalPage.filter.collapse')
             }}
           </NButton>
         </div>
 
         <div v-show="!searchCollapsed" class="mt-4">
           <NForm inline label-placement="left" @submit.prevent>
-            <NFormItem :label="t('page.sms.notification.personalPage.filter.keyword')">
+            <NFormItem
+              :label="t('page.sms.notification.personalPage.filter.keyword')"
+            >
               <NInput
                 v-model:value="query.keyword"
                 clearable
-                :placeholder="t('page.sms.notification.personalPage.filter.keywordPlaceholder')"
+                :placeholder="
+                  t(
+                    'page.sms.notification.personalPage.filter.keywordPlaceholder',
+                  )
+                "
                 style="min-width: 260px"
                 @keyup.enter="handleSearch"
               />
             </NFormItem>
 
-            <NFormItem :label="t('page.sms.notification.personalPage.filter.status')">
+            <NFormItem
+              :label="t('page.sms.notification.personalPage.filter.status')"
+            >
               <NSelect
                 v-model:value="query.status"
                 clearable
                 :options="[
                   {
-                    label: t('page.sms.notification.personalPage.filter.unread'),
+                    label: t(
+                      'page.sms.notification.personalPage.filter.unread',
+                    ),
                     value: 0,
                   },
                   {
@@ -266,12 +304,18 @@ async function handleMarkSelected(status: 0 | 1) {
                     value: 1,
                   },
                 ]"
-                :placeholder="t('page.sms.notification.personalPage.filter.statusPlaceholder')"
+                :placeholder="
+                  t(
+                    'page.sms.notification.personalPage.filter.statusPlaceholder',
+                  )
+                "
                 style="width: 180px"
               />
             </NFormItem>
 
-            <NFormItem :label="t('page.sms.notification.personalPage.filter.dateRange')">
+            <NFormItem
+              :label="t('page.sms.notification.personalPage.filter.dateRange')"
+            >
               <NDatePicker
                 v-model:value="query.dateRange"
                 clearable
@@ -284,10 +328,10 @@ async function handleMarkSelected(status: 0 | 1) {
             <NFormItem>
               <NSpace>
                 <NButton type="primary" @click="handleSearch">
-                  {{ t("page.sms.notification.personalPage.filter.search") }}
+                  {{ t('page.sms.notification.personalPage.filter.search') }}
                 </NButton>
                 <NButton @click="handleReset">
-                  {{ t("page.sms.notification.personalPage.filter.reset") }}
+                  {{ t('page.sms.notification.personalPage.filter.reset') }}
                 </NButton>
               </NSpace>
             </NFormItem>
@@ -302,15 +346,17 @@ async function handleMarkSelected(status: 0 | 1) {
           <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
             <div class="flex flex-wrap items-center gap-2">
               <NCheckbox v-model:checked="allSelected">
-                {{ t("page.sms.notification.personalPage.selection.selectAll") }}
+                {{
+                  t('page.sms.notification.personalPage.selection.selectAll')
+                }}
               </NCheckbox>
               <strong>
-                {{ t("page.sms.notification.personalPage.selection.total") }}
+                {{ t('page.sms.notification.personalPage.selection.total') }}
               </strong>
               <span>{{ total }}</span>
               <span v-if="hasSelection">
                 {{
-                  t("page.sms.notification.personalPage.selection.selected", {
+                  t('page.sms.notification.personalPage.selection.selected', {
                     count: selectedIds.size,
                   })
                 }}
@@ -318,22 +364,37 @@ async function handleMarkSelected(status: 0 | 1) {
             </div>
 
             <div class="flex flex-wrap gap-2">
-              <NButton :disabled="!hasSelection" @click="() => handleMarkSelected(1)">
-                {{ t("page.sms.notification.personalPage.actions.markAllRead") }}
+              <NButton
+                :disabled="!hasSelection"
+                @click="() => handleMarkSelected(1)"
+              >
+                {{
+                  t('page.sms.notification.personalPage.actions.markAllRead')
+                }}
               </NButton>
 
               <NPopconfirm
                 v-if="hasSelection"
                 :negative-text="t('page.common.cancel')"
-                :positive-text="t('page.sms.notification.personalPage.actions.delete')"
+                :positive-text="
+                  t('page.sms.notification.personalPage.actions.delete')
+                "
                 @positive-click="handleDeleteSelected"
               >
                 <template #trigger>
                   <NButton type="error">
-                    {{ t("page.sms.notification.personalPage.actions.deleteSelected") }}
+                    {{
+                      t(
+                        'page.sms.notification.personalPage.actions.deleteSelected',
+                      )
+                    }}
                   </NButton>
                 </template>
-                {{ t("page.sms.notification.personalPage.actions.deleteSelectedConfirm") }}
+                {{
+                  t(
+                    'page.sms.notification.personalPage.actions.deleteSelectedConfirm',
+                  )
+                }}
               </NPopconfirm>
             </div>
           </div>
@@ -344,7 +405,9 @@ async function handleMarkSelected(status: 0 | 1) {
                 <div class="pt-1.5">
                   <NCheckbox
                     :checked="selectedIds.has(item.id)"
-                    @update:checked="(checked) => toggleSelect(item.id, checked)"
+                    @update:checked="
+                      (checked) => toggleSelect(item.id, checked)
+                    "
                   />
                 </div>
                 <div class="min-w-0 flex-1">
