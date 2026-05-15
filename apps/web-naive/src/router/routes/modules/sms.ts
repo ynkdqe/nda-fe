@@ -15,7 +15,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: "SmsMessages",
         path: "/sms/messages",
-        component: () => import("#/views/sms/messages.vue"),
+        component: () => import("#/views/sms/messages/index.vue"),
         meta: {
           icon: "lucide:messages-square",
           title: $t("page.sms.messages"),
@@ -25,7 +25,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: "SmsProviders",
         path: "/sms/providers",
-        component: () => import("#/views/sms/providers.vue"),
+        component: () => import("#/views/sms/providers/index.vue"),
         meta: {
           icon: "lucide:radio-tower",
           title: $t("page.sms.providers"),
@@ -35,7 +35,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: "SmsTemplates",
         path: "/sms/templates",
-        component: () => import("#/views/sms/templates.vue"),
+        component: () => import("#/views/sms/templates/index.vue"),
         meta: {
           icon: "lucide:file-text",
           title: $t("page.sms.templates"),
@@ -45,7 +45,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: "SmsAdminNotifications",
         path: "/sms/admin-notifications",
-        component: () => import("#/views/sms/admin-notifications.vue"),
+        component: () => import("#/views/sms/admin-notifications/index.vue"),
         meta: {
           icon: "lucide:bell-ring",
           title: $t("page.sms.adminNotifications"),
@@ -53,9 +53,9 @@ const routes: RouteRecordRaw[] = [
         },
       },
       {
-        name: "SmsPersonalNotifications",
-        path: "/sms/personal-notifications",
-        component: () => import("#/views/sms/personal-notifications.vue"),
+        name: "SmsUserNotifications",
+        path: "/sms/user-notifications",
+        component: () => import("#/views/sms/user-notifications/index.vue"),
         meta: {
           icon: "lucide:bell",
           title: $t("page.sms.personalNotifications"),
