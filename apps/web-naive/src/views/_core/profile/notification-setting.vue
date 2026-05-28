@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
+import { $t } from '#/locales';
 import { ProfileNotificationSetting } from '@vben/common-ui';
 
 const formSchema = computed(() => {
@@ -8,20 +9,20 @@ const formSchema = computed(() => {
     {
       value: true,
       fieldName: 'accountPassword',
-      label: '账户密码',
-      description: '其他用户的消息将以站内信的形式通知',
+      label: $t('page.profile.userMessages'),
+      description: $t('page.profile.internalMessageDesc'),
     },
     {
       value: true,
       fieldName: 'systemMessage',
-      label: '系统消息',
-      description: '系统消息将以站内信的形式通知',
+      label: $t('page.profile.systemMessages'),
+      description: $t('page.profile.internalMessageDesc'),
     },
     {
       value: true,
       fieldName: 'todoTask',
-      label: '待办任务',
-      description: '待办任务将以站内信的形式通知',
+      label: $t('page.profile.todoTasks'),
+      description: $t('page.profile.internalMessageDesc'),
     },
   ];
 });

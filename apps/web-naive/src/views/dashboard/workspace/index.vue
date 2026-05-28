@@ -6,7 +6,7 @@ import type {
   WorkbenchTrendItem,
 } from '@vben/common-ui';
 
-import { ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import {
@@ -17,202 +17,219 @@ import {
   WorkbenchTodo,
   WorkbenchTrends,
 } from '@vben/common-ui';
+import { $t } from '@vben/locales';
 import { preferences } from '@vben/preferences';
 import { useUserStore } from '@vben/stores';
 import { openWindow } from '@vben/utils';
+
+import {
+  getCachedCurrentWeather,
+  getLocationByIp,
+  resolveWeatherDescription,
+} from '#/api/weather';
 
 import AnalyticsVisitsSource from '../analytics/analytics-visits-source.vue';
 
 const userStore = useUserStore();
 
-// 这是一个示例数据，实际项目中需要根据实际情况进行调整
-// url 也可以是内部路由，在 navTo 方法中识别处理，进行内部跳转
-// 例如：url: /dashboard/workspace
+// Đây là dữ liệu mẫu; các dự án thực tế cần điều chỉnh dựa trên các trường hợp cụ thể.
+// URL cũng có thể là một tuyến đường nội bộ, được xác định và xử lý trong phương thức `navTo` để chuyển hướng nội bộ.
+// Ví dụ: URL: /dashboard/workspace
 const projectItems: WorkbenchProjectItem[] = [
   {
     color: '',
-    content: '不要等待机会，而要创造机会。',
-    date: '2021-04-01',
-    group: '开源组',
-    icon: 'carbon:logo-github',
-    title: 'Github',
-    url: 'https://github.com',
+    content: 'E-commerce',
+    date: '07-05-2022',
+    group: '29-03-2018',
+    icon: 'https://images.glints.com/unsafe/glints-dashboard.oss-ap-southeast-1.aliyuncs.com/company-logo/fd3ef04e572c6436a8580539e7555fd0.jpg',
+    title: 'FRT Retail',
+    url: 'https://fptshop.com.vn',
   },
   {
     color: '#3fb27f',
-    content: '现在的你决定将来的你。',
-    date: '2021-04-01',
-    group: '算法组',
-    icon: 'ion:logo-vue',
-    title: 'Vue',
-    url: 'https://vuejs.org',
+    content: 'IT Outsourcing',
+    date: '03-02-2023',
+    group: '09-05-2022',
+    icon: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTi6RVHnMD4Ru7qT0wy4qOduoQflhWN2Qhz9A&s',
+    title: 'CMC Global',
+    url: 'https://cmcglobal.com.vn',
   },
   {
     color: '#e18525',
-    content: '没有什么才能比努力更重要。',
-    date: '2021-04-01',
-    group: '上班摸鱼',
-    icon: 'ion:logo-html5',
-    title: 'Html5',
-    url: 'https://developer.mozilla.org/zh-CN/docs/Web/HTML',
+    content: 'Education',
+    date: '10-11-2023',
+    group: '06-02-2023',
+    icon: 'https://vinschool.edu.vn/wp-content/themes/vsc/favicon.ico',
+    title: 'Vinschool',
+    url: 'https://vinschool.edu.vn/',
   },
   {
     color: '#bf0c2c',
-    content: '热情和欲望可以突破一切难关。',
-    date: '2021-04-01',
-    group: 'UI',
-    icon: 'ion:logo-angular',
-    title: 'Angular',
-    url: 'https://angular.io',
+    content: 'Real Estate',
+    date: '31-07-2025',
+    group: '13-11-2023',
+    icon: 'https://meeygroup.com/favicon.ico?v=1.48',
+    title: 'MeeyLand',
+    url: 'https://meeygroup.com/',
   },
   {
     color: '#00d8ff',
-    content: '健康的身体是实现目标的基石。',
-    date: '2021-04-01',
-    group: '技术牛',
-    icon: 'bx:bxl-react',
-    title: 'React',
-    url: 'https://reactjs.org',
+    content: 'IT and Software Solutions',
+    date: '13-05-2026',
+    group: '01-08-2025',
+    icon: 'https://www.microtecweb.com/favicon.ico',
+    title: 'Microtec',
+    url: 'https://www.microtecweb.com/',
   },
   {
-    color: '#EBD94E',
-    content: '路是走出来的，而不是空想出来的。',
-    date: '2021-04-01',
-    group: '架构组',
-    icon: 'ion:logo-javascript',
-    title: 'Js',
-    url: 'https://developer.mozilla.org/zh-CN/docs/Web/JavaScript',
+    color: '#00d8ff',
+    content: 'Restaurant Business',
+    date: '-',
+    group: '14-05-2026',
+    icon: 'https://cdn1.vieclam24h.vn/images/default/2023/06/26/logo%20GGG_vertital_168774578619.w-240.h-240.png',
+    title: 'Golden Gate Group',
+    url: 'https://ggc.com.vn',
   },
 ];
 
 // 同样，这里的 url 也可以使用以 http 开头的外部链接
-const quickNavItems: WorkbenchQuickNavItem[] = [
+const quickNavItems = computed<WorkbenchQuickNavItem[]>(() => [
   {
     color: '#1fdaca',
     icon: 'ion:home-outline',
-    title: '首页',
+    title: $t('page.dashboard.workspace.nav.home'),
     url: '/',
   },
   {
     color: '#bf0c2c',
     icon: 'ion:grid-outline',
-    title: '仪表盘',
+    title: $t('page.dashboard.workspace.nav.dashboard'),
     url: '/dashboard',
   },
   {
     color: '#e18525',
     icon: 'ion:layers-outline',
-    title: '组件',
+    title: $t('page.dashboard.workspace.nav.components'),
     url: '/demos/features/icons',
   },
   {
     color: '#3fb27f',
     icon: 'ion:settings-outline',
-    title: '系统管理',
-    url: '/demos/features/login-expired', // 这里的 URL 是示例，实际项目中需要根据实际情况进行调整
+    title: $t('page.dashboard.workspace.nav.settings'),
+    url: '/demos/features/login-expired',
   },
   {
     color: '#4daf1bc9',
     icon: 'ion:key-outline',
-    title: '权限管理',
+    title: $t('page.dashboard.workspace.nav.access'),
     url: '/demos/access/page-control',
   },
   {
     color: '#00d8ff',
     icon: 'ion:bar-chart-outline',
-    title: '图表',
+    title: $t('page.dashboard.workspace.nav.charts'),
     url: '/analytics',
   },
-];
+]);
 
-const todoItems = ref<WorkbenchTodoItem[]>([
+const todoItems = computed<WorkbenchTodoItem[]>(() => [
   {
     completed: false,
-    content: `审查最近提交到Git仓库的前端代码，确保代码质量和规范。`,
+    content: $t('page.dashboard.workspace.todo.codeReview'),
     date: '2024-07-30 11:00:00',
-    title: '审查前端代码提交',
+    title: $t('page.dashboard.workspace.todo.codeReview'),
   },
   {
     completed: true,
-    content: `检查并优化系统性能，降低CPU使用率。`,
+    content: $t('page.dashboard.workspace.todo.optimization'),
     date: '2024-07-30 11:00:00',
-    title: '系统性能优化',
+    title: $t('page.dashboard.workspace.todo.optimization'),
   },
   {
     completed: false,
-    content: `进行系统安全检查，确保没有安全漏洞或未授权的访问。 `,
+    content: $t('page.dashboard.workspace.todo.security'),
     date: '2024-07-30 11:00:00',
-    title: '安全检查',
+    title: $t('page.dashboard.workspace.todo.security'),
   },
   {
     completed: false,
-    content: `更新项目中的所有npm依赖包，确保使用最新版本。`,
+    content: $t('page.dashboard.workspace.todo.dependency'),
     date: '2024-07-30 11:00:00',
-    title: '更新项目依赖',
+    title: $t('page.dashboard.workspace.todo.dependency'),
   },
   {
     completed: false,
-    content: `修复用户报告的页面UI显示问题，确保在不同浏览器中显示一致。 `,
+    content: $t('page.dashboard.workspace.todo.uiFix'),
     date: '2024-07-30 11:00:00',
-    title: '修复UI显示问题',
+    title: $t('page.dashboard.workspace.todo.uiFix'),
   },
 ]);
-const trendItems: WorkbenchTrendItem[] = [
+const trendItems = computed<WorkbenchTrendItem[]>(() => [
   {
     avatar: 'svg:avatar-1',
-    content: `在 <a>开源组</a> 创建了项目 <a>Vue</a>`,
+    content: $t('page.dashboard.workspace.trends.createProject', [
+      'Vue',
+      '开源组',
+    ]),
     date: '刚刚',
     title: '威廉',
   },
   {
     avatar: 'svg:avatar-2',
-    content: `关注了 <a>威廉</a> `,
+    content: $t('page.dashboard.workspace.trends.follow', ['威廉']),
     date: '1个小时前',
     title: '艾文',
   },
   {
     avatar: 'svg:avatar-3',
-    content: `发布了 <a>个人动态</a> `,
+    content: $t('page.dashboard.workspace.trends.publish', ['个人动态']),
     date: '1天前',
     title: '克里斯',
   },
   {
     avatar: 'svg:avatar-4',
-    content: `发表文章 <a>如何编写一个Vite插件</a> `,
+    content: $t('page.dashboard.workspace.trends.writeArticle', [
+      '如何编写一个Vite插件',
+    ]),
     date: '2天前',
     title: 'Vben',
   },
   {
     avatar: 'svg:avatar-1',
-    content: `回复了 <a>杰克</a> 的问题 <a>如何进行项目优化？</a>`,
+    content: $t('page.dashboard.workspace.trends.replyQuestion', [
+      '杰克',
+      '如何进行项目 optimization？',
+    ]),
     date: '3天前',
     title: '皮特',
   },
   {
     avatar: 'svg:avatar-2',
-    content: `关闭了问题 <a>如何运行项目</a> `,
+    content: $t('page.dashboard.workspace.trends.closeIssue', ['如何运行项目']),
     date: '1周前',
     title: '杰克',
   },
   {
     avatar: 'svg:avatar-3',
-    content: `发布了 <a>个人动态</a> `,
+    content: $t('page.dashboard.workspace.trends.publish', ['个人动态']),
     date: '1周前',
     title: '威廉',
   },
   {
     avatar: 'svg:avatar-4',
-    content: `推送了代码到 <a>Github</a>`,
+    content: $t('page.dashboard.workspace.trends.pushCode', ['Github']),
     date: '2021-04-01 20:00',
     title: '威廉',
   },
   {
     avatar: 'svg:avatar-4',
-    content: `发表文章 <a>如何编写使用 Admin Vben</a> `,
+    content: $t('page.dashboard.workspace.trends.writeArticle', [
+      '如何编写 sử dụng Admin Vben',
+    ]),
     date: '2021-03-01 20:00',
     title: 'Vben',
   },
-];
+]);
 
 const router = useRouter();
 
@@ -231,6 +248,28 @@ function navTo(nav: WorkbenchProjectItem | WorkbenchQuickNavItem) {
     console.warn(`Unknown URL for navigation item: ${nav.title} -> ${nav.url}`);
   }
 }
+const weatherDesc = ref($t('page.dashboard.workspace.weather.loading'));
+
+async function fetchWeather() {
+  try {
+    const location = await getLocationByIp();
+    if (location) {
+      const weather = await getCachedCurrentWeather(
+        location.latitude,
+        location.longitude,
+      );
+      const desc = resolveWeatherDescription(weather.weathercode, $t);
+      weatherDesc.value = `${location.city}, ${desc} - ${weather.temperature}℃`;
+    }
+  } catch (error) {
+    console.error('Failed to fetch weather:', error);
+    weatherDesc.value = $t('page.dashboard.workspace.weather.error');
+  }
+}
+
+onMounted(() => {
+  fetchWeather();
+});
 </script>
 
 <template>
@@ -239,25 +278,44 @@ function navTo(nav: WorkbenchProjectItem | WorkbenchQuickNavItem) {
       :avatar="userStore.userInfo?.avatar || preferences.app.defaultAvatar"
     >
       <template #title>
-        早安, {{ userStore.userInfo?.realName }}, 开始您一天的工作吧！
+        {{
+          $t('page.dashboard.workspace.welcomeTitle', [
+            userStore.userInfo?.realName,
+          ])
+        }}
       </template>
-      <template #description> 今日晴，20℃ - 32℃！ </template>
+      <template #description> {{ weatherDesc }} </template>
     </WorkbenchHeader>
 
     <div class="mt-5 flex flex-col lg:flex-row">
       <div class="mr-4 w-full lg:w-3/5">
-        <WorkbenchProject :items="projectItems" title="项目" @click="navTo" />
-        <WorkbenchTrends :items="trendItems" class="mt-5" title="最新动态" />
+        <WorkbenchProject
+          :items="projectItems"
+          :title="$t('page.dashboard.workspace.projects')"
+          @click="navTo"
+        />
+        <WorkbenchTrends
+          :items="trendItems"
+          class="mt-5"
+          :title="$t('page.dashboard.workspace.latestDynamic')"
+        />
       </div>
       <div class="w-full lg:w-2/5">
         <WorkbenchQuickNav
           :items="quickNavItems"
           class="mt-5 lg:mt-0"
-          title="快捷导航"
+          :title="$t('page.dashboard.workspace.quickNav')"
           @click="navTo"
         />
-        <WorkbenchTodo :items="todoItems" class="mt-5" title="待办事项" />
-        <AnalysisChartCard class="mt-5" title="访问来源">
+        <WorkbenchTodo
+          :items="todoItems"
+          class="mt-5"
+          :title="$t('page.dashboard.workspace.todoItems')"
+        />
+        <AnalysisChartCard
+          class="mt-5"
+          :title="$t('page.dashboard.workspace.accessSource')"
+        >
           <AnalyticsVisitsSource />
         </AnalysisChartCard>
       </div>

@@ -1,0 +1,389 @@
+{
+  "auth": {
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "codeLogin": "Đăng nhập bằng mã",
+    "qrcodeLogin": "Đăng nhập bằng mã QR",
+    "forgetPassword": "Quên mật khẩu",
+    "profile": "Hồ sơ cá nhân"
+  },
+  "dashboard": {
+    "title": "Bảng điều khiển",
+    "analytics": "Phân tích",
+    "workspace": {
+      "title": "Không gian làm việc",
+      "welcomeTitle": "Chào buổi sáng, {0}, hãy bắt đầu ngày làm việc của bạn!",
+      "welcomeDesc": "Hôm nay trời nắng, 20℃ - 32℃!",
+      "projects": "Dự án",
+      "latestDynamic": "Hoạt động mới nhất",
+      "quickNav": "Điều hướng nhanh",
+      "todoItems": "Việc cần làm",
+      "accessSource": "Nguồn truy cập",
+      "weather": {
+        "loading": "Đang tải dữ liệu thời tiết...",
+        "error": "Lấy dữ liệu thời tiết không thành công",
+        "codes": {
+          "0": "Trời quang đãng",
+          "1": "Có mây nhẹ",
+          "2": "Có mây rải rác",
+          "3": "Nhiều mây",
+          "45": "Sương mù",
+          "48": "Sương mù băng giá",
+          "51": "Mưa phùn nhẹ",
+          "53": "Mưa phùn",
+          "55": "Mưa phùn dày đặc",
+          "56": "Mưa phùn đóng băng nhẹ",
+          "57": "Mưa phùn đóng băng dày đặc",
+          "61": "Mưa nhẹ",
+          "63": "Mưa vừa",
+          "65": "Mưa to",
+          "66": "Mưa đóng băng nhẹ",
+          "67": "Mưa đóng băng mạnh",
+          "71": "Tuyết rơi nhẹ",
+          "73": "Tuyết rơi vừa",
+          "75": "Tuyết rơi dày",
+          "77": "Mưa tuyết hạt nhỏ",
+          "80": "Mưa rào nhẹ",
+          "81": "Mưa rào vừa",
+          "82": "Mưa rào mạnh",
+          "85": "Mưa tuyết rào nhẹ",
+          "86": "Mưa tuyết rào mạnh",
+          "95": "Dông bão",
+          "96": "Dông bão kèm mưa đá nhẹ",
+          "99": "Dông bão kèm mưa đá mạnh",
+          "unknown": "Thời tiết thay đổi"
+        }
+      },
+      "nav": {
+        "home": "Trang chủ",
+        "dashboard": "Bảng điều khiển",
+        "components": "Thành phần",
+        "settings": "Cài đặt hệ thống",
+        "access": "Quản lý quyền",
+        "charts": "Biểu đồ"
+      },
+      "todo": {
+        "codeReview": "Sửa mã nguồn",
+        "optimization": "Tối ưu hệ thống",
+        "security": "Kiểm tra bảo mật",
+        "dependency": "Cập nhật phụ thuộc",
+        "uiFix": "Sửa lỗi giao diện"
+      },
+      "trends": {
+        "createProject": "đã tạo dự án {0} trong {1}",
+        "follow": "đã theo dõi {0}",
+        "publish": "đã đăng {0}",
+        "writeArticle": "đã viết bài {0}",
+        "replyQuestion": "đã trả lời {0} về {1}",
+        "closeIssue": "đã đóng vấn đề {0}",
+        "pushCode": "đã đẩy mã lên {0}"
+      }
+    }
+  },
+  "hr": {
+    "title": "Nhân sự",
+    "attendance": "Chấm công",
+    "employees": "Nhân viên",
+    "payroll": "Bảng tính",
+    "contracts": "Hợp đồng",
+    "contractTypes": "Loại hợp đồng",
+    "workShifts": "Ca làm việc",
+    "workSchedules": "Lịch làm việc",
+    "dayOffs": "Ngày nghỉ",
+    "sampleDescription": "Trang mẫu quản lý {0}.",
+    "sampleTable": {
+      "code": "Mã",
+      "name": "Tên",
+      "status": "Trạng thái",
+      "active": "Đang hoạt động",
+      "draft": "Bản nháp",
+      "sampleDataOne": "Dữ liệu mẫu 1",
+      "sampleDataTwo": "Dữ liệu mẫu 2"
+    }
+  },
+  "identity": {
+    "title": "Quản lý định danh",
+    "users": "Người dùng",
+    "roles": "Vai trò",
+    "organizations": "Tổ chức",
+    "sampleDescription": "Trang mẫu quản lý {0}.",
+    "sampleTable": {
+      "code": "Mã",
+      "name": "Tên",
+      "status": "Trạng thái",
+      "active": "Đang hoạt động",
+      "draft": "Bản nháp",
+      "sampleDataOne": "Dữ liệu mẫu 1",
+      "sampleDataTwo": "Dữ liệu mẫu 2"
+    }
+  },
+  "sms": {
+    "title": "Sms",
+    "messages": "Tin nhắn",
+    "providers": "Nhà cung cấp",
+    "templates": "Mẫu tin nhắn",
+    "adminNotifications": "Thông báo (Quản trị)",
+    "personalNotifications": "Thông báo (Cá nhân)",
+    "sampleDescription": "Trang mẫu quản lý {0}.",
+    "sampleTable": {
+      "code": "Mã",
+      "name": "Tên",
+      "status": "Trạng thái",
+      "active": "Đang hoạt động",
+      "draft": "Bản nháp",
+      "sampleDataOne": "Dữ liệu mẫu 1",
+      "sampleDataTwo": "Dữ liệu mẫu 2"
+    },
+    "providerPage": {
+      "search": {
+        "keywordLabel": "Từ khóa",
+        "keywordPlaceholder": "Nhập tên hoặc URL nhà cung cấp",
+        "statusLabel": "Trạng thái",
+        "allPlaceholder": "Tất cả",
+        "status": {
+          "active": "Đang hoạt động",
+          "inactive": "Ngừng hoạt động"
+        },
+        "submit": "Tìm kiếm",
+        "reset": "Đặt lại"
+      },
+      "table": {
+        "name": "Tên nhà cung cấp",
+        "providerUrl": "URL nhà cung cấp",
+        "status": "Trạng thái",
+        "creationTime": "Ngày tạo",
+        "creatorName": "Người tạo",
+        "modificationTime": "Ngày cập nhật",
+        "modifierName": "Người cập nhật",
+        "action": "Hành động"
+      },
+      "statusTag": {
+        "active": "Đang hoạt động",
+        "inactive": "Ngừng hoạt động"
+      },
+      "action": {
+        "notImplemented": "Chức năng chưa được triển khai",
+        "edit": "Sửa",
+        "delete": "Xóa",
+        "deleteConfirm": "Bạn có chắc muốn xóa nhà cung cấp này không?",
+        "deleteOk": "Xóa",
+        "deleteCancel": "Hủy"
+      }
+    },
+    "templatePage": {
+      "search": {
+        "keywordLabel": "Từ khóa",
+        "keywordPlaceholder": "Nhập mã hoặc tên mẫu tin nhắn",
+        "statusLabel": "Trạng thái",
+        "allPlaceholder": "Tất cả",
+        "status": {
+          "active": "Đang hoạt động",
+          "inactive": "Ngừng hoạt động"
+        },
+        "submit": "Tìm kiếm",
+        "reset": "Đặt lại"
+      },
+      "table": {
+        "code": "Mã",
+        "name": "Tên mẫu",
+        "provider": "Nhà cung cấp",
+        "template": "Nội dung mẫu",
+        "status": "Trạng thái",
+        "action": "Hành động"
+      },
+      "statusTag": {
+        "active": "Đang hoạt động",
+        "inactive": "Ngừng hoạt động"
+      },
+      "action": {
+        "notImplemented": "Chức năng chưa được triển khai",
+        "edit": "Sửa",
+        "delete": "Xóa",
+        "deleteConfirm": "Bạn có chắc muốn xóa mẫu tin nhắn này không?",
+        "deleteOk": "Xóa",
+        "deleteCancel": "Hủy"
+      }
+    },
+    "notification": {
+      "personalPage": {
+        "defaultTitle": "Thông báo",
+        "loadError": "Tải thông báo thất bại",
+        "empty": "Không có thông báo",
+        "markReadSuccess": "Đã đánh dấu đã đọc",
+        "markUnreadSuccess": "Đã đánh dấu chưa đọc",
+        "updateStatusError": "Cập nhật trạng thái thất bại",
+        "deleteSuccess": "Xóa thông báo thành công",
+        "deleteError": "Xóa thông báo thất bại",
+        "deleteSelectedSuccess": "Xóa các thông báo đã chọn thành công",
+        "deleteSelectedError": "Xóa các thông báo đã chọn thất bại",
+        "filter": {
+          "title": "Bộ lọc",
+          "expand": "Mở rộng",
+          "collapse": "Thu gọn",
+          "keyword": "Từ khóa",
+          "keywordPlaceholder": "Nhập tiêu đề hoặc nội dung",
+          "status": "Trạng thái",
+          "statusPlaceholder": "Tất cả trạng thái",
+          "unread": "Chưa đọc",
+          "read": "Đã đọc",
+          "dateRange": "Khoảng thời gian",
+          "search": "Tìm kiếm",
+          "reset": "Đặt lại"
+        },
+        "selection": {
+          "selectAll": "Chọn tất cả",
+          "total": "Tổng cộng",
+          "selected": "Đã chọn {count}"
+        },
+        "actions": {
+          "markAllRead": "Đánh dấu đã đọc",
+          "markRead": "Đánh dấu đã đọc",
+          "markUnread": "Đánh dấu chưa đọc",
+          "delete": "Xóa",
+          "deleteConfirm": "Bạn có chắc muốn xóa thông báo này không?",
+          "deleteSelected": "Xóa đã chọn",
+          "deleteSelectedConfirm": "Bạn có chắc muốn xóa các thông báo đã chọn không?"
+        },
+        "status": {
+          "read": "Đã đọc",
+          "unread": "Chưa đọc"
+        }
+      },
+      "administrationPage": {
+        "sendSuccess": "Gửi thông báo thành công",
+        "sendFailed": "Gửi thông báo thất bại",
+        "filter": {
+          "keyword": "Từ khóa",
+          "keywordPlaceholder": "Nhập tiêu đề hoặc nội dung",
+          "status": "Loại",
+          "statusPlaceholder": "Tất cả loại",
+          "private": "Riêng tư",
+          "public": "Công khai",
+          "search": "Tìm kiếm",
+          "reset": "Đặt lại"
+        },
+        "table": {
+          "title": "Tiêu đề",
+          "type": "Loại",
+          "sender": "Người gửi",
+          "recipients": "Người nhận",
+          "creationTime": "Ngày tạo",
+          "public": "Công khai",
+          "private": "Riêng tư"
+        },
+        "actions": {
+          "send": "Gửi thông báo"
+        },
+        "modal": {
+          "title": "Gửi thông báo",
+          "ok": "Gửi",
+          "type": "Loại thông báo",
+          "system": "Thông báo hệ thống",
+          "recipients": "Người nhận",
+          "recipientsPlaceholder": "Nhập hoặc chọn người nhận",
+          "notificationTitle": "Tiêu đề",
+          "titlePlaceholder": "Nhập tiêu đề",
+          "titleRequired": "Vui lòng nhập tiêu đề",
+          "message": "Nội dung",
+          "messagePlaceholder": "Nhập nội dung",
+          "messageRequired": "Vui lòng nhập nội dung",
+          "icon": "Biểu tượng",
+          "iconPlaceholder": "Nhập URL hoặc tên icon",
+          "url": "Liên kết",
+          "urlPlaceholder": "Nhập liên kết"
+        },
+        "recipients": {
+          "title": "Danh sách người nhận",
+          "fullName": "Họ và tên",
+          "account": "Tài khoản",
+          "status": "Trạng thái",
+          "viewedAt": "Đã xem lúc",
+          "allUsers": "Tất cả người dùng",
+          "view": "Xem {count} người nhận",
+          "empty": "Không có người nhận",
+          "searchPlaceholder": "Tìm theo tên, tài khoản hoặc email",
+          "read": "Đã đọc",
+          "unread": "Chưa đọc"
+        },
+        "form": {
+          "system": "Thông báo hệ thống",
+          "type": "Loại",
+          "private": "Riêng tư",
+          "public": "Công khai",
+          "sender": "Người gửi",
+          "senderPlaceholder": "Chọn người gửi",
+          "recipient": "Người nhận",
+          "recipientPlaceholder": "Chọn người nhận",
+          "title": "Tiêu đề",
+          "titlePlaceholder": "Nhập tiêu đề",
+          "titleRequired": "Vui lòng nhập tiêu đề",
+          "message": "Nội dung",
+          "messagePlaceholder": "Nhập nội dung",
+          "messageRequired": "Vui lòng nhập nội dung",
+          "icon": "Biểu tượng",
+          "iconPlaceholder": "Nhập URL hoặc tên icon",
+          "url": "Liên kết",
+          "urlPlaceholder": "Nhập liên kết"
+        }
+      }
+    }
+  },
+  "system": {
+    "title": "Hệ thống",
+    "settings": "Cài đặt",
+    "tenants": "Người thuê",
+    "authentication": "Xác thực",
+    "sampleDescription": "Trang mẫu quản lý {0}.",
+    "sampleTable": {
+      "code": "Mã",
+      "name": "Tên",
+      "status": "Trạng thái",
+      "active": "Đang hoạt động",
+      "draft": "Bản nháp",
+      "sampleDataOne": "Dữ liệu mẫu 1",
+      "sampleDataTwo": "Dữ liệu mẫu 2"
+    }
+  },
+  "profile": {
+    "title": "Hồ sơ cá nhân",
+    "basicSettings": "Cài đặt cơ bản",
+    "securitySettings": "Cài đặt bảo mật",
+    "changePassword": "Đổi mật khẩu",
+    "notificationSettings": "Thông báo",
+    "realName": "Họ và tên",
+    "username": "Tên đăng nhập",
+    "role": "Vai trò",
+    "bio": "Giới thiệu bản thân",
+    "admin": "Quản trị viên",
+    "user": "Người dùng",
+    "test": "Kiểm thử",
+    "oldPassword": "Mật khẩu cũ",
+    "newPassword": "Mật khẩu mới",
+    "confirmPassword": "Xác nhận mật khẩu",
+    "oldPasswordPlaceholder": "Vui lòng nhập mật khẩu cũ",
+    "newPasswordPlaceholder": "Vui lòng nhập mật khẩu mới",
+    "confirmPasswordPlaceholder": "Vui lòng nhập lại mật khẩu mới",
+    "passwordMismatch": "Hai mật khẩu không khớp",
+    "passwordChangeSuccess": "Đổi mật khẩu thành công",
+    "accountPassword": "Mật khẩu tài khoản",
+    "passwordStrengthStrong": "Độ mạnh mật khẩu: Mạnh",
+    "securityPhone": "Số điện thoại bảo mật",
+    "boundPhone": "Số điện thoại đã liên kết: {phone}",
+    "securityQuestion": "Câu hỏi bảo mật",
+    "securityQuestionNotSet": "Chưa thiết lập câu hỏi bảo mật, câu hỏi bảo mật có thể bảo vệ tài khoản của bạn hiệu quả",
+    "backupEmail": "Email dự phòng",
+    "boundEmail": "Email đã liên kết: {email}",
+    "mfaDevice": "Thiết bị MFA",
+    "mfaNotBound": "Chưa liên kết thiết bị MFA, sau khi liên kết có thể thực hiện xác nhận hai lớp",
+    "systemMessages": "Thông báo hệ thống",
+    "todoTasks": "Nhiệm vụ cần làm",
+    "userMessages": "Tin nhắn người dùng",
+    "internalMessageDesc": "Sẽ được thông báo dưới dạng tin nhắn nội bộ",
+    "phoneNumber": "Số điện thoại",
+    "email": "Email",
+    "birthday": "Ngày sinh",
+    "address": "Địa chỉ",
+    "avatar": "Ảnh đại diện",
+    "updateSuccess": "Cập nhật thông tin thành công"
+  }
+}

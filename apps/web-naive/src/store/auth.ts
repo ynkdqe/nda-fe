@@ -10,7 +10,13 @@ import { resetAllStores, useAccessStore, useUserStore } from '@vben/stores';
 import { defineStore } from 'pinia';
 
 import { notification } from '#/adapter/naive';
-import { getAccessCodesApi, getUserInfoApi, loginApi, logoutApi } from '#/api';
+import {
+  getUserInfoApi,
+  loginApi,
+  logoutApi,
+  removeStoredAuthTokenInfo,
+  setStoredAuthTokenInfo,
+} from '#/api';
 import { $t } from '#/locales';
 
 export const useAuthStore = defineStore('auth', () => {
@@ -19,6 +25,23 @@ export const useAuthStore = defineStore('auth', () => {
   const router = useRouter();
 
   const loginLoading = ref(false);
+
+  function normalizeUserInfo(
+    profile: Recordable<any>,
+    token: string,
+  ): UserInfo {
+    return {
+      ...profile,
+      avatar: profile.avatar || preferences.app.defaultAvatar,
+      desc: profile.desc ?? profile.email ?? '',
+      homePath: profile.homePath ?? preferences.app.defaultHomePath,
+      realName: profile.name || profile.userName || profile.username || '',
+      roles: profile.roles ?? [],
+      token,
+      userId: profile.id ?? profile.userId ?? '',
+      username: profile.userName ?? profile.username ?? '',
+    };
+  }
 
   /**
    * 异步处理登录操作
@@ -33,23 +56,24 @@ export const useAuthStore = defineStore('auth', () => {
     let userInfo: null | UserInfo = null;
     try {
       loginLoading.value = true;
-      const { accessToken } = await loginApi(params);
+      const loginResult = await loginApi(params);
+      const accessToken = loginResult.access_token;
 
       // 如果成功获取到 accessToken
       if (accessToken) {
-        // 将 accessToken 存储到 accessStore 中
-        accessStore.setAccessToken(accessToken);
+        // 将 token 存储到 core-access store，由 pinia persist 写入 localStorage
+        setStoredAuthTokenInfo({
+          access_token: accessToken,
+          expires_at: Date.now() + loginResult.expires_in * 1000,
+          expires_in: loginResult.expires_in,
+          refresh_token: loginResult.refresh_token,
+          scope: import.meta.env.VITE_APP_SCOPE,
+          tenant: params.tenant ?? null,
+          token_type: loginResult.token_type,
+          username: params.username,
+        });
 
-        // 获取用户信息并存储到 accessStore 中
-        const [fetchUserInfoResult, accessCodes] = await Promise.all([
-          fetchUserInfo(),
-          getAccessCodesApi(),
-        ]);
-
-        userInfo = fetchUserInfoResult;
-
-        userStore.setUserInfo(userInfo);
-        accessStore.setAccessCodes(accessCodes);
+        userInfo = await fetchUserInfo();
 
         if (accessStore.loginExpired) {
           accessStore.setLoginExpired(false);
@@ -84,6 +108,7 @@ export const useAuthStore = defineStore('auth', () => {
     } catch {
       // 不做任何处理
     }
+    removeStoredAuthTokenInfo();
     resetAllStores();
     accessStore.setLoginExpired(false);
 
@@ -99,8 +124,10 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function fetchUserInfo() {
-    const userInfo = await getUserInfoApi();
+    const profile = await getUserInfoApi();
+    const userInfo = normalizeUserInfo(profile, accessStore.accessToken ?? '');
     userStore.setUserInfo(userInfo);
+    accessStore.setAccessCodes(profile.permissions ?? []);
     return userInfo;
   }
 

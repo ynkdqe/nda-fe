@@ -3,63 +3,95 @@ import type { BasicOption } from '@vben/types';
 
 import type { VbenFormSchema } from '#/adapter/form';
 
-import { computed, onMounted, ref } from 'vue';
+import { computed, nextTick, onMounted, ref } from 'vue';
 
 import { ProfileBaseSetting } from '@vben/common-ui';
+import { useUserStore } from '@vben/stores';
 
-import { getUserInfoApi } from '#/api';
+import { message } from '#/adapter/naive';
+import { updateUserInfoApi } from '#/api';
+import { $t } from '#/locales';
+import { useAuthStore } from '#/store';
 
+const userStore = useUserStore();
+const authStore = useAuthStore();
 const profileBaseSettingRef = ref();
-
-const MOCK_ROLES_OPTIONS: BasicOption[] = [
-  {
-    label: '管理员',
-    value: 'super',
-  },
-  {
-    label: '用户',
-    value: 'user',
-  },
-  {
-    label: '测试',
-    value: 'test',
-  },
-];
 
 const formSchema = computed((): VbenFormSchema[] => {
   return [
     {
       fieldName: 'realName',
       component: 'Input',
-      label: '姓名',
+      label: $t('page.profile.realName'),
+      componentProps: {
+        disabled: true,
+      },
     },
     {
       fieldName: 'username',
       component: 'Input',
-      label: '用户名',
-    },
-    {
-      fieldName: 'roles',
-      component: 'Select',
+      label: $t('page.profile.username'),
       componentProps: {
-        mode: 'tags',
-        options: MOCK_ROLES_OPTIONS,
+        disabled: true,
       },
-      label: '角色',
     },
     {
-      fieldName: 'introduction',
-      component: 'Textarea',
-      label: '个人简介',
+      fieldName: 'email',
+      component: 'Input',
+      label: $t('page.profile.email'),
+      componentProps: {
+        disabled: true,
+      },
+    },
+    {
+      fieldName: 'phoneNumber',
+      component: 'Input',
+      label: $t('page.profile.phoneNumber'),
+    },
+    {
+      fieldName: 'birthday',
+      component: 'DatePicker',
+      label: $t('page.profile.birthday'),
     },
   ];
 });
 
+async function handleSubmit(values: any) {
+  try {
+    await updateUserInfoApi({ ...values });
+    message.success($t('page.profile.updateSuccess'));
+    await authStore.fetchUserInfo();
+  } catch {
+    // handled by request interceptor
+  }
+}
+
+function fillForm(data: any) {
+  if (!data) return;
+
+  const values = {
+    ...data,
+    email: data.email || '',
+    realName: data.realName || data.name || '',
+    username: data.username || data.userName || '',
+    phoneNumber: data.phoneNumber || '',
+    birthday: data.birthDate || null,
+  };
+  profileBaseSettingRef.value?.getFormApi()?.setValues(values);
+}
+
 onMounted(async () => {
-  const data = await getUserInfoApi();
-  profileBaseSettingRef.value.getFormApi().setValues(data);
+  await nextTick();
+  if (userStore.userInfo) {
+    fillForm(userStore.userInfo);
+  }
 });
 </script>
+
 <template>
-  <ProfileBaseSetting ref="profileBaseSettingRef" :form-schema="formSchema" />
+  <ProfileBaseSetting
+    ref="profileBaseSettingRef"
+    :form-schema="formSchema"
+    @submit="handleSubmit"
+  />
 </template>

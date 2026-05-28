@@ -10,6 +10,380 @@
   "dashboard": {
     "title": "Dashboard",
     "analytics": "Analytics",
-    "workspace": "Workspace"
+    "workspace": {
+      "title": "Workspace",
+      "welcomeTitle": "Good morning, {0}, let's start your day!",
+      "welcomeDesc": "Sunny today, 20℃ - 32℃!",
+      "projects": "Projects",
+      "latestDynamic": "Latest Dynamic",
+      "quickNav": "Quick Navigation",
+      "todoItems": "To-do Items",
+      "accessSource": "Access Source",
+      "weather": {
+        "loading": "Loading weather data...",
+        "error": "Failed to fetch weather data",
+        "codes": {
+          "0": "Clear sky",
+          "1": "Mainly clear",
+          "2": "Partly cloudy",
+          "3": "Overcast",
+          "45": "Fog",
+          "48": "Depositing rime fog",
+          "51": "Light drizzle",
+          "53": "Moderate drizzle",
+          "55": "Dense drizzle",
+          "56": "Light freezing drizzle",
+          "57": "Dense freezing drizzle",
+          "61": "Slight rain",
+          "63": "Moderate rain",
+          "65": "Heavy rain",
+          "66": "Light freezing rain",
+          "67": "Heavy freezing rain",
+          "71": "Slight snow fall",
+          "73": "Moderate snow fall",
+          "75": "Heavy snow fall",
+          "77": "Snow grains",
+          "80": "Slight rain showers",
+          "81": "Moderate rain showers",
+          "82": "Violent rain showers",
+          "85": "Slight snow showers",
+          "86": "Heavy snow showers",
+          "95": "Thunderstorm",
+          "96": "Thunderstorm with slight hail",
+          "99": "Thunderstorm with heavy hail",
+          "unknown": "Weather changing"
+        }
+      },
+      "nav": {
+        "home": "Home",
+        "dashboard": "Dashboard",
+        "components": "Components",
+        "settings": "System Settings",
+        "access": "Access Management",
+        "charts": "Charts"
+      },
+      "todo": {
+        "codeReview": "Review code",
+        "optimization": "System optimization",
+        "security": "Security check",
+        "dependency": "Update dependencies",
+        "uiFix": "Fix UI issues"
+      },
+      "trends": {
+        "createProject": "created project {0} in {1}",
+        "follow": "followed {0}",
+        "publish": "published {0}",
+        "writeArticle": "wrote article {0}",
+        "replyQuestion": "replied {0} about {1}",
+        "closeIssue": "closed issue {0}",
+        "pushCode": "pushed code to {0}"
+      }
+    }
+  },
+  "hr": {
+    "title": "Human Resources",
+    "attendance": "Attendance",
+    "employees": "Employees",
+    "payroll": "Payroll",
+    "contracts": "Contracts",
+    "contractTypes": "Contract Types",
+    "workShifts": "Work Shifts",
+    "workSchedules": "Work Schedules",
+    "dayOffs": "Days Off",
+    "sampleDescription": "Sample page for {0} management.",
+    "sampleTable": {
+      "code": "Code",
+      "name": "Name",
+      "status": "Status",
+      "active": "Active",
+      "draft": "Draft",
+      "sampleDataOne": "Sample Data 1",
+      "sampleDataTwo": "Sample Data 2"
+    }
+  },
+  "identity": {
+    "title": "Identity Management",
+    "users": "Users",
+    "roles": "Roles",
+    "organizations": "Organizations",
+    "sampleDescription": "Sample page for {0} management.",
+    "sampleTable": {
+      "code": "Code",
+      "name": "Name",
+      "status": "Status",
+      "active": "Active",
+      "draft": "Draft",
+      "sampleDataOne": "Sample Data 1",
+      "sampleDataTwo": "Sample Data 2"
+    }
+  },
+  "sms": {
+    "title": "Sms",
+    "messages": "Messages",
+    "providers": "Providers",
+    "templates": "Message Templates",
+    "adminNotifications": "Notifications (Admin)",
+    "personalNotifications": "Notifications (Personal)",
+    "sampleDescription": "Sample page for {0} management.",
+    "sampleTable": {
+      "code": "Code",
+      "name": "Name",
+      "status": "Status",
+      "active": "Active",
+      "draft": "Draft",
+      "sampleDataOne": "Sample Data 1",
+      "sampleDataTwo": "Sample Data 2"
+    },
+    "providerPage": {
+      "search": {
+        "keywordLabel": "Keyword",
+        "keywordPlaceholder": "Enter provider name or URL",
+        "statusLabel": "Status",
+        "allPlaceholder": "All",
+        "status": {
+          "active": "Active",
+          "inactive": "Inactive"
+        },
+        "submit": "Search",
+        "reset": "Reset"
+      },
+      "table": {
+        "name": "Provider Name",
+        "providerUrl": "Provider URL",
+        "status": "Status",
+        "creationTime": "Created At",
+        "creatorName": "Creator",
+        "modificationTime": "Updated At",
+        "modifierName": "Modifier",
+        "action": "Action"
+      },
+      "statusTag": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "action": {
+        "notImplemented": "Feature not implemented yet",
+        "edit": "Edit",
+        "delete": "Delete",
+        "deleteConfirm": "Are you sure you want to delete this provider?",
+        "deleteOk": "Delete",
+        "deleteCancel": "Cancel"
+      }
+    },
+    "templatePage": {
+      "search": {
+        "keywordLabel": "Keyword",
+        "keywordPlaceholder": "Enter template code or name",
+        "statusLabel": "Status",
+        "allPlaceholder": "All",
+        "status": {
+          "active": "Active",
+          "inactive": "Inactive"
+        },
+        "submit": "Search",
+        "reset": "Reset"
+      },
+      "table": {
+        "code": "Code",
+        "name": "Template Name",
+        "provider": "Provider",
+        "template": "Template Content",
+        "status": "Status",
+        "action": "Action"
+      },
+      "statusTag": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "action": {
+        "notImplemented": "Feature not implemented yet",
+        "edit": "Edit",
+        "delete": "Delete",
+        "deleteConfirm": "Are you sure you want to delete this template?",
+        "deleteOk": "Delete",
+        "deleteCancel": "Cancel"
+      }
+    },
+    "notification": {
+      "personalPage": {
+        "defaultTitle": "Notification",
+        "loadError": "Failed to load notifications",
+        "empty": "No notifications",
+        "markReadSuccess": "Marked as read",
+        "markUnreadSuccess": "Marked as unread",
+        "updateStatusError": "Failed to update status",
+        "deleteSuccess": "Notification deleted successfully",
+        "deleteError": "Failed to delete notification",
+        "deleteSelectedSuccess": "Selected notifications deleted successfully",
+        "deleteSelectedError": "Failed to delete selected notifications",
+        "filter": {
+          "title": "Filter",
+          "expand": "Expand",
+          "collapse": "Collapse",
+          "keyword": "Keyword",
+          "keywordPlaceholder": "Enter title or content",
+          "status": "Status",
+          "statusPlaceholder": "All statuses",
+          "unread": "Unread",
+          "read": "Read",
+          "dateRange": "Date range",
+          "search": "Search",
+          "reset": "Reset"
+        },
+        "selection": {
+          "selectAll": "Select all",
+          "total": "Total",
+          "selected": "Selected {count}"
+        },
+        "actions": {
+          "markAllRead": "Mark as read",
+          "markRead": "Mark read",
+          "markUnread": "Mark unread",
+          "delete": "Delete",
+          "deleteConfirm": "Are you sure you want to delete this notification?",
+          "deleteSelected": "Delete selected",
+          "deleteSelectedConfirm": "Are you sure you want to delete selected notifications?"
+        },
+        "status": {
+          "read": "Read",
+          "unread": "Unread"
+        }
+      },
+      "administrationPage": {
+        "sendSuccess": "Notification sent successfully",
+        "sendFailed": "Failed to send notification",
+        "filter": {
+          "keyword": "Keyword",
+          "keywordPlaceholder": "Enter title or content",
+          "status": "Type",
+          "statusPlaceholder": "All types",
+          "private": "Private",
+          "public": "Public",
+          "search": "Search",
+          "reset": "Reset"
+        },
+        "table": {
+          "title": "Title",
+          "type": "Type",
+          "sender": "Sender",
+          "recipients": "Recipients",
+          "creationTime": "Created At",
+          "public": "Public",
+          "private": "Private"
+        },
+        "actions": {
+          "send": "Send notification"
+        },
+        "modal": {
+          "title": "Send notification",
+          "ok": "Send",
+          "type": "Notification type",
+          "system": "System notification",
+          "recipients": "Recipients",
+          "recipientsPlaceholder": "Enter or select recipients",
+          "notificationTitle": "Title",
+          "titlePlaceholder": "Enter title",
+          "titleRequired": "Please enter title",
+          "message": "Message",
+          "messagePlaceholder": "Enter message",
+          "messageRequired": "Please enter message",
+          "icon": "Icon",
+          "iconPlaceholder": "Enter icon URL or name",
+          "url": "URL",
+          "urlPlaceholder": "Enter URL"
+        },
+        "recipients": {
+          "title": "Recipients",
+          "fullName": "Full name",
+          "account": "Account",
+          "status": "Status",
+          "viewedAt": "Viewed at",
+          "allUsers": "All users",
+          "view": "View {count} recipients",
+          "empty": "No recipients",
+          "searchPlaceholder": "Search by name, account or email",
+          "read": "Read",
+          "unread": "Unread"
+        },
+        "form": {
+          "system": "System notification",
+          "type": "Type",
+          "private": "Private",
+          "public": "Public",
+          "sender": "Sender",
+          "senderPlaceholder": "Select sender",
+          "recipient": "Recipients",
+          "recipientPlaceholder": "Select recipients",
+          "title": "Title",
+          "titlePlaceholder": "Enter title",
+          "titleRequired": "Please enter title",
+          "message": "Message",
+          "messagePlaceholder": "Enter message",
+          "messageRequired": "Please enter message",
+          "icon": "Icon",
+          "iconPlaceholder": "Enter icon URL or name",
+          "url": "URL",
+          "urlPlaceholder": "Enter URL"
+        }
+      }
+    }
+  },
+  "system": {
+    "title": "System",
+    "settings": "Settings",
+    "tenants": "Tenants",
+    "authentication": "Authentication",
+    "sampleDescription": "Sample page for {0} management.",
+    "sampleTable": {
+      "code": "Code",
+      "name": "Name",
+      "status": "Status",
+      "active": "Active",
+      "draft": "Draft",
+      "sampleDataOne": "Sample Data 1",
+      "sampleDataTwo": "Sample Data 2"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "basicSettings": "Basic Settings",
+    "securitySettings": "Security Settings",
+    "changePassword": "Change Password",
+    "notificationSettings": "Notifications",
+    "realName": "Real Name",
+    "username": "Username",
+    "role": "Role",
+    "bio": "Bio",
+    "admin": "Administrator",
+    "user": "User",
+    "test": "Test",
+    "oldPassword": "Old Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+    "oldPasswordPlaceholder": "Please enter old password",
+    "newPasswordPlaceholder": "Please enter new password",
+    "confirmPasswordPlaceholder": "Please enter new password again",
+    "passwordMismatch": "The two passwords do not match",
+    "passwordChangeSuccess": "Password changed successfully",
+    "accountPassword": "Account Password",
+    "passwordStrengthStrong": "Password strength: Strong",
+    "securityPhone": "Security Phone",
+    "boundPhone": "Bound phone: {phone}",
+    "securityQuestion": "Security Question",
+    "securityQuestionNotSet": "Security question not set, it can effectively protect account security",
+    "backupEmail": "Backup Email",
+    "boundEmail": "Bound email: {email}",
+    "mfaDevice": "MFA Device",
+    "mfaNotBound": "MFA device not bound, can be used for two-factor confirmation",
+    "systemMessages": "System Messages",
+    "todoTasks": "To-do Tasks",
+    "userMessages": "User Messages",
+    "internalMessageDesc": "Will be notified via internal messages",
+    "phoneNumber": "Phone Number",
+    "email": "Email",
+    "birthday": "Birthday",
+    "address": "Address",
+    "avatar": "Avatar",
+    "updateSuccess": "Profile updated successfully"
   }
 }

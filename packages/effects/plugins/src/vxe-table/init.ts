@@ -20,6 +20,7 @@ import {
   VxeUpload,
 } from 'vxe-pc-ui';
 import enUS from 'vxe-pc-ui/lib/language/en-US'; // 导入默认的语言
+import viVN from 'vxe-pc-ui/lib/language/vi-VN';
 import zhCN from 'vxe-pc-ui/lib/language/zh-CN';
 import {
   VxeColgroup,
@@ -119,17 +120,20 @@ export function setupVbenVxeTable(setupOptions: SetupVxeTable) {
   }
   const { isDark, locale } = usePreferences();
 
-  const localMap = {
+  const localMap: Record<string, Record<string, any>> = {
     'zh-CN': normalizeVxeLocale(zhCN),
     'en-US': normalizeVxeLocale(enUS),
+    'vi-VN': normalizeVxeLocale(viVN),
   };
 
   watch(
     [() => isDark.value, () => locale.value],
     ([isDarkValue, localeValue]) => {
+      const vxeLocale = localeValue in localMap ? localeValue : 'en-US';
+
       VxeUI.setTheme(isDarkValue ? 'dark' : 'light');
-      VxeUI.setI18n(localeValue, localMap[localeValue]);
-      VxeUI.setLanguage(localeValue);
+      VxeUI.setI18n(localeValue, localMap[vxeLocale] || localMap['en-US']!);
+      VxeUI.setLanguage(vxeLocale);
     },
     {
       immediate: true,
