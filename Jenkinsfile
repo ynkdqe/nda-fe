@@ -13,7 +13,6 @@ pipeline {
 
   environment {
     IMAGE_NAME = 'nda-fe-web-naive'
-    DOCKER_BUILDKIT = '1'
   }
 
   stages {
@@ -73,7 +72,6 @@ pipeline {
       steps {
         sh '''
           docker build \
-            --platform linux/arm64 \
             -f "$DOCKERFILE" \
             -t "$IMAGE_NAME:$IMAGE_TAG" \
             -t "$IMAGE_NAME:$LATEST_TAG" \

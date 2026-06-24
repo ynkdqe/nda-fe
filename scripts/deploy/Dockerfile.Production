@@ -16,7 +16,7 @@ RUN corepack enable
 
 COPY . .
 
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 RUN test -f apps/${APP_NAME}/.env.${BUILD_MODE}
 RUN pnpm --filter ${PACKAGE_FILTER} exec vite build --mode ${BUILD_MODE}
 
