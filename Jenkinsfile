@@ -13,6 +13,9 @@ pipeline {
 
   environment {
     IMAGE_NAME = 'nda-fe-web-naive'
+    REGISTRY_URL = credentials('docker-registry-personal-url')
+    REGISTRY_USER = credentials('docker-registry-user')
+    REGISTRY_PASS = credentials('docker-registry-pass')
   }
 
   stages {
@@ -52,11 +55,13 @@ pipeline {
           ).trim()
 
           env.IMAGE_TAG = "${env.IMAGE_TAG}-${env.GIT_COMMIT_SHORT}"
+          env.REGISTRY_URL_NORMALIZED = env.REGISTRY_URL.replaceFirst(/^https?:\/\//, '').replaceAll(/\/+$/, '')
+          env.REGISTRY_IMAGE = "${env.REGISTRY_URL_NORMALIZED}/${env.REGISTRY_USER}/${env.IMAGE_NAME}".toLowerCase()
 
           echo "Branch: ${branch}"
           echo "App env: ${env.APP_ENV}"
           echo "Dockerfile: ${env.DOCKERFILE}"
-          echo "Image tag: ${env.IMAGE_NAME}:${env.IMAGE_TAG}"
+          echo "Image tag: ${env.REGISTRY_IMAGE}:${env.IMAGE_TAG}"
         }
       }
     }
@@ -73,19 +78,40 @@ pipeline {
         sh '''
           CACHE_FROM=""
 
-          if docker image inspect "$IMAGE_NAME:$LATEST_TAG" >/dev/null 2>&1; then
-            CACHE_FROM="--cache-from $IMAGE_NAME:$LATEST_TAG"
-            echo "Using Docker cache from $IMAGE_NAME:$LATEST_TAG"
+          if docker image inspect "$REGISTRY_IMAGE:$LATEST_TAG" >/dev/null 2>&1; then
+            CACHE_FROM="--cache-from $REGISTRY_IMAGE:$LATEST_TAG"
+            echo "Using Docker cache from $REGISTRY_IMAGE:$LATEST_TAG"
           else
-            echo "No local Docker cache image found for $IMAGE_NAME:$LATEST_TAG"
+            echo "No local Docker cache image found for $REGISTRY_IMAGE:$LATEST_TAG"
           fi
 
           docker build \
             $CACHE_FROM \
             -f "$DOCKERFILE" \
-            -t "$IMAGE_NAME:$IMAGE_TAG" \
-            -t "$IMAGE_NAME:$LATEST_TAG" \
+            -t "$REGISTRY_IMAGE:$IMAGE_TAG" \
+            -t "$REGISTRY_IMAGE:$LATEST_TAG" \
             .
+        '''
+      }
+    }
+
+    stage('Login and push Docker image') {
+      when {
+        anyOf {
+          branch 'dev'
+          branch 'main'
+          expression { env.GIT_BRANCH == 'origin/dev' || env.GIT_BRANCH == 'origin/main' }
+        }
+      }
+      steps {
+        sh '''
+          echo "Login to Docker Registry..."
+          echo "$REGISTRY_PASS" | docker login "$REGISTRY_URL_NORMALIZED" -u "$REGISTRY_USER" --password-stdin
+
+          docker push "$REGISTRY_IMAGE:$IMAGE_TAG"
+          docker push "$REGISTRY_IMAGE:$LATEST_TAG"
+
+          docker logout "$REGISTRY_URL_NORMALIZED"
         '''
       }
     }
@@ -93,7 +119,7 @@ pipeline {
 
   post {
     success {
-      echo "Build succeeded: ${IMAGE_NAME}:${IMAGE_TAG}"
+      echo "Build and push succeeded: ${REGISTRY_IMAGE}:${IMAGE_TAG}"
     }
     failure {
       echo 'Build failed. Please check the Jenkins console output.'
