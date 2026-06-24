@@ -71,7 +71,17 @@ pipeline {
       }
       steps {
         sh '''
+          CACHE_FROM=""
+
+          if docker image inspect "$IMAGE_NAME:$LATEST_TAG" >/dev/null 2>&1; then
+            CACHE_FROM="--cache-from $IMAGE_NAME:$LATEST_TAG"
+            echo "Using Docker cache from $IMAGE_NAME:$LATEST_TAG"
+          else
+            echo "No local Docker cache image found for $IMAGE_NAME:$LATEST_TAG"
+          fi
+
           docker build \
+            $CACHE_FROM \
             -f "$DOCKERFILE" \
             -t "$IMAGE_NAME:$IMAGE_TAG" \
             -t "$IMAGE_NAME:$LATEST_TAG" \
