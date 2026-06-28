@@ -1,9 +1,16 @@
 <script lang="ts" setup>
-import type { VbenFormSchema } from '@vben/common-ui';
 import type { SelectOption } from 'naive-ui';
+
+import type { VbenFormSchema } from '@vben/common-ui';
 
 type LoginAccountOption = Omit<SelectOption, 'value'> & {
   value: null | string;
+};
+
+type LoginFormValues = {
+  password?: string;
+  tenant?: null | string;
+  username?: string;
 };
 
 import { computed } from 'vue';
@@ -16,6 +23,8 @@ import { useAuthStore } from '#/store';
 defineOptions({ name: 'Login' });
 
 const authStore = useAuthStore();
+
+const LOGIN_TENANT_STORAGE_KEY = 'web-naive:login-tenant';
 
 const MOCK_USER_OPTIONS: LoginAccountOption[] = [
   {
@@ -36,6 +45,34 @@ const MOCK_USER_OPTIONS: LoginAccountOption[] = [
   },
 ];
 
+function getStoredLoginTenant() {
+  try {
+    const tenant = localStorage.getItem(LOGIN_TENANT_STORAGE_KEY);
+    const exists = MOCK_USER_OPTIONS.some((option) => option.value === tenant);
+
+    return exists ? tenant : null;
+  } catch {
+    return null;
+  }
+}
+
+function setStoredLoginTenant(tenant?: null | string) {
+  try {
+    if (tenant) {
+      localStorage.setItem(LOGIN_TENANT_STORAGE_KEY, tenant);
+    } else {
+      localStorage.removeItem(LOGIN_TENANT_STORAGE_KEY);
+    }
+  } catch {
+    // Ignore localStorage errors in restricted browser contexts.
+  }
+}
+
+async function handleSubmit(values: LoginFormValues) {
+  setStoredLoginTenant(values.tenant ?? null);
+  await authStore.authLogin(values);
+}
+
 const formSchema = computed((): VbenFormSchema[] => {
   return [
     {
@@ -44,6 +81,7 @@ const formSchema = computed((): VbenFormSchema[] => {
         options: MOCK_USER_OPTIONS,
         placeholder: $t('authentication.selectAccount'),
       },
+      defaultValue: getStoredLoginTenant(),
       fieldName: 'tenant',
       label: $t('authentication.selectAccount'),
       rules: z.nullable(z.string()).optional().default(null),
@@ -76,6 +114,6 @@ const formSchema = computed((): VbenFormSchema[] => {
   <AuthenticationLogin
     :form-schema="formSchema"
     :loading="authStore.loginLoading"
-    @submit="authStore.authLogin"
+    @submit="handleSubmit"
   />
 </template>
