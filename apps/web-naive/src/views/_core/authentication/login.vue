@@ -30,6 +30,10 @@ const MOCK_USER_OPTIONS: LoginAccountOption[] = [
     label: 'NDA',
     value: 'NDA',
   },
+  {
+    label: 'Golden Gate',
+    value: 'GOLDEN GATE',
+  },
 ];
 
 const formSchema = computed((): VbenFormSchema[] => {
