@@ -90,6 +90,11 @@
     "workShifts": "Work Shifts",
     "workSchedules": "Work Schedules",
     "dayOffs": "Days Off",
+    "attendancePage": {
+      "status": {
+        "lateOrEarly": "Late/Early leave"
+      }
+    },
     "sampleDescription": "Sample page for {0} management.",
     "sampleTable": {
       "code": "Code",

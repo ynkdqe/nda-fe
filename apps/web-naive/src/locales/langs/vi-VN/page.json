@@ -90,6 +90,11 @@
     "workShifts": "Ca làm việc",
     "workSchedules": "Lịch làm việc",
     "dayOffs": "Ngày nghỉ",
+    "attendancePage": {
+      "status": {
+        "lateOrEarly": "Đi muộn/về sớm"
+      }
+    },
     "sampleDescription": "Trang mẫu quản lý {0}.",
     "sampleTable": {
       "code": "Mã",

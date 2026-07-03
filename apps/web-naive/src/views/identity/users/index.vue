@@ -19,13 +19,8 @@ import Permission from '#/components/Permission.vue';
 import SetPasswordModal from './SetPasswordModal.vue';
 import UserForm from './UserForm.vue';
 
-type DropdownKey =
-  | 'delete'
-  | 'edit'
-  | 'lock'
-  | 'loginAs'
-  | 'permission'
-  | 'setPassword';
+type DropdownKey = 'delete' | 'edit' | 'lock' | 'loginAs' | 'permission' | 'setPassword';
+type DropdownSelectKey = number | string;
 
 type GridPage = {
   currentPage?: number;
@@ -104,8 +99,15 @@ const gridOptions: VxeGridProps<IdentityUserApi.UserItem> = {
     {
       field: 'lockoutEnabled',
       slots: { default: 'lockedTag' },
-      title: 'Khóa',
-      width: 120,
+      title: 'Cho phép khóa',
+      width: 140,
+    },
+    {
+      field: 'lockoutEnd',
+      formatter: ({ cellValue }: { cellValue?: null | string }) =>
+        cellValue ? formatDateTime(cellValue) : '-',
+      title: 'Hết khóa lúc',
+      width: 200,
     },
     {
       field: 'accessFailedCount',
@@ -130,16 +132,10 @@ const gridOptions: VxeGridProps<IdentityUserApi.UserItem> = {
   pagerConfig: {},
   proxyConfig: {
     ajax: {
-      query: async (
-        { page }: { page: GridPage },
-        formValues?: Record<string, unknown>,
-      ) => {
+      query: async ({ page }: { page: GridPage }, formValues?: Record<string, unknown>) => {
         const current = page.currentPage ?? 1;
         const pageSize = page.pageSize ?? 10;
-        const keyword =
-          typeof formValues?.keyword === 'string'
-            ? formValues.keyword.trim()
-            : '';
+        const keyword = typeof formValues?.keyword === 'string' ? formValues.keyword.trim() : '';
         const response = await getIdentityUsers({
           filter: keyword || undefined,
           maxResultCount: pageSize,
@@ -197,7 +193,7 @@ function onDelete(row: IdentityUserApi.UserItem) {
   message.info(`Chưa có API xóa người dùng: ${row.userName ?? ''}`);
 }
 
-function handleMenu(row: IdentityUserApi.UserItem, key: string | number) {
+function handleMenu(row: IdentityUserApi.UserItem, key: DropdownSelectKey) {
   const menuKey = String(key) as DropdownKey;
 
   switch (menuKey) {
@@ -261,11 +257,8 @@ async function onFormSubmit() {
       </template>
 
       <template #lockedTag="{ row }">
-        <NTag
-          :bordered="false"
-          :type="row.lockoutEnabled ? 'error' : 'success'"
-        >
-          {{ row.lockoutEnabled ? 'Đã khóa' : 'Không khóa' }}
+        <NTag :bordered="false" :type="row.lockoutEnabled ? 'error' : 'success'">
+          {{ row.lockoutEnabled ? 'Bật' : 'Tắt' }}
         </NTag>
       </template>
 

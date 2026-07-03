@@ -90,6 +90,11 @@
     "workShifts": "班次",
     "workSchedules": "工作日程",
     "dayOffs": "休假日",
+    "attendancePage": {
+      "status": {
+        "lateOrEarly": "迟到/早退"
+      }
+    },
     "sampleDescription": "{0}管理示例页面。",
     "sampleTable": {
       "code": "编码",

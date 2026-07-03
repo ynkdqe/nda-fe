@@ -8,6 +8,8 @@ import type {
 
 import { computed } from 'vue';
 
+import { $t } from '@vben/locales';
+
 import { NButton, NCard, NSpin } from 'naive-ui';
 
 const props = defineProps<{
@@ -95,7 +97,7 @@ const calendarData = computed(() => {
       badges.push({ text: 'Thiếu công', type: 'danger' });
     } else if (record.isLate) {
       entryType = 'late';
-      badges.push({ text: 'Đi muộn', type: 'warning' });
+      badges.push({ text: $t('page.hr.attendancePage.status.lateOrEarly'), type: 'warning' });
     }
 
     const workPoint = record.workshift?.workPoint ?? 1;
@@ -112,8 +114,7 @@ const calendarData = computed(() => {
       highlightType = 'warning';
     }
 
-    const holidayLabel =
-      record.holiday?.holidayTypeName ?? record.holiday?.name ?? 'Ngày nghỉ';
+    const holidayLabel = record.holiday?.holidayTypeName ?? record.holiday?.name ?? 'Ngày nghỉ';
     const isUnpaidHoliday = isHoliday && record.holiday?.isPaid === false;
 
     result[dateKey] = isUnpaidHoliday
@@ -136,8 +137,7 @@ const calendarData = computed(() => {
               ]
             : [
                 {
-                  label:
-                    record.workshift?.nameAscii ?? record.workshift?.name ?? '',
+                  label: record.workshift?.nameAscii ?? record.workshift?.name ?? '',
                   note: record.description ?? '',
                   timeRange: `${formatTime(record.checkIn)} - ${formatTime(record.checkOut)}`,
                   type: entryType,
@@ -154,11 +154,7 @@ const calendarData = computed(() => {
 });
 
 const monthDays = computed(() => {
-  const firstDay = new Date(
-    calendarDate.value.getFullYear(),
-    calendarDate.value.getMonth(),
-    1,
-  );
+  const firstDay = new Date(calendarDate.value.getFullYear(), calendarDate.value.getMonth(), 1);
   const mondayOffset = (firstDay.getDay() + 6) % 7;
   const start = new Date(firstDay);
   start.setDate(firstDay.getDate() - mondayOffset);
@@ -246,21 +242,11 @@ function badgeClass(type?: string) {
   <NCard class="calendar-card" :bordered="false">
     <template #header>
       <div class="calendar-toolbar">
-        <NButton
-          size="small"
-          quaternary
-          :disabled="!canGoMonth(-1)"
-          @click="changeMonth(-1)"
-        >
+        <NButton size="small" quaternary :disabled="!canGoMonth(-1)" @click="changeMonth(-1)">
           Tháng trước
         </NButton>
         <div class="calendar-title">{{ monthLabel }}</div>
-        <NButton
-          size="small"
-          quaternary
-          :disabled="!canGoMonth(1)"
-          @click="changeMonth(1)"
-        >
+        <NButton size="small" quaternary :disabled="!canGoMonth(1)" @click="changeMonth(1)">
           Tháng sau
         </NButton>
       </div>
@@ -307,10 +293,7 @@ function badgeClass(type?: string) {
               <div v-if="entry.timeRange" class="calendar-entry__time">
                 {{ entry.timeRange }}
               </div>
-              <div
-                v-if="entry.type !== 'holiday'"
-                class="calendar-entry__label"
-              >
+              <div v-if="entry.type !== 'holiday'" class="calendar-entry__label">
                 {{ entry.label }}
               </div>
               <div v-if="entry.note" class="calendar-entry__note">
@@ -319,10 +302,7 @@ function badgeClass(type?: string) {
             </div>
           </div>
 
-          <div
-            v-if="(getDay(day)?.badges ?? []).length > 0"
-            class="calendar-cell__badges"
-          >
+          <div v-if="(getDay(day)?.badges ?? []).length > 0" class="calendar-cell__badges">
             <span
               v-for="badge in getDay(day)?.badges ?? []"
               :key="badge.text + badge.type"
@@ -524,7 +504,66 @@ function badgeClass(type?: string) {
 
 @media (max-width: 768px) {
   .calendar-cell {
-    min-height: 100px;
+    min-height: 86px;
+  }
+}
+
+@media (max-width: 640px) {
+  .calendar-toolbar {
+    gap: 8px;
+  }
+
+  .calendar-title {
+    font-size: 15px;
+    text-align: center;
+  }
+
+  .calendar-weekday {
+    padding: 6px 2px;
+    font-size: 11px;
+  }
+
+  .calendar-cell {
+    gap: 2px;
+    min-height: 54px;
+    padding: 4px;
+  }
+
+  .calendar-cell__header {
+    flex-direction: column;
+    gap: 3px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .calendar-cell__date {
+    font-size: 13px;
+    line-height: 1;
+  }
+
+  .calendar-highlight {
+    min-width: 0;
+    max-width: 100%;
+    padding: 1px 5px;
+    font-size: 10px;
+    line-height: 1.2;
+  }
+
+  .calendar-cell__entries,
+  .calendar-cell__badges {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .calendar-cell {
+    min-height: 48px;
+    padding: 3px 2px;
+  }
+
+  .calendar-highlight {
+    padding: 1px 4px;
+    font-size: 9px;
   }
 }
 </style>
