@@ -1,12 +1,23 @@
 <script lang="ts" setup>
-import type { TimesheetOverviewItem, TimesheetStatisticItem } from '#/models/hr/timesheet';
+import type {
+  TimesheetOverviewItem,
+  TimesheetStatisticItem,
+} from '#/models/hr/timesheet';
 
 import { computed } from 'vue';
 
 import { IconifyIcon } from '@vben/icons';
 import { $t } from '@vben/locales';
 
-import { NButton, NCard, NDivider, NPopconfirm, NProgress, NTag, NTooltip } from 'naive-ui';
+import {
+  NButton,
+  NCard,
+  NDivider,
+  NPopconfirm,
+  NProgress,
+  NTag,
+  NTooltip,
+} from 'naive-ui';
 
 const props = defineProps<{
   monthLabel: string;
@@ -37,7 +48,9 @@ function overviewColor(item: TimesheetOverviewItem) {
 
 const normalizedOverview = computed(() => {
   return props.overview.map((item) => {
-    const percent = item.total ? Math.min((item.value / item.total) * 100, 100) : 0;
+    const percent = item.total
+      ? Math.min((item.value / item.total) * 100, 100)
+      : 0;
     const text = `${item.value}${item.unit ?? ''}/${item.total}${item.unit ?? ''}`;
 
     return { ...item, percent, text };
@@ -121,10 +134,17 @@ const normalizedOverview = computed(() => {
     </NDivider>
 
     <div class="monthly-detail__stats">
-      <div v-for="stat in statistics" :key="stat.label" class="monthly-detail__stat-item">
+      <div
+        v-for="stat in statistics"
+        :key="stat.label"
+        class="monthly-detail__stat-item"
+      >
         <div class="monthly-detail__stat-label">{{ stat.label }}</div>
         <div class="monthly-detail__stat-value">{{ stat.value }}</div>
-        <NTag v-if="stat.trend" :type="stat.trend === 'up' ? 'success' : 'warning'">
+        <NTag
+          v-if="stat.trend"
+          :type="stat.trend === 'up' ? 'success' : 'warning'"
+        >
           {{
             stat.trend === 'up'
               ? $t('page.hr.attendancePage.summary.trendUp')

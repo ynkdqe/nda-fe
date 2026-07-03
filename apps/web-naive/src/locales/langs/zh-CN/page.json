@@ -91,6 +91,19 @@
     "workSchedules": "工作日程",
     "dayOffs": "休假日",
     "attendancePage": {
+      "calendar": {
+        "nextMonth": "下个月",
+        "previousMonth": "上个月",
+        "weekdays": {
+          "fri": "周五",
+          "mon": "周一",
+          "sat": "周六",
+          "sun": "周日",
+          "thu": "周四",
+          "tue": "周二",
+          "wed": "周三"
+        }
+      },
       "status": {
         "lateOrEarly": "迟到/早退"
       },

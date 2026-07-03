@@ -9,6 +9,7 @@ import type {
 import { computed } from 'vue';
 
 import { $t } from '@vben/locales';
+import { preferences } from '@vben/preferences';
 
 import { NButton, NCard, NSpin } from 'naive-ui';
 
@@ -26,7 +27,15 @@ const emit = defineEmits<{
   'update:selectedDate': [string];
 }>();
 
-const weekDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+const weekDays = computed(() => [
+  $t('page.hr.attendancePage.calendar.weekdays.mon'),
+  $t('page.hr.attendancePage.calendar.weekdays.tue'),
+  $t('page.hr.attendancePage.calendar.weekdays.wed'),
+  $t('page.hr.attendancePage.calendar.weekdays.thu'),
+  $t('page.hr.attendancePage.calendar.weekdays.fri'),
+  $t('page.hr.attendancePage.calendar.weekdays.sat'),
+  $t('page.hr.attendancePage.calendar.weekdays.sun'),
+]);
 
 function pad(value: number) {
   return String(value).padStart(2, '0');
@@ -67,7 +76,7 @@ const calendarValue = computed({
 const calendarDate = computed(() => parseDateKey(calendarValue.value));
 
 const monthLabel = computed(() => {
-  return new Intl.DateTimeFormat('vi-VN', {
+  return new Intl.DateTimeFormat(preferences.app.locale, {
     month: 'long',
     year: 'numeric',
   }).format(calendarDate.value);
@@ -159,7 +168,7 @@ const calendarData = computed(() => {
 const selectedDayDetail = computed(() => calendarData.value[props.selectedDate]);
 
 const selectedDateLabel = computed(() => {
-  return new Intl.DateTimeFormat('vi-VN', {
+  return new Intl.DateTimeFormat(preferences.app.locale, {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -256,13 +265,13 @@ function badgeClass(type?: string) {
     <template #header>
       <div class="calendar-toolbar">
         <NButton size="small" quaternary :disabled="!canGoMonth(-1)" @click="changeMonth(-1)">
-          Tháng trước
+          {{ $t('page.hr.attendancePage.calendar.previousMonth') }}
         </NButton>
 
         <div class="calendar-title">{{ monthLabel }}</div>
 
         <NButton size="small" quaternary :disabled="!canGoMonth(1)" @click="changeMonth(1)">
-          Tháng sau
+          {{ $t('page.hr.attendancePage.calendar.nextMonth') }}
         </NButton>
       </div>
     </template>
@@ -588,9 +597,9 @@ function badgeClass(type?: string) {
 
   .calendar-title {
     overflow: hidden;
+    text-overflow: ellipsis;
     font-size: 15px;
     text-align: center;
-    text-overflow: ellipsis;
     white-space: nowrap;
   }
 

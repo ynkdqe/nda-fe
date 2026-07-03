@@ -1,5 +1,8 @@
 <script lang="ts" setup>
-import type { TimesheetOverviewItem, TimesheetStatisticItem } from '#/models/hr/timesheet';
+import type {
+  TimesheetOverviewItem,
+  TimesheetStatisticItem,
+} from '#/models/hr/timesheet';
 
 import { computed, onMounted, ref, watch } from 'vue';
 
@@ -7,7 +10,11 @@ import { Page } from '@vben/common-ui';
 import { $t } from '@vben/locales';
 
 import { message } from '#/adapter/naive';
-import { getTimesheetListApi, syncTimesheetsApi, syncTimesheetsV2Api } from '#/api';
+import {
+  getTimesheetListApi,
+  syncTimesheetsApi,
+  syncTimesheetsV2Api,
+} from '#/api';
 
 import TimesheetCalendar from './TimesheetCalendar.vue';
 import TimesheetMonthlyDetail from './TimesheetMonthlyDetail.vue';
@@ -42,7 +49,11 @@ function addMonths(value: Date, offset: number) {
   return date;
 }
 
-const currentMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+const currentMonth = new Date(
+  new Date().getFullYear(),
+  new Date().getMonth(),
+  1,
+);
 const allowedMonths = Array.from({ length: 6 }, (_, index) => {
   const date = addMonths(currentMonth, -index);
   const value = toDateKey(date);

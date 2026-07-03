@@ -91,6 +91,19 @@
     "workSchedules": "Work Schedules",
     "dayOffs": "Days Off",
     "attendancePage": {
+      "calendar": {
+        "nextMonth": "Next",
+        "previousMonth": "Previous",
+        "weekdays": {
+          "fri": "Fri",
+          "mon": "Mon",
+          "sat": "Sat",
+          "sun": "Sun",
+          "thu": "Thu",
+          "tue": "Tue",
+          "wed": "Wed"
+        }
+      },
       "status": {
         "lateOrEarly": "Late/Early leave"
       },

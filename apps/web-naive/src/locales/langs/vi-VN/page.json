@@ -91,6 +91,19 @@
     "workSchedules": "Lịch làm việc",
     "dayOffs": "Ngày nghỉ",
     "attendancePage": {
+      "calendar": {
+        "nextMonth": "Tháng sau",
+        "previousMonth": "Tháng trước",
+        "weekdays": {
+          "fri": "T6",
+          "mon": "T2",
+          "sat": "T7",
+          "sun": "CN",
+          "thu": "T5",
+          "tue": "T3",
+          "wed": "T4"
+        }
+      },
       "status": {
         "lateOrEarly": "Đi muộn/về sớm"
       },
