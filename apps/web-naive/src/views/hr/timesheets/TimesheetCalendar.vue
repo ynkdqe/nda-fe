@@ -117,7 +117,8 @@ const calendarData = computed(() => {
       highlightType = 'warning';
     }
 
-    const holidayLabel = record.holiday?.holidayTypeName ?? record.holiday?.name ?? 'Ngày nghỉ';
+    const holidayLabel =
+      record.holiday?.holidayTypeName ?? record.holiday?.name ?? 'Ngày nghỉ';
     const isUnpaidHoliday = isHoliday && record.holiday?.isPaid === false;
 
     result[dateKey] = isUnpaidHoliday
@@ -140,7 +141,8 @@ const calendarData = computed(() => {
               ]
             : [
                 {
-                  label: record.workshift?.nameAscii ?? record.workshift?.name ?? '',
+                  label:
+                    record.workshift?.nameAscii ?? record.workshift?.name ?? '',
                   note: record.description ?? '',
                   timeRange: `${formatTime(record.checkIn)} - ${formatTime(record.checkOut)}`,
                   type: entryType,
@@ -156,7 +158,9 @@ const calendarData = computed(() => {
   return result;
 });
 
-const selectedDayDetail = computed(() => calendarData.value[props.selectedDate]);
+const selectedDayDetail = computed(
+  () => calendarData.value[props.selectedDate],
+);
 
 const selectedDateLabel = computed(() => {
   return new Intl.DateTimeFormat('vi-VN', {
@@ -167,7 +171,11 @@ const selectedDateLabel = computed(() => {
 });
 
 const monthDays = computed(() => {
-  const firstDay = new Date(calendarDate.value.getFullYear(), calendarDate.value.getMonth(), 1);
+  const firstDay = new Date(
+    calendarDate.value.getFullYear(),
+    calendarDate.value.getMonth(),
+    1,
+  );
   const mondayOffset = (firstDay.getDay() + 6) % 7;
   const start = new Date(firstDay);
   start.setDate(firstDay.getDate() - mondayOffset);
@@ -255,11 +263,21 @@ function badgeClass(type?: string) {
   <NCard class="calendar-card" :bordered="false">
     <template #header>
       <div class="calendar-toolbar">
-        <NButton size="small" quaternary :disabled="!canGoMonth(-1)" @click="changeMonth(-1)">
+        <NButton
+          size="small"
+          quaternary
+          :disabled="!canGoMonth(-1)"
+          @click="changeMonth(-1)"
+        >
           Tháng trước
         </NButton>
         <div class="calendar-title">{{ monthLabel }}</div>
-        <NButton size="small" quaternary :disabled="!canGoMonth(1)" @click="changeMonth(1)">
+        <NButton
+          size="small"
+          quaternary
+          :disabled="!canGoMonth(1)"
+          @click="changeMonth(1)"
+        >
           Tháng sau
         </NButton>
       </div>
@@ -306,7 +324,10 @@ function badgeClass(type?: string) {
               <div v-if="entry.timeRange" class="calendar-entry__time">
                 {{ entry.timeRange }}
               </div>
-              <div v-if="entry.type !== 'holiday'" class="calendar-entry__label">
+              <div
+                v-if="entry.type !== 'holiday'"
+                class="calendar-entry__label"
+              >
                 {{ entry.label }}
               </div>
               <div v-if="entry.note" class="calendar-entry__note">
@@ -315,7 +336,10 @@ function badgeClass(type?: string) {
             </div>
           </div>
 
-          <div v-if="(getDay(day)?.badges ?? []).length > 0" class="calendar-cell__badges">
+          <div
+            v-if="(getDay(day)?.badges ?? []).length > 0"
+            class="calendar-cell__badges"
+          >
             <span
               v-for="badge in getDay(day)?.badges ?? []"
               :key="badge.text + badge.type"
@@ -332,7 +356,9 @@ function badgeClass(type?: string) {
         <div class="calendar-mobile-detail__header">
           <div>
             <div class="calendar-mobile-detail__label">Chi tiết ngày</div>
-            <div class="calendar-mobile-detail__date">{{ selectedDateLabel }}</div>
+            <div class="calendar-mobile-detail__date">
+              {{ selectedDateLabel }}
+            </div>
           </div>
           <span
             v-if="selectedDayDetail?.highlight"
@@ -358,7 +384,10 @@ function badgeClass(type?: string) {
             </span>
           </div>
 
-          <div v-if="selectedDayDetail.entries.length > 0" class="calendar-mobile-detail__entries">
+          <div
+            v-if="selectedDayDetail.entries.length > 0"
+            class="calendar-mobile-detail__entries"
+          >
             <div
               v-for="entry in selectedDayDetail.entries"
               :key="entry.timeRange + entry.label"
@@ -375,9 +404,13 @@ function badgeClass(type?: string) {
               </div>
             </div>
           </div>
-          <div v-else class="calendar-mobile-detail__empty">Không có dữ liệu chấm công</div>
+          <div v-else class="calendar-mobile-detail__empty">
+            Không có dữ liệu chấm công
+          </div>
         </template>
-        <div v-else class="calendar-mobile-detail__empty">Không có dữ liệu chấm công</div>
+        <div v-else class="calendar-mobile-detail__empty">
+          Không có dữ liệu chấm công
+        </div>
       </div>
     </NSpin>
   </NCard>
