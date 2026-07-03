@@ -93,6 +93,31 @@
     "attendancePage": {
       "status": {
         "lateOrEarly": "Đi muộn/về sớm"
+      },
+      "summary": {
+        "actualWorkdays": "Ngày công thực tế",
+        "actualWorkHours": "Giờ làm thực tế",
+        "annualLeave": "Nghỉ phép năm",
+        "missingCheckInOut": "Thiếu check-in/out",
+        "overtime": "Tăng ca",
+        "paidLeave": "Nghỉ có lương",
+        "subtitle": "Theo dõi công, giờ làm và trạng thái chấm công",
+        "title": "Tổng quan tháng {0}",
+        "totalWorkdays": "Tổng công",
+        "trendUp": "Tăng",
+        "trendWarning": "Cần chú ý",
+        "unpaidLeave": "Nghỉ không lương",
+        "workdaysDivider": "Ngày công",
+        "workingHours": "Giờ làm"
+      },
+      "sync": {
+        "cancel": "Hủy",
+        "confirm": "Đồng bộ",
+        "confirmContent": "Đồng bộ dữ liệu chấm công sẽ mất 1 chút thời gian!",
+        "error": "Gửi yêu cầu đồng bộ chấm công thất bại",
+        "success": "Đã gửi yêu cầu đồng bộ chấm công",
+        "tooltip": "Đồng bộ chấm công",
+        "tooltipV2": "Đồng bộ chấm công V2"
       }
     },
     "sampleDescription": "Trang mẫu quản lý {0}.",

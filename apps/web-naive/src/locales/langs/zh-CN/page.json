@@ -93,6 +93,31 @@
     "attendancePage": {
       "status": {
         "lateOrEarly": "迟到/早退"
+      },
+      "summary": {
+        "actualWorkdays": "实际出勤天数",
+        "actualWorkHours": "实际工时",
+        "annualLeave": "年假",
+        "missingCheckInOut": "缺少签到/签退",
+        "overtime": "加班",
+        "paidLeave": "带薪休假",
+        "subtitle": "跟踪出勤、工时和考勤状态",
+        "title": "{0} 月度概览",
+        "totalWorkdays": "总出勤",
+        "trendUp": "增加",
+        "trendWarning": "需关注",
+        "unpaidLeave": "无薪休假",
+        "workdaysDivider": "出勤",
+        "workingHours": "工时"
+      },
+      "sync": {
+        "cancel": "取消",
+        "confirm": "同步",
+        "confirmContent": "同步考勤数据需要一点时间！",
+        "error": "发送考勤同步请求失败",
+        "success": "已发送考勤同步请求",
+        "tooltip": "同步考勤",
+        "tooltipV2": "同步考勤 V2"
       }
     },
     "sampleDescription": "{0}管理示例页面。",

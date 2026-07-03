@@ -1,14 +1,13 @@
 <script lang="ts" setup>
-import type {
-  TimesheetOverviewItem,
-  TimesheetStatisticItem,
-} from '#/models/hr/timesheet';
+import type { TimesheetOverviewItem, TimesheetStatisticItem } from '#/models/hr/timesheet';
 
 import { computed, onMounted, ref, watch } from 'vue';
 
 import { Page } from '@vben/common-ui';
+import { $t } from '@vben/locales';
 
-import { getTimesheetListApi } from '#/api';
+import { message } from '#/adapter/naive';
+import { getTimesheetListApi, syncTimesheetsApi, syncTimesheetsV2Api } from '#/api';
 
 import TimesheetCalendar from './TimesheetCalendar.vue';
 import TimesheetMonthlyDetail from './TimesheetMonthlyDetail.vue';
@@ -32,18 +31,19 @@ function formatMonthLabel(value: string) {
   return `${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
 }
 
+function getMonthStartPeriod(value: string) {
+  const date = parseDateKey(value);
+  return `${date.getFullYear()}/${pad(date.getMonth() + 1)}/01`;
+}
+
 function addMonths(value: Date, offset: number) {
   const date = new Date(value);
   date.setMonth(date.getMonth() + offset, 1);
   return date;
 }
 
-const currentMonth = new Date(
-  new Date().getFullYear(),
-  new Date().getMonth(),
-  1,
-);
-const allowedMonths = Array.from({ length: 3 }, (_, index) => {
+const currentMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+const allowedMonths = Array.from({ length: 6 }, (_, index) => {
   const date = addMonths(currentMonth, -index);
   const value = toDateKey(date);
 
@@ -57,6 +57,16 @@ const calendarValue = ref(toDateKey(currentMonth));
 const selectedDate = ref(today);
 const dataSource = ref<Awaited<ReturnType<typeof getTimesheetListApi>>>();
 const loading = ref(false);
+
+function handleSync(version: 'v1' | 'v2') {
+  const period = getMonthStartPeriod(calendarValue.value);
+  const request = version === 'v1' ? syncTimesheetsApi : syncTimesheetsV2Api;
+
+  request(period).catch(() => {
+    message.error($t('page.hr.attendancePage.sync.error'));
+  });
+  message.success($t('page.hr.attendancePage.sync.success'));
+}
 
 async function fetchTimesheetData(selected?: string) {
   loading.value = true;
@@ -78,13 +88,13 @@ const overviewMetrics = computed<TimesheetOverviewItem[]>(() => {
   return [
     {
       color: 'primary',
-      label: 'Ngày công thực tế',
+      label: $t('page.hr.attendancePage.summary.actualWorkdays'),
       total: dataExtend?.workdays ?? 0,
       value: dataExtend?.actualWorkdays ?? 0,
     },
     {
       color: 'success',
-      label: 'Giờ làm thực tế',
+      label: $t('page.hr.attendancePage.summary.actualWorkHours'),
       total: dataExtend?.workHours ?? 0,
       unit: 'h',
       value: dataExtend?.actualWorkHours ?? 0,
@@ -97,28 +107,38 @@ const statistics = computed<TimesheetStatisticItem[]>(() => {
 
   return [
     {
-      label: 'Tổng công',
+      label: $t('page.hr.attendancePage.summary.totalWorkdays'),
       value: dataExtend?.actualWorkdays?.toString() ?? '0',
     },
-    { label: 'Giờ làm', value: `${dataExtend?.actualWorkHours ?? 0}h` },
     {
-      label: 'Đi muộn/về sớm',
+      label: $t('page.hr.attendancePage.summary.workingHours'),
+      value: `${dataExtend?.actualWorkHours ?? 0}h`,
+    },
+    {
+      label: $t('page.hr.attendancePage.status.lateOrEarly'),
       trend: 'down',
       value: dataExtend?.earlyLate ?? 0,
     },
     {
-      label: 'Thiếu check-in/out',
+      label: $t('page.hr.attendancePage.summary.missingCheckInOut'),
       trend: 'down',
       value: dataExtend?.missing ?? 0,
     },
     {
-      label: 'Nghỉ phép năm',
+      label: $t('page.hr.attendancePage.summary.annualLeave'),
       value: dataExtend?.annualLeave?.toString() ?? '0',
     },
-    { label: 'Tăng ca', trend: 'up', value: `${dataExtend?.overtime ?? 0}h` },
-    { label: 'Nghỉ có lương', value: dataExtend?.paidLeave?.toString() ?? '0' },
     {
-      label: 'Nghỉ không lương',
+      label: $t('page.hr.attendancePage.summary.overtime'),
+      trend: 'up',
+      value: `${dataExtend?.overtime ?? 0}h`,
+    },
+    {
+      label: $t('page.hr.attendancePage.summary.paidLeave'),
+      value: dataExtend?.paidLeave?.toString() ?? '0',
+    },
+    {
+      label: $t('page.hr.attendancePage.summary.unpaidLeave'),
       value: dataExtend?.unpaidLeave?.toString() ?? '0',
     },
   ];
@@ -148,6 +168,7 @@ watch(calendarValue, (value) => {
           :month-label="formatMonthLabel(calendarValue)"
           :overview="overviewMetrics"
           :statistics="statistics"
+          @sync="handleSync"
         />
       </div>
     </div>
@@ -163,6 +184,12 @@ watch(calendarValue, (value) => {
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .timesheet-page {
+    padding: 12px;
+  }
 }
 
 @media (min-width: 1200px) {

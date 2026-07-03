@@ -1,17 +1,21 @@
 <script lang="ts" setup>
-import type {
-  TimesheetOverviewItem,
-  TimesheetStatisticItem,
-} from '#/models/hr/timesheet';
+import type { TimesheetOverviewItem, TimesheetStatisticItem } from '#/models/hr/timesheet';
 
 import { computed } from 'vue';
 
-import { NCard, NDivider, NProgress, NTag } from 'naive-ui';
+import { IconifyIcon } from '@vben/icons';
+import { $t } from '@vben/locales';
+
+import { NButton, NCard, NDivider, NPopconfirm, NProgress, NTag, NTooltip } from 'naive-ui';
 
 const props = defineProps<{
   monthLabel: string;
   overview: TimesheetOverviewItem[];
   statistics: TimesheetStatisticItem[];
+}>();
+
+const emit = defineEmits<{
+  sync: [version: 'v1' | 'v2'];
 }>();
 
 function overviewColor(item: TimesheetOverviewItem) {
@@ -33,9 +37,7 @@ function overviewColor(item: TimesheetOverviewItem) {
 
 const normalizedOverview = computed(() => {
   return props.overview.map((item) => {
-    const percent = item.total
-      ? Math.min((item.value / item.total) * 100, 100)
-      : 0;
+    const percent = item.total ? Math.min((item.value / item.total) * 100, 100) : 0;
     const text = `${item.value}${item.unit ?? ''}/${item.total}${item.unit ?? ''}`;
 
     return { ...item, percent, text };
@@ -46,10 +48,56 @@ const normalizedOverview = computed(() => {
 <template>
   <NCard class="timesheet-monthly-detail" :bordered="false">
     <div class="monthly-detail__header">
-      <h3 class="monthly-detail__title">Tổng quan tháng {{ monthLabel }}</h3>
-      <p class="monthly-detail__subtitle">
-        Theo dõi công, giờ làm và trạng thái chấm công
-      </p>
+      <div>
+        <h3 class="monthly-detail__title">
+          {{ $t('page.hr.attendancePage.summary.title', [monthLabel]) }}
+        </h3>
+        <p class="monthly-detail__subtitle">
+          {{ $t('page.hr.attendancePage.summary.subtitle') }}
+        </p>
+      </div>
+
+      <div class="monthly-detail__actions">
+        <NPopconfirm
+          :negative-text="$t('page.hr.attendancePage.sync.cancel')"
+          :positive-text="$t('page.hr.attendancePage.sync.confirm')"
+          @positive-click="() => emit('sync', 'v1')"
+        >
+          <template #trigger>
+            <NTooltip trigger="hover">
+              <template #trigger>
+                <NButton circle quaternary size="small" type="primary">
+                  <template #icon>
+                    <IconifyIcon icon="lucide:refresh-cw" />
+                  </template>
+                </NButton>
+              </template>
+              {{ $t('page.hr.attendancePage.sync.tooltip') }}
+            </NTooltip>
+          </template>
+          {{ $t('page.hr.attendancePage.sync.confirmContent') }}
+        </NPopconfirm>
+
+        <NPopconfirm
+          :negative-text="$t('page.hr.attendancePage.sync.cancel')"
+          :positive-text="$t('page.hr.attendancePage.sync.confirm')"
+          @positive-click="() => emit('sync', 'v2')"
+        >
+          <template #trigger>
+            <NTooltip trigger="hover">
+              <template #trigger>
+                <NButton circle quaternary size="small" type="primary">
+                  <template #icon>
+                    <IconifyIcon icon="lucide:refresh-ccw" />
+                  </template>
+                </NButton>
+              </template>
+              {{ $t('page.hr.attendancePage.sync.tooltipV2') }}
+            </NTooltip>
+          </template>
+          {{ $t('page.hr.attendancePage.sync.confirmContent') }}
+        </NPopconfirm>
+      </div>
     </div>
 
     <div class="monthly-detail__overview">
@@ -68,21 +116,20 @@ const normalizedOverview = computed(() => {
       </div>
     </div>
 
-    <NDivider class="monthly-detail__divider">Ngày công</NDivider>
+    <NDivider class="monthly-detail__divider">
+      {{ $t('page.hr.attendancePage.summary.workdaysDivider') }}
+    </NDivider>
 
     <div class="monthly-detail__stats">
-      <div
-        v-for="stat in statistics"
-        :key="stat.label"
-        class="monthly-detail__stat-item"
-      >
+      <div v-for="stat in statistics" :key="stat.label" class="monthly-detail__stat-item">
         <div class="monthly-detail__stat-label">{{ stat.label }}</div>
         <div class="monthly-detail__stat-value">{{ stat.value }}</div>
-        <NTag
-          v-if="stat.trend"
-          :type="stat.trend === 'up' ? 'success' : 'warning'"
-        >
-          {{ stat.trend === 'up' ? 'Tăng' : 'Cần chú ý' }}
+        <NTag v-if="stat.trend" :type="stat.trend === 'up' ? 'success' : 'warning'">
+          {{
+            stat.trend === 'up'
+              ? $t('page.hr.attendancePage.summary.trendUp')
+              : $t('page.hr.attendancePage.summary.trendWarning')
+          }}
         </NTag>
       </div>
     </div>
@@ -92,6 +139,25 @@ const normalizedOverview = computed(() => {
 <style scoped>
 .timesheet-monthly-detail {
   height: 100%;
+}
+
+.monthly-detail__header {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.monthly-detail__actions {
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 2px;
+  align-items: center;
+}
+
+.monthly-detail__actions :deep(.n-button) {
+  --n-width: 28px;
+  --n-height: 28px;
 }
 
 .monthly-detail__title {
@@ -164,5 +230,20 @@ const normalizedOverview = computed(() => {
 .monthly-detail__stat-value {
   font-size: 20px;
   font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .monthly-detail__header {
+    align-items: center;
+  }
+
+  .monthly-detail__title {
+    font-size: 17px;
+  }
+
+  .monthly-detail__actions :deep(.n-button) {
+    --n-width: 26px;
+    --n-height: 26px;
+  }
 }
 </style>

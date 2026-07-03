@@ -93,6 +93,31 @@
     "attendancePage": {
       "status": {
         "lateOrEarly": "Late/Early leave"
+      },
+      "summary": {
+        "actualWorkdays": "Actual workdays",
+        "actualWorkHours": "Actual working hours",
+        "annualLeave": "Annual leave",
+        "missingCheckInOut": "Missing check-in/out",
+        "overtime": "Overtime",
+        "paidLeave": "Paid leave",
+        "subtitle": "Track workdays, working hours, and attendance status",
+        "title": "Monthly overview {0}",
+        "totalWorkdays": "Total workdays",
+        "trendUp": "Up",
+        "trendWarning": "Needs attention",
+        "unpaidLeave": "Unpaid leave",
+        "workdaysDivider": "Workdays",
+        "workingHours": "Working hours"
+      },
+      "sync": {
+        "cancel": "Cancel",
+        "confirm": "Sync",
+        "confirmContent": "Syncing attendance data will take a little while!",
+        "error": "Failed to send attendance sync request",
+        "success": "Attendance sync request sent",
+        "tooltip": "Sync attendance",
+        "tooltipV2": "Sync attendance V2"
       }
     },
     "sampleDescription": "Sample page for {0} management.",
