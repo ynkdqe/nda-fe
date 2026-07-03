@@ -19,7 +19,13 @@ import Permission from '#/components/Permission.vue';
 import SetPasswordModal from './SetPasswordModal.vue';
 import UserForm from './UserForm.vue';
 
-type DropdownKey = 'delete' | 'edit' | 'lock' | 'loginAs' | 'permission' | 'setPassword';
+type DropdownKey =
+  | 'delete'
+  | 'edit'
+  | 'lock'
+  | 'loginAs'
+  | 'permission'
+  | 'setPassword';
 type DropdownSelectKey = number | string;
 
 type GridPage = {
@@ -132,10 +138,16 @@ const gridOptions: VxeGridProps<IdentityUserApi.UserItem> = {
   pagerConfig: {},
   proxyConfig: {
     ajax: {
-      query: async ({ page }: { page: GridPage }, formValues?: Record<string, unknown>) => {
+      query: async (
+        { page }: { page: GridPage },
+        formValues?: Record<string, unknown>,
+      ) => {
         const current = page.currentPage ?? 1;
         const pageSize = page.pageSize ?? 10;
-        const keyword = typeof formValues?.keyword === 'string' ? formValues.keyword.trim() : '';
+        const keyword =
+          typeof formValues?.keyword === 'string'
+            ? formValues.keyword.trim()
+            : '';
         const response = await getIdentityUsers({
           filter: keyword || undefined,
           maxResultCount: pageSize,
@@ -257,7 +269,10 @@ async function onFormSubmit() {
       </template>
 
       <template #lockedTag="{ row }">
-        <NTag :bordered="false" :type="row.lockoutEnabled ? 'error' : 'success'">
+        <NTag
+          :bordered="false"
+          :type="row.lockoutEnabled ? 'error' : 'success'"
+        >
           {{ row.lockoutEnabled ? 'Bật' : 'Tắt' }}
         </NTag>
       </template>

@@ -97,7 +97,10 @@ const calendarData = computed(() => {
       badges.push({ text: 'Thiếu công', type: 'danger' });
     } else if (record.isLate) {
       entryType = 'late';
-      badges.push({ text: $t('page.hr.attendancePage.status.lateOrEarly'), type: 'warning' });
+      badges.push({
+        text: $t('page.hr.attendancePage.status.lateOrEarly'),
+        type: 'warning',
+      });
     }
 
     const workPoint = record.workshift?.workPoint ?? 1;
@@ -151,6 +154,16 @@ const calendarData = computed(() => {
   });
 
   return result;
+});
+
+const selectedDayDetail = computed(() => calendarData.value[props.selectedDate]);
+
+const selectedDateLabel = computed(() => {
+  return new Intl.DateTimeFormat('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(parseDateKey(props.selectedDate));
 });
 
 const monthDays = computed(() => {
@@ -313,6 +326,58 @@ function badgeClass(type?: string) {
             </span>
           </div>
         </button>
+      </div>
+
+      <div class="calendar-mobile-detail">
+        <div class="calendar-mobile-detail__header">
+          <div>
+            <div class="calendar-mobile-detail__label">Chi tiết ngày</div>
+            <div class="calendar-mobile-detail__date">{{ selectedDateLabel }}</div>
+          </div>
+          <span
+            v-if="selectedDayDetail?.highlight"
+            class="calendar-highlight"
+            :class="highlightClass(selectedDayDetail.highlight.type)"
+          >
+            {{ selectedDayDetail.highlight.value }}
+          </span>
+        </div>
+
+        <template v-if="selectedDayDetail">
+          <div
+            v-if="(selectedDayDetail.badges ?? []).length > 0"
+            class="calendar-mobile-detail__badges"
+          >
+            <span
+              v-for="badge in selectedDayDetail.badges ?? []"
+              :key="badge.text + badge.type"
+              class="calendar-badge"
+              :class="badgeClass(badge.type)"
+            >
+              {{ badge.text }}
+            </span>
+          </div>
+
+          <div v-if="selectedDayDetail.entries.length > 0" class="calendar-mobile-detail__entries">
+            <div
+              v-for="entry in selectedDayDetail.entries"
+              :key="entry.timeRange + entry.label"
+              class="calendar-mobile-detail__entry"
+            >
+              <div v-if="entry.timeRange" class="calendar-mobile-detail__time">
+                {{ entry.timeRange }}
+              </div>
+              <div v-if="entry.label" class="calendar-mobile-detail__name">
+                {{ entry.label }}
+              </div>
+              <div v-if="entry.note" class="calendar-mobile-detail__note">
+                {{ entry.note }}
+              </div>
+            </div>
+          </div>
+          <div v-else class="calendar-mobile-detail__empty">Không có dữ liệu chấm công</div>
+        </template>
+        <div v-else class="calendar-mobile-detail__empty">Không có dữ liệu chấm công</div>
       </div>
     </NSpin>
   </NCard>
@@ -502,6 +567,10 @@ function badgeClass(type?: string) {
   text-transform: uppercase;
 }
 
+.calendar-mobile-detail {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .calendar-cell {
     min-height: 86px;
@@ -552,6 +621,72 @@ function badgeClass(type?: string) {
   .calendar-cell__entries,
   .calendar-cell__badges {
     display: none;
+  }
+
+  .calendar-mobile-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    margin-top: 12px;
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: 10px;
+  }
+
+  .calendar-mobile-detail__header {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .calendar-mobile-detail__label {
+    font-size: 12px;
+    opacity: 0.65;
+  }
+
+  .calendar-mobile-detail__date {
+    margin-top: 2px;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .calendar-mobile-detail__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .calendar-mobile-detail__entries {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .calendar-mobile-detail__entry {
+    padding: 10px;
+    background-color: rgb(22 119 255 / 6%);
+    border-radius: 8px;
+  }
+
+  .calendar-mobile-detail__time {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0958d9;
+  }
+
+  .calendar-mobile-detail__name {
+    margin-top: 4px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .calendar-mobile-detail__note,
+  .calendar-mobile-detail__empty {
+    margin-top: 4px;
+    font-size: 12px;
+    opacity: 0.7;
   }
 }
 
