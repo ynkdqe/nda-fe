@@ -1,15 +1,12 @@
 import type { PluginOption } from 'vite';
 
-import {
-  colors,
-  generatorContentHash,
-  readPackageJSON,
-} from '@vben/node-utils';
+import { colors, generatorContentHash, readPackageJSON } from '@vben/node-utils';
 
 import { loadEnv } from '../utils/env';
 
 interface PluginOptions {
   isBuild: boolean;
+  mode: string;
   root: string;
 }
 
@@ -23,6 +20,7 @@ const VBEN_ADMIN_PRO_APP_CONF = '_VBEN_ADMIN_PRO_APP_CONF_';
 
 async function viteExtraAppConfigPlugin({
   isBuild,
+  mode,
   root,
 }: PluginOptions): Promise<PluginOption | undefined> {
   let publicPath: string;
@@ -37,7 +35,7 @@ async function viteExtraAppConfigPlugin({
   return {
     async configResolved(config) {
       publicPath = ensureTrailingSlash(config.base);
-      source = await getConfigSource();
+      source = await getConfigSource(mode);
     },
     async generateBundle() {
       try {
@@ -50,9 +48,7 @@ async function viteExtraAppConfigPlugin({
         console.log(colors.cyan(`✨configuration file is build successfully!`));
       } catch (error) {
         console.log(
-          colors.red(
-            `configuration file configuration file failed to package:\n${error}`,
-          ),
+          colors.red(`configuration file configuration file failed to package:\n${error}`),
         );
       }
     },
@@ -70,8 +66,13 @@ async function viteExtraAppConfigPlugin({
   };
 }
 
-async function getConfigSource() {
-  const config = await loadEnv();
+async function getConfigSource(mode: string) {
+  const config = await loadEnv('VITE_GLOB_', [
+    '.env',
+    '.env.local',
+    `.env.${mode}`,
+    `.env.${mode}.local`,
+  ]);
   const windowVariable = `window.${VBEN_ADMIN_PRO_APP_CONF}`;
   // 确保变量不会被修改
   let source = `${windowVariable}=${JSON.stringify(config)};`;

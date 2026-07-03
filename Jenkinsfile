@@ -102,6 +102,7 @@ pipeline {
 
           docker build \
             $CACHE_FROM \
+            --build-arg BUILD_MODE="$APP_ENV" \
             -f "$DOCKERFILE" \
             -t "$REGISTRY_IMAGE:$IMAGE_TAG" \
             -t "$REGISTRY_IMAGE:$LATEST_TAG" \
