@@ -130,7 +130,7 @@
         "error": "Gửi yêu cầu đồng bộ chấm công thất bại",
         "success": "Đã gửi yêu cầu đồng bộ chấm công",
         "tooltip": "Đồng bộ chấm công",
-        "tooltipV2": "Đồng bộ chấm công V2"
+        "tooltipV2": "Đồng bộ chấm công"
       }
     },
     "sampleDescription": "Trang mẫu quản lý {0}.",

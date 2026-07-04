@@ -130,7 +130,7 @@
         "error": "Failed to send attendance sync request",
         "success": "Attendance sync request sent",
         "tooltip": "Sync attendance",
-        "tooltipV2": "Sync attendance V2"
+        "tooltipV2": "Sync attendance"
       }
     },
     "sampleDescription": "Sample page for {0} management.",

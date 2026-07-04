@@ -74,26 +74,6 @@ const normalizedOverview = computed(() => {
         <NPopconfirm
           :negative-text="$t('page.hr.attendancePage.sync.cancel')"
           :positive-text="$t('page.hr.attendancePage.sync.confirm')"
-          @positive-click="() => emit('sync', 'v1')"
-        >
-          <template #trigger>
-            <NTooltip trigger="hover">
-              <template #trigger>
-                <NButton circle quaternary size="small" type="primary">
-                  <template #icon>
-                    <IconifyIcon icon="lucide:refresh-cw" />
-                  </template>
-                </NButton>
-              </template>
-              {{ $t('page.hr.attendancePage.sync.tooltip') }}
-            </NTooltip>
-          </template>
-          {{ $t('page.hr.attendancePage.sync.confirmContent') }}
-        </NPopconfirm>
-
-        <NPopconfirm
-          :negative-text="$t('page.hr.attendancePage.sync.cancel')"
-          :positive-text="$t('page.hr.attendancePage.sync.confirm')"
           @positive-click="() => emit('sync', 'v2')"
         >
           <template #trigger>

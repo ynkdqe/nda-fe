@@ -130,7 +130,7 @@
         "error": "发送考勤同步请求失败",
         "success": "已发送考勤同步请求",
         "tooltip": "同步考勤",
-        "tooltipV2": "同步考勤 V2"
+        "tooltipV2": "同步考勤"
       }
     },
     "sampleDescription": "{0}管理示例页面。",
