@@ -77,6 +77,39 @@
         "replyQuestion": "回复了 {0} 的问题 {1}",
         "closeIssue": "关闭了问题 {0}",
         "pushCode": "推送了代码到 {0}"
+      },
+      "auditLog": {
+        "unknownUser": "用户",
+        "defaultMethod": "REQUEST",
+        "durationValue": "{0}ms",
+        "empty": "暂无活动",
+        "detailTitle": "审计日志详情",
+        "actions": "操作",
+        "noActions": "暂无操作",
+        "close": "关闭",
+        "labels": {
+          "user": "用户",
+          "time": "时间",
+          "method": "方法",
+          "status": "状态",
+          "url": "URL",
+          "clientId": "Client ID",
+          "ip": "IP",
+          "correlationId": "Correlation ID",
+          "browser": "浏览器",
+          "error": "错误",
+          "service": "服务",
+          "actionMethod": "方法",
+          "duration": "耗时",
+          "parameters": "参数"
+        },
+        "summary": {
+          "duration": "，耗时 {0}ms",
+          "forbidden": "访问 {0} 被拒绝{1}",
+          "failed": "{0} {1} 失败，状态码 {2}{3}",
+          "success": "{0} {1} 成功{2}"
+        },
+        "actionTitle": "操作 {0}: {1}.{2}"
       }
     }
   },

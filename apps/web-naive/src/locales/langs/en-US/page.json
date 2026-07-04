@@ -77,6 +77,39 @@
         "replyQuestion": "replied {0} about {1}",
         "closeIssue": "closed issue {0}",
         "pushCode": "pushed code to {0}"
+      },
+      "auditLog": {
+        "unknownUser": "User",
+        "defaultMethod": "REQUEST",
+        "durationValue": "{0}ms",
+        "empty": "No recent activity",
+        "detailTitle": "Audit log details",
+        "actions": "Actions",
+        "noActions": "No actions",
+        "close": "Close",
+        "labels": {
+          "user": "User",
+          "time": "Time",
+          "method": "Method",
+          "status": "Status",
+          "url": "URL",
+          "clientId": "Client ID",
+          "ip": "IP",
+          "correlationId": "Correlation ID",
+          "browser": "Browser",
+          "error": "Error",
+          "service": "Service",
+          "actionMethod": "Method",
+          "duration": "Duration",
+          "parameters": "Parameters"
+        },
+        "summary": {
+          "duration": ", completed in {0}ms",
+          "forbidden": "was denied access to {0}{1}",
+          "failed": "{0} {1} failed with status {2}{3}",
+          "success": "{0} {1} succeeded{2}"
+        },
+        "actionTitle": "Action {0}: {1}.{2}"
       }
     }
   },

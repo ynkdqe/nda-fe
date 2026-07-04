@@ -77,6 +77,39 @@
         "replyQuestion": "đã trả lời {0} về {1}",
         "closeIssue": "đã đóng vấn đề {0}",
         "pushCode": "đã đẩy mã lên {0}"
+      },
+      "auditLog": {
+        "unknownUser": "Người dùng",
+        "defaultMethod": "REQUEST",
+        "durationValue": "{0}ms",
+        "empty": "Chưa có hoạt động nào",
+        "detailTitle": "Chi tiết audit log",
+        "actions": "Actions",
+        "noActions": "Không có action",
+        "close": "Đóng",
+        "labels": {
+          "user": "Người dùng",
+          "time": "Thời gian",
+          "method": "Phương thức",
+          "status": "Trạng thái",
+          "url": "URL",
+          "clientId": "Client ID",
+          "ip": "IP",
+          "correlationId": "Correlation ID",
+          "browser": "Trình duyệt",
+          "error": "Lỗi",
+          "service": "Service",
+          "actionMethod": "Method",
+          "duration": "Thời lượng",
+          "parameters": "Parameters"
+        },
+        "summary": {
+          "duration": ", hoàn tất trong {0}ms",
+          "forbidden": "bị từ chối quyền khi truy cập {0}{1}",
+          "failed": "{0} {1} thất bại với mã {2}{3}",
+          "success": "{0} {1} thành công{2}"
+        },
+        "actionTitle": "Action {0}: {1}.{2}"
       }
     }
   },
