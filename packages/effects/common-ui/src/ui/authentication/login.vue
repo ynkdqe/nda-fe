@@ -58,19 +58,25 @@ const [Form, formApi] = useVbenForm(
 );
 const router = useRouter();
 
-const REMEMBER_ME_KEY = `REMEMBER_ME_USERNAME_${location.hostname}`;
+const REMEMBER_ME_USERNAME_KEY = `REMEMBER_ME_USERNAME_${location.hostname}`;
+const REMEMBER_ME_PASSWORD_KEY = `REMEMBER_ME_PASSWORD_${location.hostname}`;
 
-const localUsername = localStorage.getItem(REMEMBER_ME_KEY) || '';
+const localUsername = localStorage.getItem(REMEMBER_ME_USERNAME_KEY) || '';
+const localPassword = localStorage.getItem(REMEMBER_ME_PASSWORD_KEY) || '';
 
-const rememberMe = ref(!!localUsername);
+const rememberMe = ref(!!localUsername || !!localPassword);
 
 async function handleSubmit() {
   const { valid } = await formApi.validate();
   const values = await formApi.getValues();
   if (valid) {
     localStorage.setItem(
-      REMEMBER_ME_KEY,
+      REMEMBER_ME_USERNAME_KEY,
       rememberMe.value ? values?.username : '',
+    );
+    localStorage.setItem(
+      REMEMBER_ME_PASSWORD_KEY,
+      rememberMe.value ? values?.password : '',
     );
     emit('submit', values);
   }
@@ -83,6 +89,9 @@ function handleGo(path: string) {
 onMounted(() => {
   if (localUsername) {
     formApi.setFieldValue('username', localUsername);
+  }
+  if (localPassword) {
+    formApi.setFieldValue('password', localPassword);
   }
 });
 

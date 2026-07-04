@@ -101,7 +101,7 @@ const formSchema = computed((): VbenFormSchema[] => {
       componentProps: {
         placeholder: $t('authentication.password'),
       },
-      defaultValue: '1q2w3E*',
+      defaultValue: '123456aA@',
       fieldName: 'password',
       label: $t('authentication.password'),
       rules: z.string().min(1, { message: $t('authentication.passwordTip') }),

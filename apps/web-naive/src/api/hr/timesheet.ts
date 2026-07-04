@@ -17,7 +17,7 @@ export function syncTimesheetsApi(period: string) {
 }
 
 export function syncTimesheetsV2Api(period: string) {
-  return requestClient.get('/api/timesheets/gg-sync-v2', {
+  return requestClient.post('/api/timesheets/gg-sync-v2', undefined, {
     params: { period },
     responseReturn: 'body',
   });
