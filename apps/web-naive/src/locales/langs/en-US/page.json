@@ -67,7 +67,19 @@
         "optimization": "System optimization",
         "security": "Security check",
         "dependency": "Update dependencies",
-        "uiFix": "Fix UI issues"
+        "uiFix": "Fix UI issues",
+        "empty": "No to-do items",
+        "priority": {
+          "high": "High priority",
+          "medium": "Medium priority",
+          "low": "Low priority"
+        },
+        "status": {
+          "open": "Open",
+          "closed": "Closed",
+          "completed": "Completed",
+          "done": "Done"
+        }
       },
       "trends": {
         "createProject": "created project {0} in {1}",

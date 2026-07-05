@@ -5,11 +5,8 @@ import type {
   WorkbenchTodoItem,
 } from '@vben/common-ui';
 
-import type {
-  AuditActionDto,
-  AuditLogDto,
-  AuditLogListResult,
-} from '#/models/audit-log';
+import type { AuditActionDto, AuditLogDto, AuditLogListResult } from '#/models/audit-log';
+import type { TodoDto, TodoListResult } from '#/models/todo';
 
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -42,16 +39,13 @@ import {
 } from 'naive-ui';
 
 import { requestClient } from '#/api/request';
-import {
-  getCachedCurrentWeather,
-  getLocationByIp,
-  resolveWeatherDescription,
-} from '#/api/weather';
+import { getCachedCurrentWeather, getLocationByIp, resolveWeatherDescription } from '#/api/weather';
 
 import AnalyticsVisitsSource from '../analytics/analytics-visits-source.vue';
 
 const userStore = useUserStore();
 const AUDIT_LOG_PAGE_SIZE = 5;
+const TODO_PAGE_SIZE = 5;
 
 // Đây là dữ liệu mẫu; các dự án thực tế cần điều chỉnh dựa trên các trường hợp cụ thể.
 // URL cũng có thể là một tuyến đường nội bộ, được xác định và xử lý trong phương thức `navTo` để chuyển hướng nội bộ.
@@ -153,38 +147,10 @@ const quickNavItems = computed<WorkbenchQuickNavItem[]>(() => [
   },
 ]);
 
-const todoItems = computed<WorkbenchTodoItem[]>(() => [
-  {
-    completed: false,
-    content: $t('page.dashboard.workspace.todo.codeReview'),
-    date: '2024-07-30 11:00:00',
-    title: $t('page.dashboard.workspace.todo.codeReview'),
-  },
-  {
-    completed: true,
-    content: $t('page.dashboard.workspace.todo.optimization'),
-    date: '2024-07-30 11:00:00',
-    title: $t('page.dashboard.workspace.todo.optimization'),
-  },
-  {
-    completed: false,
-    content: $t('page.dashboard.workspace.todo.security'),
-    date: '2024-07-30 11:00:00',
-    title: $t('page.dashboard.workspace.todo.security'),
-  },
-  {
-    completed: false,
-    content: $t('page.dashboard.workspace.todo.dependency'),
-    date: '2024-07-30 11:00:00',
-    title: $t('page.dashboard.workspace.todo.dependency'),
-  },
-  {
-    completed: false,
-    content: $t('page.dashboard.workspace.todo.uiFix'),
-    date: '2024-07-30 11:00:00',
-    title: $t('page.dashboard.workspace.todo.uiFix'),
-  },
-]);
+const todoItems = ref<WorkbenchTodoItem[]>([]);
+const todoLoading = ref(false);
+const todoCurrentPage = ref(1);
+const todoTotal = ref(0);
 
 const auditLogs = ref<AuditLogDto[]>([]);
 const auditLogLoading = ref(false);
@@ -194,6 +160,8 @@ const selectedAuditLog = ref<AuditLogDto | null>(null);
 const showAuditLogDetailModal = ref(false);
 
 const router = useRouter();
+
+const TODO_COMPLETED_STATUSES = new Set(['closed', 'completed', 'done']);
 
 // 这是一个示例方法，实际项目中需要根据实际情况进行调整
 // This is a sample method, adjust according to the actual project requirements
@@ -211,6 +179,93 @@ function navTo(nav: WorkbenchProjectItem | WorkbenchQuickNavItem) {
   }
 }
 const weatherDesc = ref($t('page.dashboard.workspace.weather.loading'));
+
+function escapeHtml(value?: null | number | string) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function getTodoPriorityLabel(priority?: null | string) {
+  const priorityKey = priority?.toLowerCase();
+
+  if (priorityKey && ['high', 'low', 'medium'].includes(priorityKey)) {
+    return $t(`page.dashboard.workspace.todo.priority.${priorityKey}`);
+  }
+
+  return priority || '-';
+}
+
+function getTodoStatusLabel(status?: null | string) {
+  const statusKey = status?.toLowerCase();
+
+  if (statusKey && ['closed', 'completed', 'done', 'open'].includes(statusKey)) {
+    return $t(`page.dashboard.workspace.todo.status.${statusKey}`);
+  }
+
+  return status || '-';
+}
+
+function isTodoCompleted(todo: TodoDto) {
+  const status = todo.status?.toLowerCase();
+  return Boolean((status && TODO_COMPLETED_STATUSES.has(status)) || todo.progress === '4');
+}
+
+function formatTodoDate(todo: TodoDto) {
+  const date = isTodoCompleted(todo)
+    ? (todo.completionDate ?? todo.dueDate ?? todo.creationTime)
+    : (todo.dueDate ?? todo.creationTime);
+
+  return date ? formatDate(date, 'DD-MM-YYYY HH:mm:ss') : '-';
+}
+
+function mapTodoToWorkbenchItem(todo: TodoDto): WorkbenchTodoItem {
+  const code = todo.code || todo.taskId || todo.id;
+  const source = todo.source || '-';
+  const priority = getTodoPriorityLabel(todo.priority);
+  const status = getTodoStatusLabel(todo.status);
+
+  return {
+    completed: isTodoCompleted(todo),
+    content: `${escapeHtml(`#${code}`)} · ${escapeHtml(source)} · ${escapeHtml(
+      priority,
+    )} · ${escapeHtml(status)}`,
+    date: formatTodoDate(todo),
+    id: todo.id,
+    title: todo.name || String(code),
+  };
+}
+
+function normalizeTodos(response: TodoListResult) {
+  return (response.data ?? []).map((todo) => mapTodoToWorkbenchItem(todo));
+}
+
+async function fetchTodos(page = todoCurrentPage.value) {
+  todoLoading.value = true;
+
+  try {
+    const response = await requestClient.get<TodoListResult>('/api/todo', {
+      params: {
+        current: page,
+        pageSize: TODO_PAGE_SIZE,
+      },
+      responseReturn: 'body',
+    });
+
+    todoCurrentPage.value = page;
+    todoTotal.value = response.total ?? response.data?.length ?? 0;
+    todoItems.value = normalizeTodos(response);
+  } catch (error) {
+    console.error('Failed to fetch todos:', error);
+    todoItems.value = [];
+    todoTotal.value = 0;
+  } finally {
+    todoLoading.value = false;
+  }
+}
 
 function getAuditLogTitle(log: AuditLogDto) {
   return (
@@ -230,10 +285,7 @@ function getAuditLogStatusType(statusCode?: null | number) {
 }
 
 function getAuditLogMethodType(method?: null | string) {
-  const methodTypeMap: Record<
-    string,
-    'default' | 'error' | 'info' | 'success' | 'warning'
-  > = {
+  const methodTypeMap: Record<string, 'default' | 'error' | 'info' | 'success' | 'warning'> = {
     DELETE: 'error',
     GET: 'info',
     PATCH: 'warning',
@@ -241,9 +293,7 @@ function getAuditLogMethodType(method?: null | string) {
     PUT: 'warning',
   };
 
-  return method
-    ? (methodTypeMap[method.toUpperCase()] ?? 'default')
-    : 'default';
+  return method ? (methodTypeMap[method.toUpperCase()] ?? 'default') : 'default';
 }
 
 function getAuditLogIcon(log: AuditLogDto) {
@@ -258,9 +308,7 @@ function getAuditLogIcon(log: AuditLogDto) {
     PUT: 'lucide:pencil',
   };
 
-  return method
-    ? (methodIconMap[method] ?? 'lucide:activity')
-    : 'lucide:activity';
+  return method ? (methodIconMap[method] ?? 'lucide:activity') : 'lucide:activity';
 }
 
 function getDefaultAuditLogMethod() {
@@ -273,16 +321,11 @@ function getAuditLogSummary(log: AuditLogDto) {
   const statusCode = log.httpStatusCode ?? 0;
   const duration =
     typeof log.executionDuration === 'number'
-      ? $t('page.dashboard.workspace.auditLog.summary.duration', [
-          log.executionDuration,
-        ])
+      ? $t('page.dashboard.workspace.auditLog.summary.duration', [log.executionDuration])
       : '';
 
   if (statusCode === 403) {
-    return $t('page.dashboard.workspace.auditLog.summary.forbidden', [
-      url,
-      duration,
-    ]);
+    return $t('page.dashboard.workspace.auditLog.summary.forbidden', [url, duration]);
   }
 
   if (statusCode >= 400) {
@@ -294,11 +337,7 @@ function getAuditLogSummary(log: AuditLogDto) {
     ]);
   }
 
-  return $t('page.dashboard.workspace.auditLog.summary.success', [
-    method,
-    url,
-    duration,
-  ]);
+  return $t('page.dashboard.workspace.auditLog.summary.success', [method, url, duration]);
 }
 
 function formatAuditLogDate(value?: null | string) {
@@ -321,11 +360,7 @@ function formatJsonText(value?: null | string) {
   }
 }
 
-function normalizeAuditLogs(
-  response: AuditLogListResult,
-  currentPage: number,
-  pageSize: number,
-) {
+function normalizeAuditLogs(response: AuditLogListResult, currentPage: number, pageSize: number) {
   const data = response.data ?? [];
 
   if (response.current || response.pageSize || data.length <= pageSize) {
@@ -339,16 +374,13 @@ async function fetchAuditLogs(page = auditLogCurrentPage.value) {
   auditLogLoading.value = true;
 
   try {
-    const response = await requestClient.get<AuditLogListResult>(
-      '/api/audit-log',
-      {
-        params: {
-          current: page,
-          pageSize: AUDIT_LOG_PAGE_SIZE,
-        },
-        responseReturn: 'body',
+    const response = await requestClient.get<AuditLogListResult>('/api/audit-log', {
+      params: {
+        current: page,
+        pageSize: AUDIT_LOG_PAGE_SIZE,
       },
-    );
+      responseReturn: 'body',
+    });
 
     auditLogCurrentPage.value = page;
     auditLogTotal.value = response.total ?? response.data?.length ?? 0;
@@ -370,21 +402,14 @@ function openAuditLogDetail(log: AuditLogDto) {
 function getActionTitle(action: AuditActionDto, index: number) {
   const serviceName = getShortServiceName(action.serviceName);
   const methodName = action.methodName || '-';
-  return $t('page.dashboard.workspace.auditLog.actionTitle', [
-    index + 1,
-    serviceName,
-    methodName,
-  ]);
+  return $t('page.dashboard.workspace.auditLog.actionTitle', [index + 1, serviceName, methodName]);
 }
 
 async function fetchWeather() {
   try {
     const location = await getLocationByIp();
     if (location) {
-      const weather = await getCachedCurrentWeather(
-        location.latitude,
-        location.longitude,
-      );
+      const weather = await getCachedCurrentWeather(location.latitude, location.longitude);
       const desc = resolveWeatherDescription(weather.weathercode, $t);
       weatherDesc.value = `${location.city}, ${desc} - ${weather.temperature}℃`;
     }
@@ -395,22 +420,15 @@ async function fetchWeather() {
 }
 
 onMounted(() => {
-  fetchWeather();
-  fetchAuditLogs();
+  void Promise.allSettled([fetchWeather(), fetchAuditLogs(), fetchTodos()]);
 });
 </script>
 
 <template>
   <div class="p-5">
-    <WorkbenchHeader
-      :avatar="userStore.userInfo?.avatar || preferences.app.defaultAvatar"
-    >
+    <WorkbenchHeader :avatar="userStore.userInfo?.avatar || preferences.app.defaultAvatar">
       <template #title>
-        {{
-          $t('page.dashboard.workspace.welcomeTitle', [
-            userStore.userInfo?.realName,
-          ])
-        }}
+        {{ $t('page.dashboard.workspace.welcomeTitle', [userStore.userInfo?.realName]) }}
       </template>
       <template #description> {{ weatherDesc }} </template>
     </WorkbenchHeader>
@@ -423,10 +441,7 @@ onMounted(() => {
           @click="navTo"
         />
 
-        <NCard
-          class="mt-5"
-          :title="$t('page.dashboard.workspace.latestDynamic')"
-        >
+        <NCard class="mt-5" :title="$t('page.dashboard.workspace.latestDynamic')">
           <NSpin :show="auditLogLoading">
             <NEmpty
               v-if="auditLogs.length === 0 && !auditLogLoading"
@@ -470,9 +485,7 @@ onMounted(() => {
                     </p>
                   </div>
                 </div>
-                <div
-                  class="hidden h-full shrink-0 px-2 sm:flex sm:flex-col sm:items-end"
-                >
+                <div class="hidden h-full shrink-0 px-2 sm:flex sm:flex-col sm:items-end">
                   <span class="mt-6 text-xs/6 text-foreground/80">
                     {{ formatAuditLogDate(log.executionTime) }}
                   </span>
@@ -481,10 +494,7 @@ onMounted(() => {
             </ul>
           </NSpin>
 
-          <div
-            v-if="auditLogTotal > AUDIT_LOG_PAGE_SIZE"
-            class="mt-4 flex justify-end"
-          >
+          <div v-if="auditLogTotal > AUDIT_LOG_PAGE_SIZE" class="mt-4 flex justify-end">
             <NPagination
               v-model:page="auditLogCurrentPage"
               :item-count="auditLogTotal"
@@ -501,15 +511,25 @@ onMounted(() => {
           :title="$t('page.dashboard.workspace.quickNav')"
           @click="navTo"
         />
-        <WorkbenchTodo
-          :items="todoItems"
-          class="mt-5"
-          :title="$t('page.dashboard.workspace.todoItems')"
-        />
-        <AnalysisChartCard
-          class="mt-5"
-          :title="$t('page.dashboard.workspace.accessSource')"
-        >
+        <NSpin :show="todoLoading" class="mt-5">
+          <WorkbenchTodo
+            v-if="todoItems.length > 0 || todoLoading"
+            :items="todoItems"
+            :title="$t('page.dashboard.workspace.todoItems')"
+          />
+          <NCard v-else :title="$t('page.dashboard.workspace.todoItems')">
+            <NEmpty :description="$t('page.dashboard.workspace.todo.empty')" />
+          </NCard>
+        </NSpin>
+        <div v-if="todoTotal > TODO_PAGE_SIZE" class="mt-4 flex justify-end">
+          <NPagination
+            v-model:page="todoCurrentPage"
+            :item-count="todoTotal"
+            :page-size="TODO_PAGE_SIZE"
+            @update:page="fetchTodos"
+          />
+        </div>
+        <AnalysisChartCard class="mt-5" :title="$t('page.dashboard.workspace.accessSource')">
           <AnalyticsVisitsSource />
         </AnalysisChartCard>
       </div>
@@ -525,32 +545,22 @@ onMounted(() => {
         <NScrollbar class="max-h-[72vh] pr-2">
           <NSpace vertical :size="16">
             <NDescriptions bordered :column="2" size="small">
-              <NDescriptionsItem
-                :label="$t('page.dashboard.workspace.auditLog.labels.user')"
-              >
+              <NDescriptionsItem :label="$t('page.dashboard.workspace.auditLog.labels.user')">
                 {{ getAuditLogTitle(selectedAuditLog) }}
               </NDescriptionsItem>
-              <NDescriptionsItem
-                :label="$t('page.dashboard.workspace.auditLog.labels.time')"
-              >
+              <NDescriptionsItem :label="$t('page.dashboard.workspace.auditLog.labels.time')">
                 {{ formatAuditLogDate(selectedAuditLog.executionTime) }}
               </NDescriptionsItem>
-              <NDescriptionsItem
-                :label="$t('page.dashboard.workspace.auditLog.labels.method')"
-              >
+              <NDescriptionsItem :label="$t('page.dashboard.workspace.auditLog.labels.method')">
                 <NTag
                   :bordered="false"
                   size="small"
                   :type="getAuditLogMethodType(selectedAuditLog.httpMethod)"
                 >
-                  {{
-                    selectedAuditLog.httpMethod || getDefaultAuditLogMethod()
-                  }}
+                  {{ selectedAuditLog.httpMethod || getDefaultAuditLogMethod() }}
                 </NTag>
               </NDescriptionsItem>
-              <NDescriptionsItem
-                :label="$t('page.dashboard.workspace.auditLog.labels.status')"
-              >
+              <NDescriptionsItem :label="$t('page.dashboard.workspace.auditLog.labels.status')">
                 <NTag
                   :bordered="false"
                   size="small"
@@ -565,20 +575,14 @@ onMounted(() => {
               >
                 {{ selectedAuditLog.url || '-' }}
               </NDescriptionsItem>
-              <NDescriptionsItem
-                :label="$t('page.dashboard.workspace.auditLog.labels.clientId')"
-              >
+              <NDescriptionsItem :label="$t('page.dashboard.workspace.auditLog.labels.clientId')">
                 {{ selectedAuditLog.clientId || '-' }}
               </NDescriptionsItem>
-              <NDescriptionsItem
-                :label="$t('page.dashboard.workspace.auditLog.labels.ip')"
-              >
+              <NDescriptionsItem :label="$t('page.dashboard.workspace.auditLog.labels.ip')">
                 {{ selectedAuditLog.clientIpAddress || '-' }}
               </NDescriptionsItem>
               <NDescriptionsItem
-                :label="
-                  $t('page.dashboard.workspace.auditLog.labels.correlationId')
-                "
+                :label="$t('page.dashboard.workspace.auditLog.labels.correlationId')"
                 :span="2"
               >
                 {{ selectedAuditLog.correlationId || '-' }}
@@ -616,48 +620,31 @@ onMounted(() => {
                 >
                   <NDescriptions bordered :column="2" size="small">
                     <NDescriptionsItem
-                      :label="
-                        $t('page.dashboard.workspace.auditLog.labels.service')
-                      "
+                      :label="$t('page.dashboard.workspace.auditLog.labels.service')"
                     >
                       {{ action.serviceName || '-' }}
                     </NDescriptionsItem>
                     <NDescriptionsItem
-                      :label="
-                        $t(
-                          'page.dashboard.workspace.auditLog.labels.actionMethod',
-                        )
-                      "
+                      :label="$t('page.dashboard.workspace.auditLog.labels.actionMethod')"
                     >
                       {{ action.methodName || '-' }}
                     </NDescriptionsItem>
-                    <NDescriptionsItem
-                      :label="
-                        $t('page.dashboard.workspace.auditLog.labels.time')
-                      "
-                    >
+                    <NDescriptionsItem :label="$t('page.dashboard.workspace.auditLog.labels.time')">
                       {{ formatAuditLogDate(action.executionTime) }}
                     </NDescriptionsItem>
                     <NDescriptionsItem
-                      :label="
-                        $t('page.dashboard.workspace.auditLog.labels.duration')
-                      "
+                      :label="$t('page.dashboard.workspace.auditLog.labels.duration')"
                     >
                       {{
                         typeof action.executionDuration === 'number'
-                          ? $t(
-                              'page.dashboard.workspace.auditLog.durationValue',
-                              [action.executionDuration],
-                            )
+                          ? $t('page.dashboard.workspace.auditLog.durationValue', [
+                              action.executionDuration,
+                            ])
                           : '-'
                       }}
                     </NDescriptionsItem>
                     <NDescriptionsItem
-                      :label="
-                        $t(
-                          'page.dashboard.workspace.auditLog.labels.parameters',
-                        )
-                      "
+                      :label="$t('page.dashboard.workspace.auditLog.labels.parameters')"
                       :span="2"
                     >
                       <pre class="whitespace-pre-wrap break-words text-xs">{{

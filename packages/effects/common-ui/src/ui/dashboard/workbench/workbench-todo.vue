@@ -1,13 +1,7 @@
 <script setup lang="ts">
 import type { WorkbenchTodoItem } from '../typing';
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  VbenCheckbox,
-} from '@vben-core/shadcn-ui';
+import { Card, CardContent, CardHeader, CardTitle, VbenCheckbox } from '@vben-core/shadcn-ui';
 
 interface Props {
   items?: WorkbenchTodoItem[];
@@ -32,7 +26,7 @@ withDefaults(defineProps<Props>(), {
       <ul class="w-full divide-y divide-border" role="list">
         <li
           v-for="item in items"
-          :key="item.title"
+          :key="item.id ?? item.title"
           :class="{
             'line-through opacity-60 select-none': item.completed,
           }"

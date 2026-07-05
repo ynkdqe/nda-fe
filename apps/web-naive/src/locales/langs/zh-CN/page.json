@@ -67,7 +67,19 @@
         "optimization": "系统优化",
         "security": "安全检查",
         "dependency": "更新依赖",
-        "uiFix": "修复UI问题"
+        "uiFix": "修复UI问题",
+        "empty": "暂无待办事项",
+        "priority": {
+          "high": "高优先级",
+          "medium": "中优先级",
+          "low": "低优先级"
+        },
+        "status": {
+          "open": "进行中",
+          "closed": "已关闭",
+          "completed": "已完成",
+          "done": "已完成"
+        }
       },
       "trends": {
         "createProject": "在 {1} 创建了项目 {0}",

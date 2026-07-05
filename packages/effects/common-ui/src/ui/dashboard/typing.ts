@@ -29,6 +29,7 @@ interface WorkbenchTodoItem {
   completed: boolean;
   content: string;
   date: string;
+  id?: number | string;
   title: string;
 }
 

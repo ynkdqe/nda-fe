@@ -67,7 +67,19 @@
         "optimization": "Tối ưu hệ thống",
         "security": "Kiểm tra bảo mật",
         "dependency": "Cập nhật phụ thuộc",
-        "uiFix": "Sửa lỗi giao diện"
+        "uiFix": "Sửa lỗi giao diện",
+        "empty": "Chưa có việc cần làm",
+        "priority": {
+          "high": "Ưu tiên cao",
+          "medium": "Ưu tiên trung bình",
+          "low": "Ưu tiên thấp"
+        },
+        "status": {
+          "open": "Đang mở",
+          "closed": "Đã đóng",
+          "completed": "Hoàn thành",
+          "done": "Hoàn thành"
+        }
       },
       "trends": {
         "createProject": "đã tạo dự án {0} trong {1}",
