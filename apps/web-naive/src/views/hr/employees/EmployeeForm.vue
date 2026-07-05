@@ -4,12 +4,14 @@ import type { FormInst, FormRules, SelectOption } from 'naive-ui';
 import type { EmployeeApi } from '#/api';
 import type {
   EmployeeBankFormItem,
+  EmployeeExtraPropertyFormItem,
   EmployeeFormData,
 } from '#/models/hr/employee';
 
 import { computed, nextTick, reactive, ref, watch } from 'vue';
 
 import { useVbenDrawer } from '@vben/common-ui';
+import { $t } from '@vben/locales';
 
 import {
   NButton,
@@ -53,6 +55,7 @@ const emit = defineEmits<{
 
 const formRef = ref<FormInst | null>(null);
 let bankItemSeed = 0;
+let extraPropertyItemSeed = 0;
 
 function getTodayTimestamp() {
   const today = new Date();
@@ -72,9 +75,7 @@ function generateUuid() {
   });
 }
 
-function createBankItem(
-  item?: Partial<EmployeeApi.EmployeeBankItem>,
-): EmployeeBankFormItem {
+function createBankItem(item?: Partial<EmployeeApi.EmployeeBankItem>): EmployeeBankFormItem {
   const bankItem = item as
     | (Partial<EmployeeApi.EmployeeBankItem> & {
         accountNumber?: null | string;
@@ -91,6 +92,30 @@ function createBankItem(
   };
 }
 
+function stringifyExtraPropertyValue(value: unknown) {
+  if (value === null || value === undefined) {
+    return '';
+  }
+
+  if (typeof value === 'object') {
+    return JSON.stringify(value);
+  }
+
+  return String(value);
+}
+
+function createExtraPropertyItem(
+  propertyKey = '',
+  value: unknown = '',
+): EmployeeExtraPropertyFormItem {
+  return {
+    id: generateUuid(),
+    key: ++extraPropertyItemSeed,
+    propertyKey,
+    value: stringifyExtraPropertyValue(value),
+  };
+}
+
 function resetForm(): EmployeeFormData {
   return {
     address: null,
@@ -101,6 +126,7 @@ function resetForm(): EmployeeFormData {
     email: null,
     employeeCode: null,
     enrollDate: getTodayTimestamp(),
+    extraProperties: [],
     gender: null,
     id: undefined,
     identification: null,
@@ -199,9 +225,35 @@ function normalizeBankPayload() {
   return banks.length > 0 ? banks : null;
 }
 
-function normalizeOptionResponse(
-  response: EmployeeApi.EmployeeOptionResult,
-): SelectOption[] {
+function normalizeExtraPropertyItems(
+  value?: null | Record<string, any>,
+): EmployeeExtraPropertyFormItem[] {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return [];
+  }
+
+  return Object.entries(value).map(([propertyKey, propertyValue]) =>
+    createExtraPropertyItem(propertyKey, propertyValue),
+  );
+}
+
+function normalizeExtraPropertiesPayload() {
+  const extraProperties: Record<string, any> = {};
+
+  for (const item of formData.extraProperties) {
+    const propertyKey = item.propertyKey.trim();
+
+    if (!propertyKey) {
+      continue;
+    }
+
+    extraProperties[propertyKey] = item.value;
+  }
+
+  return Object.keys(extraProperties).length > 0 ? extraProperties : null;
+}
+
+function normalizeOptionResponse(response: EmployeeApi.EmployeeOptionResult): SelectOption[] {
   let items: EmployeeApi.EmployeeOptionItem[] = [];
 
   if (Array.isArray(response)) {
@@ -214,8 +266,7 @@ function normalizeOptionResponse(
 
   return items
     .map((item) => {
-      const value =
-        item.value ?? item.code ?? item.shortName ?? item.name ?? item.id;
+      const value = item.value ?? item.code ?? item.shortName ?? item.name ?? item.id;
       const label = item.shortName
         ? `${item.shortName}${item.name ? ` - ${item.name}` : ''}`
         : (item.name ?? item.displayName ?? item.code ?? item.value ?? item.id);
@@ -232,9 +283,7 @@ function normalizeOptionResponse(
     .filter(Boolean) as SelectOption[];
 }
 
-function normalizeBankOptionResponse(
-  response: EmployeeApi.BankListResult,
-): SelectOption[] {
+function normalizeBankOptionResponse(response: EmployeeApi.BankListResult): SelectOption[] {
   return response.data
     .map((bank) => {
       const value = bank.id;
@@ -285,10 +334,7 @@ function getRoleValue(role: Record<string, unknown> | string) {
   return null;
 }
 
-function getRoleLabel(
-  role: Record<string, unknown> | string,
-  value: number | string,
-) {
+function getRoleLabel(role: Record<string, unknown> | string, value: number | string) {
   if (typeof role === 'string') {
     return role;
   }
@@ -340,27 +386,20 @@ function getRecordRole(record?: null | Partial<EmployeeApi.EmployeeItem>) {
   const roles = rawRecord.roles ?? rawRecord.Roles;
 
   if (Array.isArray(roles)) {
-    return (
-      roles.find((item) => isObjectRecord(item) || typeof item === 'string') ??
-      null
-    );
+    return roles.find((item) => isObjectRecord(item) || typeof item === 'string') ?? null;
   }
 
   return null;
 }
 
-function syncSelectedUserFromRecord(
-  record?: null | Partial<EmployeeApi.EmployeeItem>,
-) {
+function syncSelectedUserFromRecord(record?: null | Partial<EmployeeApi.EmployeeItem>) {
   const rawRecord = record as Record<string, unknown> | undefined;
   const user = rawRecord?.user ?? rawRecord?.User;
 
   selectedUser.value = isObjectRecord(user) ? user : null;
 }
 
-function syncPositionOptionFromRole(
-  record?: null | Partial<EmployeeApi.EmployeeItem>,
-) {
+function syncPositionOptionFromRole(record?: null | Partial<EmployeeApi.EmployeeItem>) {
   const roleOption = normalizeRoleOption(getRecordRole(record));
 
   if (!roleOption) {
@@ -391,11 +430,7 @@ async function loadDepartmentOptions() {
 }
 
 async function loadPositionOptions() {
-  if (
-    isEditMode.value ||
-    positionLoading.value ||
-    positionOptions.value.length > 0
-  ) {
+  if (isEditMode.value || positionLoading.value || positionOptions.value.length > 0) {
     return;
   }
 
@@ -425,8 +460,7 @@ async function loadBankOptions() {
 
 function loadBankOptionsForSelectedBanks() {
   const hasSelectedBank = formData.banks.some(
-    (item) =>
-      item.bankId !== null && item.bankId !== undefined && item.bankId !== '',
+    (item) => item.bankId !== null && item.bankId !== undefined && item.bankId !== '',
   );
 
   if (hasSelectedBank) {
@@ -442,14 +476,25 @@ function removeBankItem(index: number) {
   formData.banks.splice(index, 1);
 }
 
-function normalizeRecord(
-  record?: null | Partial<EmployeeApi.EmployeeItem>,
-): EmployeeFormData {
+function addExtraPropertyItem() {
+  formData.extraProperties.push(createExtraPropertyItem());
+}
+
+function removeExtraPropertyItem(index: number) {
+  formData.extraProperties.splice(index, 1);
+}
+
+function normalizeRecord(record?: null | Partial<EmployeeApi.EmployeeItem>): EmployeeFormData {
   const initialValue = resetForm();
 
   if (!record) {
     return initialValue;
   }
+
+  const rawRecord = record as Partial<EmployeeApi.EmployeeItem> & {
+    ExtraProperties?: null | Record<string, any>;
+  };
+  const extraProperties = record.extraProperties ?? rawRecord.ExtraProperties;
 
   return {
     ...initialValue,
@@ -460,9 +505,8 @@ function normalizeRecord(
     department: record.department ?? null,
     email: record.email ?? null,
     employeeCode: record.employeeCode ?? null,
-    enrollDate: record.enrollDate
-      ? toTimestamp(record.enrollDate)
-      : initialValue.enrollDate,
+    enrollDate: record.enrollDate ? toTimestamp(record.enrollDate) : initialValue.enrollDate,
+    extraProperties: normalizeExtraPropertyItems(extraProperties),
     gender: record.gender ?? null,
     id: record.id,
     identification: record.identification ?? null,
@@ -488,6 +532,7 @@ function buildPayload(): EmployeeApi.EmployeeMutationPayload {
     email: normalizeText(formData.email),
     employeeCode: normalizeText(formData.employeeCode),
     enrollDate: toApiDate(formData.enrollDate),
+    extraProperties: normalizeExtraPropertiesPayload(),
     gender: formData.gender ?? null,
     identification: normalizeText(formData.identification),
     maritalStatus: normalizeNumberValue(formData.maritalStatus),
@@ -510,8 +555,7 @@ function getUserText(user: UserRecord, key: string) {
 function onUserSelected(user: UserRecord) {
   formData.userName = getUserText(user, 'userName') || null;
   formData.email = getUserText(user, 'email') || null;
-  formData.phone =
-    getUserText(user, 'phoneNumber') || getUserText(user, 'phone') || '';
+  formData.phone = getUserText(user, 'phoneNumber') || getUserText(user, 'phone') || '';
 }
 
 watch(
@@ -536,9 +580,7 @@ async function handleSubmit() {
   try {
     const payload = buildPayload();
 
-    await (formData.id
-      ? updateEmployeeApi(formData.id, payload)
-      : createEmployeeApi(payload));
+    await (formData.id ? updateEmployeeApi(formData.id, payload) : createEmployeeApi(payload));
 
     message.success('Thao tác thành công');
     emit('submit', payload);
@@ -584,9 +626,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
   },
 });
 
-const title = computed(() =>
-  formData.id ? 'Sửa nhân viên' : 'Thêm nhân viên',
-);
+const title = computed(() => (formData.id ? 'Sửa nhân viên' : 'Thêm nhân viên'));
 
 defineExpose({
   drawerApi,
@@ -617,26 +657,15 @@ defineExpose({
         </NFormItemGi>
 
         <NFormItemGi label="Tên người dùng" path="userName">
-          <NInput
-            v-model:value="formData.userName"
-            placeholder="Tên người dùng"
-            readonly
-          />
+          <NInput v-model:value="formData.userName" placeholder="Tên người dùng" readonly />
         </NFormItemGi>
 
         <NFormItemGi label="Mã nhân viên" path="employeeCode">
-          <NInput
-            v-model:value="formData.employeeCode"
-            placeholder="Mã nhân viên"
-            readonly
-          />
+          <NInput v-model:value="formData.employeeCode" placeholder="Mã nhân viên" readonly />
         </NFormItemGi>
 
         <NFormItemGi label="Số điện thoại" path="phone">
-          <NInput
-            v-model:value="formData.phone"
-            placeholder="Nhập số điện thoại"
-          />
+          <NInput v-model:value="formData.phone" placeholder="Nhập số điện thoại" />
         </NFormItemGi>
 
         <NFormItemGi label="Email" path="email">
@@ -666,11 +695,7 @@ defineExpose({
         <NFormItemGi
           label="Vị trí"
           path="position"
-          :feedback="
-            isEditMode
-              ? 'Thay đổi trong Quản lý người dùng/Vai trò.'
-              : undefined
-          "
+          :feedback="isEditMode ? 'Thay đổi trong Quản lý người dùng/Vai trò.' : undefined"
         >
           <NSelect
             v-model:value="formData.position"
@@ -697,17 +722,11 @@ defineExpose({
         </NFormItemGi>
 
         <NFormItemGi label="CCCD/Hộ Chiếu" path="identification">
-          <NInput
-            v-model:value="formData.identification"
-            placeholder="Nhập CCCD/Hộ Chiếu"
-          />
+          <NInput v-model:value="formData.identification" placeholder="Nhập CCCD/Hộ Chiếu" />
         </NFormItemGi>
 
         <NFormItemGi label="Mã số thuế" path="taxCode">
-          <NInput
-            v-model:value="formData.taxCode"
-            placeholder="Nhập mã số thuế"
-          />
+          <NInput v-model:value="formData.taxCode" placeholder="Nhập mã số thuế" />
         </NFormItemGi>
 
         <NFormItemGi label="Trạng thái" path="status">
@@ -731,15 +750,8 @@ defineExpose({
       </NGrid>
 
       <NFormItem label="Ngân hàng" path="banks">
-        <NSpace
-          class="employee-bank-list"
-          vertical
-          :size="4"
-          style="width: 100%"
-        >
-          <NButton dashed type="primary" @click="addBankItem">
-            + Thêm ngân hàng
-          </NButton>
+        <NSpace class="employee-bank-list" vertical :size="4" style="width: 100%">
+          <NButton dashed type="primary" @click="addBankItem"> + Thêm ngân hàng </NButton>
 
           <NGrid
             v-for="(bankItem, index) in formData.banks"
@@ -748,33 +760,15 @@ defineExpose({
             :cols="12"
             :x-gap="12"
           >
-            <NFormItemGi
-              class="employee-bank-field"
-              :show-feedback="false"
-              :span="3"
-            >
-              <NInput
-                v-model:value="bankItem.accountNo"
-                placeholder="Nhập số tài khoản"
-              />
+            <NFormItemGi class="employee-bank-field" :show-feedback="false" :span="3">
+              <NInput v-model:value="bankItem.accountNo" placeholder="Nhập số tài khoản" />
             </NFormItemGi>
 
-            <NFormItemGi
-              class="employee-bank-field"
-              :show-feedback="false"
-              :span="3"
-            >
-              <NInput
-                v-model:value="bankItem.accountName"
-                placeholder="Nhập tên tài khoản"
-              />
+            <NFormItemGi class="employee-bank-field" :show-feedback="false" :span="3">
+              <NInput v-model:value="bankItem.accountName" placeholder="Nhập tên tài khoản" />
             </NFormItemGi>
 
-            <NFormItemGi
-              class="employee-bank-field"
-              :show-feedback="false"
-              :span="4"
-            >
+            <NFormItemGi class="employee-bank-field" :show-feedback="false" :span="4">
               <NSelect
                 v-model:value="bankItem.bankId"
                 clearable
@@ -787,13 +781,53 @@ defineExpose({
               />
             </NFormItemGi>
 
+            <NFormItemGi class="employee-bank-field" :show-feedback="false" :span="2">
+              <NButton type="error" @click="removeBankItem(index)"> Xóa </NButton>
+            </NFormItemGi>
+          </NGrid>
+        </NSpace>
+      </NFormItem>
+
+      <NFormItem :label="$t('page.hr.employeeForm.extraProperties')" path="extraProperties">
+        <NSpace class="employee-extra-property-list" vertical :size="4" style="width: 100%">
+          <NButton dashed type="primary" @click="addExtraPropertyItem">
+            {{ $t('page.hr.employeeForm.addExtraProperty') }}
+          </NButton>
+
+          <NGrid
+            v-for="(propertyItem, index) in formData.extraProperties"
+            :key="propertyItem.key"
+            class="employee-extra-property-row"
+            :cols="12"
+            :x-gap="12"
+          >
             <NFormItemGi
-              class="employee-bank-field"
+              class="employee-extra-property-field"
+              :label="$t('page.hr.employeeForm.extraPropertyKey')"
               :show-feedback="false"
-              :span="2"
+              :span="5"
             >
-              <NButton type="error" @click="removeBankItem(index)">
-                Xóa
+              <NInput
+                v-model:value="propertyItem.propertyKey"
+                :placeholder="$t('page.hr.employeeForm.extraPropertyKeyPlaceholder')"
+              />
+            </NFormItemGi>
+
+            <NFormItemGi
+              class="employee-extra-property-field"
+              :label="$t('page.hr.employeeForm.extraPropertyValue')"
+              :show-feedback="false"
+              :span="5"
+            >
+              <NInput
+                v-model:value="propertyItem.value"
+                :placeholder="$t('page.hr.employeeForm.extraPropertyValuePlaceholder')"
+              />
+            </NFormItemGi>
+
+            <NFormItemGi class="employee-extra-property-field" :show-feedback="false" :span="2">
+              <NButton type="error" @click="removeExtraPropertyItem(index)">
+                {{ $t('page.hr.employeeForm.removeExtraProperty') }}
               </NButton>
             </NFormItemGi>
           </NGrid>
@@ -849,11 +883,13 @@ defineExpose({
   margin-bottom: 16px;
 }
 
-.employee-bank-list :deep(.employee-bank-row .n-form-item) {
+.employee-bank-list :deep(.employee-bank-row .n-form-item),
+.employee-extra-property-list :deep(.employee-extra-property-row .n-form-item) {
   margin-bottom: 0;
 }
 
-.employee-bank-list :deep(.employee-bank-field .n-form-item-blank) {
+.employee-bank-list :deep(.employee-bank-field .n-form-item-blank),
+.employee-extra-property-list :deep(.employee-extra-property-field .n-form-item-blank) {
   min-height: 34px;
 }
 </style>

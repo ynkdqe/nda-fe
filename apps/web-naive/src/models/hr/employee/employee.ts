@@ -8,6 +8,13 @@ export interface EmployeeBankFormItem {
   key: number;
 }
 
+export interface EmployeeExtraPropertyFormItem {
+  id: string;
+  key: number;
+  propertyKey: string;
+  value: string;
+}
+
 export interface EmployeeFormData {
   address?: NullableString;
   banks: EmployeeBankFormItem[];
@@ -17,6 +24,7 @@ export interface EmployeeFormData {
   email?: NullableString;
   employeeCode?: NullableString;
   enrollDate?: null | number;
+  extraProperties: EmployeeExtraPropertyFormItem[];
   gender?: null | number;
   id?: number | string;
   identification?: NullableString;

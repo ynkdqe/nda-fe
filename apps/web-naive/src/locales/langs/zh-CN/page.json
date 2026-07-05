@@ -166,6 +166,15 @@
         "tooltipV2": "同步考勤"
       }
     },
+    "employeeForm": {
+      "extraProperties": "扩展属性",
+      "extraPropertyKey": "键",
+      "extraPropertyValue": "值",
+      "extraPropertyKeyPlaceholder": "请输入键",
+      "extraPropertyValuePlaceholder": "请输入值",
+      "addExtraProperty": "+ 添加属性",
+      "removeExtraProperty": "删除"
+    },
     "sampleDescription": "{0}管理示例页面。",
     "sampleTable": {
       "code": "编码",

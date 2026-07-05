@@ -166,6 +166,15 @@
         "tooltipV2": "Đồng bộ chấm công"
       }
     },
+    "employeeForm": {
+      "extraProperties": "Thuộc tính",
+      "extraPropertyKey": "Key",
+      "extraPropertyValue": "Value",
+      "extraPropertyKeyPlaceholder": "Nhập key",
+      "extraPropertyValuePlaceholder": "Nhập value",
+      "addExtraProperty": "+ Thêm thuộc tính",
+      "removeExtraProperty": "Xóa"
+    },
     "sampleDescription": "Trang mẫu quản lý {0}.",
     "sampleTable": {
       "code": "Mã",

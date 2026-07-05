@@ -166,6 +166,15 @@
         "tooltipV2": "Sync attendance"
       }
     },
+    "employeeForm": {
+      "extraProperties": "Extra properties",
+      "extraPropertyKey": "Key",
+      "extraPropertyValue": "Value",
+      "extraPropertyKeyPlaceholder": "Enter key",
+      "extraPropertyValuePlaceholder": "Enter value",
+      "addExtraProperty": "+ Add property",
+      "removeExtraProperty": "Remove"
+    },
     "sampleDescription": "Sample page for {0} management.",
     "sampleTable": {
       "code": "Code",
