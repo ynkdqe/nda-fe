@@ -19,6 +19,11 @@
       "quickNav": "Điều hướng nhanh",
       "todoItems": "Việc cần làm",
       "accessSource": "Nguồn truy cập",
+      "summary": {
+        "projects": "Dự án",
+        "team": "Nhân sự",
+        "todo": "Việc cần làm"
+      },
       "weather": {
         "loading": "Đang tải dữ liệu thời tiết...",
         "error": "Lấy dữ liệu thời tiết không thành công",

@@ -19,6 +19,11 @@
       "quickNav": "快捷导航",
       "todoItems": "待办事项",
       "accessSource": "访问来源",
+      "summary": {
+        "projects": "项目",
+        "team": "团队",
+        "todo": "待办"
+      },
       "weather": {
         "loading": "正在加载天气数据...",
         "error": "获取天气数据失败",

@@ -19,6 +19,11 @@
       "quickNav": "Quick Navigation",
       "todoItems": "To-do Items",
       "accessSource": "Access Source",
+      "summary": {
+        "projects": "Projects",
+        "team": "Team",
+        "todo": "To-dos"
+      },
       "weather": {
         "loading": "Loading weather data...",
         "error": "Failed to fetch weather data",

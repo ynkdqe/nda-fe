@@ -3,6 +3,12 @@ import { VbenAvatar } from '@vben-core/shadcn-ui';
 
 interface Props {
   avatar?: string;
+  projectLabel?: string;
+  projectValue?: number | string;
+  teamLabel?: string;
+  teamValue?: number | string;
+  todoLabel?: string;
+  todoValue?: number | string;
 }
 
 defineOptions({
@@ -11,6 +17,12 @@ defineOptions({
 
 withDefaults(defineProps<Props>(), {
   avatar: '',
+  projectLabel: '',
+  projectValue: '-',
+  teamLabel: '',
+  teamValue: '-',
+  todoLabel: '',
+  todoValue: '-',
 });
 </script>
 <template>
@@ -29,17 +41,17 @@ withDefaults(defineProps<Props>(), {
     </div>
     <div class="mt-4 flex flex-1 justify-end md:mt-0">
       <div class="flex flex-col justify-center text-right">
-        <span class="text-foreground/80"> 待办 </span>
-        <span class="text-2xl">2/10</span>
+        <span class="text-foreground/80">{{ todoLabel }}</span>
+        <span class="text-2xl">{{ todoValue }}</span>
       </div>
 
       <div class="mx-12 flex flex-col justify-center text-right md:mx-16">
-        <span class="text-foreground/80"> 项目 </span>
-        <span class="text-2xl">8</span>
+        <span class="text-foreground/80">{{ projectLabel }}</span>
+        <span class="text-2xl">{{ projectValue }}</span>
       </div>
       <div class="mr-4 flex flex-col justify-center text-right md:mr-10">
-        <span class="text-foreground/80"> 团队 </span>
-        <span class="text-2xl">300</span>
+        <span class="text-foreground/80">{{ teamLabel }}</span>
+        <span class="text-2xl">{{ teamValue }}</span>
       </div>
     </div>
   </div>
