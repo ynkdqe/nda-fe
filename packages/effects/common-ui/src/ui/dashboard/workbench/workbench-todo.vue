@@ -70,7 +70,10 @@ function getPriorityClass(priority?: string) {
               class="flex size-8 shrink-0 items-center justify-center rounded-full"
               :class="getPriorityClass(item.priority)"
             >
-              <IconifyIcon class="size-4" :icon="getPriorityIcon(item.priority)" />
+              <IconifyIcon
+                class="size-4"
+                :icon="getPriorityIcon(item.priority)"
+              />
             </div>
             <div class="min-w-0 flex-auto">
               <p class="text-sm/6 font-semibold text-foreground">
@@ -81,7 +84,9 @@ function getPriorityClass(priority?: string) {
                 class="mt-1 truncate text-xs/5 text-foreground/80 *:text-primary"
                 v-html="item.content"
               ></p>
-              <p class="mt-1 truncate text-xs/5 text-foreground/80 *:text-primary">
+              <p
+                class="mt-1 truncate text-xs/5 text-foreground/80 *:text-primary"
+              >
                 {{ item.date }}
               </p>
             </div>
