@@ -30,6 +30,8 @@ interface WorkbenchTodoItem {
   content: string;
   date: string;
   id?: number | string;
+  priority?: string;
+  status?: string;
   title: string;
 }
 
