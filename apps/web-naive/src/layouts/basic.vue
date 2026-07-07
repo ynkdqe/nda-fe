@@ -8,7 +8,12 @@ import { AuthenticationLoginExpiredModal } from '@vben/common-ui';
 import { VBEN_DOC_URL, VBEN_GITHUB_URL } from '@vben/constants';
 import { useWatermark } from '@vben/hooks';
 import { BookOpenText, CircleHelp, SvgGithubIcon } from '@vben/icons';
-import { BasicLayout, LockScreen, Notification, UserDropdown } from '@vben/layouts';
+import {
+  BasicLayout,
+  LockScreen,
+  Notification,
+  UserDropdown,
+} from '@vben/layouts';
 import { preferences, usePreferences } from '@vben/preferences';
 import { useAccessStore, useUserStore } from '@vben/stores';
 import { formatDate, openWindow } from '@vben/utils';
@@ -102,7 +107,10 @@ const avatar = computed(() => {
 
 const userDropdownDescription = computed(() => {
   return (
-    userStore.userInfo?.email || userStore.userInfo?.username || userStore.userInfo?.realName || ''
+    userStore.userInfo?.email ||
+    userStore.userInfo?.username ||
+    userStore.userInfo?.realName ||
+    ''
   );
 });
 
@@ -155,7 +163,11 @@ const handleClick = (item: NotificationItem) => {
   }
 };
 
-function navigateTo(link: string, query?: Record<string, any>, state?: Record<string, any>) {
+function navigateTo(
+  link: string,
+  query?: Record<string, any>,
+  state?: Record<string, any>,
+) {
   if (link.startsWith('http://') || link.startsWith('https://')) {
     window.open(link, '_blank');
   } else {
@@ -179,7 +191,9 @@ watch(
   }),
   async ({ enable, content, isDark: isDarkValue }) => {
     if (enable) {
-      const watermarkColor = isDarkValue ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)';
+      const watermarkColor = isDarkValue
+        ? 'rgba(255, 255, 255, 0.12)'
+        : 'rgba(0, 0, 0, 0.12)';
 
       await updateWatermark({
         advancedStyle: {
@@ -195,7 +209,9 @@ watch(
           ],
           type: 'linear',
         },
-        content: content || `${userStore.userInfo?.username} - ${userStore.userInfo?.realName}`,
+        content:
+          content ||
+          `${userStore.userInfo?.username} - ${userStore.userInfo?.realName}`,
       });
     } else {
       destroyWatermark();
@@ -233,7 +249,10 @@ watch(
       />
     </template>
     <template #extra>
-      <AuthenticationLoginExpiredModal v-model:open="accessStore.loginExpired" :avatar>
+      <AuthenticationLoginExpiredModal
+        v-model:open="accessStore.loginExpired"
+        :avatar
+      >
         <LoginForm />
       </AuthenticationLoginExpiredModal>
     </template>

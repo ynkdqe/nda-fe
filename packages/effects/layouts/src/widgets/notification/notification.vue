@@ -6,7 +6,12 @@ import { computed } from 'vue';
 import { Bell, CircleCheckBig, CircleX, MailCheck } from '@vben/icons';
 import { $t } from '@vben/locales';
 
-import { VbenButton, VbenIconButton, VbenPopover, VbenScrollbar } from '@vben-core/shadcn-ui';
+import {
+  VbenButton,
+  VbenIconButton,
+  VbenPopover,
+  VbenScrollbar,
+} from '@vben-core/shadcn-ui';
 
 import { useToggle } from '@vueuse/core';
 
@@ -108,8 +113,13 @@ const handleClear = () => {
                   class="absolute top-2 right-2 size-2 rounded-sm bg-primary"
                 ></span>
 
-                <span class="relative flex size-10 shrink-0 overflow-hidden rounded-full">
-                  <img :src="item.avatar" class="aspect-square size-full object-cover" />
+                <span
+                  class="relative flex size-10 shrink-0 overflow-hidden rounded-full"
+                >
+                  <img
+                    :src="item.avatar"
+                    class="aspect-square size-full object-cover"
+                  />
                 </span>
                 <div class="flex flex-col gap-1 leading-none">
                   <p class="font-semibold">{{ item.title }}</p>
@@ -120,7 +130,9 @@ const handleClear = () => {
                     {{ item.date }}
                   </p>
                 </div>
-                <div class="absolute top-1/2 right-3 flex -translate-y-1/2 flex-row gap-1">
+                <div
+                  class="absolute top-1/2 right-3 flex -translate-y-1/2 flex-row gap-1"
+                >
                   <slot name="action" :item="item">
                     <slot name="action-prepend" :item="item"></slot>
                     <VbenIconButton
@@ -158,7 +170,9 @@ const handleClear = () => {
         </div>
       </template>
 
-      <div class="flex items-center justify-between border-t border-border px-4 py-3">
+      <div
+        class="flex items-center justify-between border-t border-border px-4 py-3"
+      >
         <VbenButton
           :disabled="notifications.length <= 0"
           size="sm"
