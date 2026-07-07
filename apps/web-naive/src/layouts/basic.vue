@@ -1,79 +1,25 @@
 <script lang="ts" setup>
 import type { NotificationItem } from '@vben/layouts';
 
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { AuthenticationLoginExpiredModal } from '@vben/common-ui';
 import { VBEN_DOC_URL, VBEN_GITHUB_URL } from '@vben/constants';
 import { useWatermark } from '@vben/hooks';
 import { BookOpenText, CircleHelp, SvgGithubIcon } from '@vben/icons';
-import {
-  BasicLayout,
-  LockScreen,
-  Notification,
-  UserDropdown,
-} from '@vben/layouts';
+import { BasicLayout, LockScreen, Notification, UserDropdown } from '@vben/layouts';
 import { preferences, usePreferences } from '@vben/preferences';
 import { useAccessStore, useUserStore } from '@vben/stores';
-import { openWindow } from '@vben/utils';
+import { formatDate, openWindow } from '@vben/utils';
 
+import { fetchNotificationUserList, updateNotificationStatus } from '#/api';
 import { $t } from '#/locales';
 import { useAuthStore } from '#/store';
 import LoginForm from '#/views/_core/authentication/login.vue';
 
-const notifications = ref<NotificationItem[]>([
-  {
-    id: 1,
-    avatar: 'https://avatar.vercel.sh/vercel.svg?text=VB',
-    date: '3小时前',
-    isRead: true,
-    message: '描述信息描述信息描述信息',
-    title: '收到了 14 份新周报',
-  },
-  {
-    id: 2,
-    avatar: 'https://avatar.vercel.sh/1',
-    date: '刚刚',
-    isRead: false,
-    message: '描述信息描述信息描述信息',
-    title: '朱偏右 回复了你',
-  },
-  {
-    id: 3,
-    avatar: 'https://avatar.vercel.sh/1',
-    date: '2024-01-01',
-    isRead: false,
-    message: '描述信息描述信息描述信息',
-    title: '曲丽丽 评论了你',
-  },
-  {
-    id: 4,
-    avatar: 'https://avatar.vercel.sh/satori',
-    date: '1天前',
-    isRead: false,
-    message: '描述信息描述信息描述信息',
-    title: '代办提醒',
-  },
-  {
-    id: 5,
-    avatar: 'https://avatar.vercel.sh/satori',
-    date: '1天前',
-    isRead: false,
-    message: '描述信息描述信息描述信息',
-    title: '跳转Workspace示例',
-    link: '/workspace',
-  },
-  {
-    id: 6,
-    avatar: 'https://avatar.vercel.sh/satori',
-    date: '1天前',
-    isRead: false,
-    message: '描述信息描述信息描述信息',
-    title: '跳转外部链接示例',
-    link: 'https://doc.vben.pro',
-  },
-]);
+const notifications = ref<NotificationItem[]>([]);
+const unreadCount = ref(0);
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -81,9 +27,37 @@ const authStore = useAuthStore();
 const accessStore = useAccessStore();
 const { destroyWatermark, updateWatermark } = useWatermark();
 const { isDark } = usePreferences();
-const showDot = computed(() =>
-  notifications.value.some((item) => !item.isRead),
-);
+const showDot = computed(() => unreadCount.value > 0);
+
+function mapNotificationItem(item: any): NotificationItem {
+  const id = item.id ?? crypto.randomUUID?.() ?? String(Math.random());
+  return {
+    id,
+    avatar: item.icon || `https://avatar.vercel.sh/${encodeURIComponent(id)}`,
+    date: item.creationTime
+      ? (formatDate(item.creationTime, 'DD-MM-YYYY HH:mm:ss') as string) || ''
+      : '',
+    isRead: item.status === 1,
+    link: item.url || undefined,
+    message: item.message ?? '',
+    raw: item,
+    title: item.title ?? $t('page.sms.notification.personalPage.defaultTitle'),
+  };
+}
+
+async function loadNotifications() {
+  const response = await fetchNotificationUserList({
+    current: 1,
+    pageSize: 10,
+  });
+
+  const items = response.data ?? response.items ?? [];
+  notifications.value = items.map((item) => mapNotificationItem(item));
+  unreadCount.value =
+    response.dataExtend?.unreadCount ??
+    items[0]?.unreadCount ??
+    notifications.value.filter((item) => !item.isRead).length;
+}
 
 const menus = computed(() => [
   {
@@ -128,10 +102,7 @@ const avatar = computed(() => {
 
 const userDropdownDescription = computed(() => {
   return (
-    userStore.userInfo?.email ||
-    userStore.userInfo?.username ||
-    userStore.userInfo?.realName ||
-    ''
+    userStore.userInfo?.email || userStore.userInfo?.username || userStore.userInfo?.realName || ''
   );
 });
 
@@ -145,12 +116,15 @@ async function handleLogout() {
 
 function handleNoticeClear() {
   notifications.value = [];
+  unreadCount.value = 0;
 }
 
-function markRead(id: number | string) {
+async function markRead(id: number | string) {
+  await updateNotificationStatus([String(id)], 1);
   const item = notifications.value.find((item) => item.id === id);
-  if (item) {
+  if (item && !item.isRead) {
     item.isRead = true;
+    unreadCount.value = Math.max(0, unreadCount.value - 1);
   }
 }
 
@@ -158,29 +132,33 @@ function remove(id: number | string) {
   notifications.value = notifications.value.filter((item) => item.id !== id);
 }
 
-function handleMakeAll() {
+async function handleMakeAll() {
+  const unreadIds = notifications.value
+    .filter((item) => !item.isRead)
+    .map((item) => String(item.id));
+
+  if (unreadIds.length > 0) {
+    await updateNotificationStatus(unreadIds, 1);
+  }
+
   notifications.value.forEach((item) => (item.isRead = true));
+  unreadCount.value = 0;
 }
 
-const viewAll = () => {};
+const viewAll = () => {
+  router.push('/sms/user-notifications');
+};
 
 const handleClick = (item: NotificationItem) => {
-  // 如果通知项有链接，点击时跳转
   if (item.link) {
     navigateTo(item.link, item.query, item.state);
   }
 };
 
-function navigateTo(
-  link: string,
-  query?: Record<string, any>,
-  state?: Record<string, any>,
-) {
+function navigateTo(link: string, query?: Record<string, any>, state?: Record<string, any>) {
   if (link.startsWith('http://') || link.startsWith('https://')) {
-    // 外部链接，在新标签页打开
     window.open(link, '_blank');
   } else {
-    // 内部路由链接，支持 query 参数和 state
     router.push({
       path: link,
       query: query || {},
@@ -188,6 +166,10 @@ function navigateTo(
     });
   }
 }
+
+onMounted(() => {
+  loadNotifications();
+});
 
 watch(
   () => ({
@@ -197,9 +179,7 @@ watch(
   }),
   async ({ enable, content, isDark: isDarkValue }) => {
     if (enable) {
-      const watermarkColor = isDarkValue
-        ? 'rgba(255, 255, 255, 0.12)'
-        : 'rgba(0, 0, 0, 0.12)';
+      const watermarkColor = isDarkValue ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)';
 
       await updateWatermark({
         advancedStyle: {
@@ -215,9 +195,7 @@ watch(
           ],
           type: 'linear',
         },
-        content:
-          content ||
-          `${userStore.userInfo?.username} - ${userStore.userInfo?.realName}`,
+        content: content || `${userStore.userInfo?.username} - ${userStore.userInfo?.realName}`,
       });
     } else {
       destroyWatermark();
@@ -243,6 +221,7 @@ watch(
     </template>
     <template #notification>
       <Notification
+        :count="unreadCount"
         :dot="showDot"
         :notifications="notifications"
         @clear="handleNoticeClear"
@@ -254,10 +233,7 @@ watch(
       />
     </template>
     <template #extra>
-      <AuthenticationLoginExpiredModal
-        v-model:open="accessStore.loginExpired"
-        :avatar
-      >
+      <AuthenticationLoginExpiredModal v-model:open="accessStore.loginExpired" :avatar>
         <LoginForm />
       </AuthenticationLoginExpiredModal>
     </template>

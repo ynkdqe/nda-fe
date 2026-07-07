@@ -1,4 +1,4 @@
-import { requestClient } from "#/api/request";
+import { requestClient } from '#/api/request';
 
 export namespace SmsNotificationApi {
   export interface NotificationReceiver {
@@ -30,12 +30,24 @@ export namespace SmsNotificationApi {
 
   export interface NotificationUserItem {
     creationTime?: string;
-    icon?: string;
+    creatorId?: null | string;
+    creatorName?: null | string;
+    icon?: null | string;
     id?: string;
     message?: string;
+    name?: null | string;
+    readAt?: null | string;
+    senderId?: null | string;
     senderName?: null | string;
+    senderUserName?: null | string;
     status?: number;
     title?: string;
+    totalCount?: number;
+    type?: number;
+    unreadCount?: number;
+    url?: null | string;
+    userId?: null | string;
+    userName?: null | string;
   }
 
   export interface NotificationListParams {
@@ -50,7 +62,10 @@ export namespace SmsNotificationApi {
   export interface NotificationListResult<T = NotificationUserItem> {
     current?: number;
     data?: T[];
-    dataExtend?: unknown;
+    dataExtend?: {
+      unreadCount?: number;
+      [key: string]: unknown;
+    } | null;
     items?: T[];
     message?: null | string;
     pageSize?: number;
@@ -62,9 +77,22 @@ export namespace SmsNotificationApi {
 export async function fetchNotificationList(params: SmsNotificationApi.NotificationListParams) {
   return requestClient.get<
     SmsNotificationApi.NotificationListResult<SmsNotificationApi.NotificationUserItem>
-  >("/api/sms/notification", {
+  >('/api/sms/notification', {
     params,
-    responseReturn: "body",
+    responseReturn: 'body',
+  });
+}
+
+export async function fetchNotificationUserList(
+  params: Pick<SmsNotificationApi.NotificationListParams, 'pageSize'> & {
+    current: number;
+  },
+) {
+  return requestClient.get<
+    SmsNotificationApi.NotificationListResult<SmsNotificationApi.NotificationUserItem>
+  >('/api/sms/notification-user', {
+    params,
+    responseReturn: 'body',
   });
 }
 
@@ -73,35 +101,35 @@ export async function fetchAdminNotificationList(
 ) {
   return requestClient.get<
     SmsNotificationApi.NotificationListResult<SmsNotificationApi.NotificationItem>
-  >("/api/sms/notification", {
+  >('/api/sms/notification', {
     params,
-    responseReturn: "body",
+    responseReturn: 'body',
   });
 }
 
 export async function createNotification(data: Record<string, any>) {
-  return requestClient.post("/api/sms/notification", data, {
-    responseReturn: "body",
+  return requestClient.post('/api/sms/notification', data, {
+    responseReturn: 'body',
   });
 }
 
 export async function updateNotificationStatus(ids: string[], status: 0 | 1) {
   return requestClient.put(
-    "/api/sms/notification/status",
+    '/api/sms/notification/status',
     { ids, status },
-    { responseReturn: "body" },
+    { responseReturn: 'body' },
   );
 }
 
 export async function deleteNotification(id: string) {
   return requestClient.delete(`/api/sms/notification/${id}`, {
-    responseReturn: "body",
+    responseReturn: 'body',
   });
 }
 
 export async function deleteNotifications(ids: string[]) {
-  return requestClient.delete("/api/sms/notification", {
+  return requestClient.delete('/api/sms/notification', {
     data: { ids },
-    responseReturn: "body",
+    responseReturn: 'body',
   });
 }

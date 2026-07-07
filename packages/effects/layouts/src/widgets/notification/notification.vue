@@ -1,28 +1,28 @@
 <script lang="ts" setup>
 import type { NotificationItem } from './types';
 
+import { computed } from 'vue';
+
 import { Bell, CircleCheckBig, CircleX, MailCheck } from '@vben/icons';
 import { $t } from '@vben/locales';
 
-import {
-  VbenButton,
-  VbenIconButton,
-  VbenPopover,
-  VbenScrollbar,
-} from '@vben-core/shadcn-ui';
+import { VbenButton, VbenIconButton, VbenPopover, VbenScrollbar } from '@vben-core/shadcn-ui';
 
 import { useToggle } from '@vueuse/core';
 
 defineOptions({ name: 'NotificationPopup' });
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
+    /** 未读数量 */
+    count?: number;
     /** 显示圆点 */
     dot?: boolean;
     /** 消息列表 */
     notifications?: NotificationItem[];
   }>(),
   {
+    count: 0,
     dot: false,
     notifications: () => [],
   },
@@ -38,6 +38,14 @@ const emit = defineEmits<{
 }>();
 
 const [open, toggle] = useToggle();
+
+const badgeText = computed(() => {
+  if (props.count <= 0) {
+    return '';
+  }
+
+  return props.count > 99 ? '99+' : String(props.count);
+});
 
 const close = () => {
   open.value = false;
@@ -62,7 +70,13 @@ const handleClear = () => {
       <div class="mr-2 flex-center h-full" @click.stop="toggle()">
         <VbenIconButton class="bell-button relative text-foreground">
           <span
-            v-if="dot"
+            v-if="badgeText"
+            class="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-medium leading-none text-destructive-foreground"
+          >
+            {{ badgeText }}
+          </span>
+          <span
+            v-else-if="dot"
             class="absolute top-0.5 right-0.5 size-2 rounded-sm bg-primary"
           ></span>
           <Bell class="size-4" />
@@ -94,13 +108,8 @@ const handleClear = () => {
                   class="absolute top-2 right-2 size-2 rounded-sm bg-primary"
                 ></span>
 
-                <span
-                  class="relative flex size-10 shrink-0 overflow-hidden rounded-full"
-                >
-                  <img
-                    :src="item.avatar"
-                    class="aspect-square size-full object-cover"
-                  />
+                <span class="relative flex size-10 shrink-0 overflow-hidden rounded-full">
+                  <img :src="item.avatar" class="aspect-square size-full object-cover" />
                 </span>
                 <div class="flex flex-col gap-1 leading-none">
                   <p class="font-semibold">{{ item.title }}</p>
@@ -111,9 +120,7 @@ const handleClear = () => {
                     {{ item.date }}
                   </p>
                 </div>
-                <div
-                  class="absolute top-1/2 right-3 flex -translate-y-1/2 flex-row gap-1"
-                >
+                <div class="absolute top-1/2 right-3 flex -translate-y-1/2 flex-row gap-1">
                   <slot name="action" :item="item">
                     <slot name="action-prepend" :item="item"></slot>
                     <VbenIconButton
@@ -151,9 +158,7 @@ const handleClear = () => {
         </div>
       </template>
 
-      <div
-        class="flex items-center justify-between border-t border-border px-4 py-3"
-      >
+      <div class="flex items-center justify-between border-t border-border px-4 py-3">
         <VbenButton
           :disabled="notifications.length <= 0"
           size="sm"
