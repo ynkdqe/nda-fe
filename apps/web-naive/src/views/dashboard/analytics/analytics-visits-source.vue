@@ -3,6 +3,7 @@ import type { EchartsUIType } from '@vben/plugins/echarts';
 
 import { onMounted, ref } from 'vue';
 
+import { $t } from '@vben/locales';
 import { EchartsUI, useEcharts } from '@vben/plugins/echarts';
 
 const chartRef = ref<EchartsUIType>();
@@ -24,10 +25,22 @@ onMounted(() => {
         avoidLabelOverlap: false,
         color: ['#5ab1ef', '#b6a2de', '#67e0e3', '#2ec7c9'],
         data: [
-          { name: '搜索引擎', value: 1048 },
-          { name: '直接访问', value: 735 },
-          { name: '邮件营销', value: 580 },
-          { name: '联盟广告', value: 484 },
+          {
+            name: $t('page.dashboard.analyticsPage.source.searchEngine'),
+            value: 1048,
+          },
+          {
+            name: $t('page.dashboard.analyticsPage.source.direct'),
+            value: 735,
+          },
+          {
+            name: $t('page.dashboard.analyticsPage.source.emailMarketing'),
+            value: 580,
+          },
+          {
+            name: $t('page.dashboard.analyticsPage.source.affiliateAds'),
+            value: 484,
+          },
         ],
         emphasis: {
           label: {
@@ -48,7 +61,7 @@ onMounted(() => {
         labelLine: {
           show: false,
         },
-        name: '访问来源',
+        name: $t('page.dashboard.analyticsPage.cards.visitSource'),
         radius: ['40%', '65%'],
         type: 'pie',
       },

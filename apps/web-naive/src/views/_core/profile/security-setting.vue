@@ -19,18 +19,6 @@ const formSchema = computed(() => {
       description: $t('page.profile.boundPhone', { phone: '138****8293' }),
     },
     {
-      value: true,
-      fieldName: 'securityQuestion',
-      label: $t('page.profile.securityQuestion'),
-      description: $t('page.profile.securityQuestionNotSet'),
-    },
-    {
-      value: true,
-      fieldName: 'securityEmail',
-      label: $t('page.profile.backupEmail'),
-      description: $t('page.profile.boundEmail', { email: 'ant***sign.com' }),
-    },
-    {
       value: false,
       fieldName: 'securityMfa',
       label: $t('page.profile.mfaDevice'),

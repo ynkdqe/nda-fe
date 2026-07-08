@@ -10,6 +10,52 @@
   "dashboard": {
     "title": "Bảng điều khiển",
     "analytics": "Phân tích",
+    "analyticsPage": {
+      "overview": {
+        "users": "Người dùng",
+        "totalUsers": "Tổng người dùng",
+        "visits": "Lượt truy cập",
+        "totalVisits": "Tổng lượt truy cập",
+        "downloads": "Lượt tải xuống",
+        "totalDownloads": "Tổng lượt tải xuống",
+        "usage": "Lượt sử dụng",
+        "totalUsage": "Tổng lượt sử dụng"
+      },
+      "tabs": {
+        "trafficTrends": "Xu hướng lưu lượng",
+        "monthlyVisits": "Lượt truy cập theo tháng"
+      },
+      "cards": {
+        "visitCount": "Số lượt truy cập",
+        "visitSource": "Nguồn truy cập",
+        "salesRatio": "Tỷ lệ kinh doanh"
+      },
+      "chart": {
+        "monthLabel": "Tháng {0}",
+        "visits": "Lượt truy cập",
+        "trend": "Xu hướng"
+      },
+      "platform": {
+        "web": "Web",
+        "mobile": "Di động",
+        "ipad": "iPad",
+        "client": "Ứng dụng khách",
+        "thirdParty": "Bên thứ ba",
+        "other": "Khác"
+      },
+      "source": {
+        "searchEngine": "Công cụ tìm kiếm",
+        "direct": "Truy cập trực tiếp",
+        "emailMarketing": "Email marketing",
+        "affiliateAds": "Quảng cáo liên kết"
+      },
+      "sales": {
+        "outsource": "Thuê ngoài",
+        "custom": "Tùy chỉnh",
+        "technicalSupport": "Hỗ trợ kỹ thuật",
+        "remote": "Từ xa"
+      }
+    },
     "workspace": {
       "title": "Không gian làm việc",
       "welcomeTitle": "Chào buổi sáng, {0}, hãy bắt đầu ngày làm việc của bạn!",

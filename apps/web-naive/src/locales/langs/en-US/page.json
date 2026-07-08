@@ -10,6 +10,52 @@
   "dashboard": {
     "title": "Dashboard",
     "analytics": "Analytics",
+    "analyticsPage": {
+      "overview": {
+        "users": "Users",
+        "totalUsers": "Total Users",
+        "visits": "Visits",
+        "totalVisits": "Total Visits",
+        "downloads": "Downloads",
+        "totalDownloads": "Total Downloads",
+        "usage": "Usage",
+        "totalUsage": "Total Usage"
+      },
+      "tabs": {
+        "trafficTrends": "Traffic Trends",
+        "monthlyVisits": "Monthly Visits"
+      },
+      "cards": {
+        "visitCount": "Visit Count",
+        "visitSource": "Visit Source",
+        "salesRatio": "Business Ratio"
+      },
+      "chart": {
+        "monthLabel": "Month {0}",
+        "visits": "Visits",
+        "trend": "Trend"
+      },
+      "platform": {
+        "web": "Web",
+        "mobile": "Mobile",
+        "ipad": "iPad",
+        "client": "Client",
+        "thirdParty": "Third Party",
+        "other": "Other"
+      },
+      "source": {
+        "searchEngine": "Search Engine",
+        "direct": "Direct",
+        "emailMarketing": "Email Marketing",
+        "affiliateAds": "Affiliate Ads"
+      },
+      "sales": {
+        "outsource": "Outsource",
+        "custom": "Custom",
+        "technicalSupport": "Technical Support",
+        "remote": "Remote"
+      }
+    },
     "workspace": {
       "title": "Workspace",
       "welcomeTitle": "Good morning, {0}, let's start your day!",

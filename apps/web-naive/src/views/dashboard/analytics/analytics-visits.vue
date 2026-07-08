@@ -3,6 +3,7 @@ import type { EchartsUIType } from '@vben/plugins/echarts';
 
 import { onMounted, ref } from 'vue';
 
+import { $t } from '@vben/locales';
 import { EchartsUI, useEcharts } from '@vben/plugins/echarts';
 
 const chartRef = ref<EchartsUIType>();
@@ -38,7 +39,9 @@ onMounted(() => {
       trigger: 'axis',
     },
     xAxis: {
-      data: Array.from({ length: 12 }).map((_item, index) => `${index + 1}月`),
+      data: Array.from({ length: 12 }).map((_item, index) =>
+        $t('page.dashboard.analyticsPage.chart.monthLabel', [index + 1]),
+      ),
       type: 'category',
     },
     yAxis: {
