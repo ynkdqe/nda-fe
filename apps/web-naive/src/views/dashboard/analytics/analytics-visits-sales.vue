@@ -21,7 +21,10 @@ onMounted(() => {
         center: ['50%', '50%'],
         color: ['#5ab1ef', '#b6a2de', '#67e0e3', '#2ec7c9'],
         data: [
-          { name: $t('page.dashboard.analyticsPage.sales.outsource'), value: 500 },
+          {
+            name: $t('page.dashboard.analyticsPage.sales.outsource'),
+            value: 500,
+          },
           { name: $t('page.dashboard.analyticsPage.sales.custom'), value: 310 },
           {
             name: $t('page.dashboard.analyticsPage.sales.technicalSupport'),
