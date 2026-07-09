@@ -15,11 +15,11 @@
         "users": "Người dùng",
         "totalUsers": "Tổng người dùng",
         "visits": "Lượt truy cập",
-        "totalVisits": "Tổng lượt truy cập",
-        "downloads": "Lượt tải xuống",
-        "totalDownloads": "Tổng lượt tải xuống",
-        "usage": "Lượt sử dụng",
-        "totalUsage": "Tổng lượt sử dụng"
+        "totalVisits": "Tổng lượt truy cập trong 24H",
+        "downloads": "Tổng lưu lượng",
+        "totalDownloads": "Tổng lưu lượng trong 24H",
+        "usage": "Tổng số yêu cầu",
+        "totalUsage": "Tổng số yêu cầu trong 24H"
       },
       "tabs": {
         "trafficTrends": "Xu hướng lưu lượng",

@@ -15,11 +15,11 @@
         "users": "Users",
         "totalUsers": "Total Users",
         "visits": "Visits",
-        "totalVisits": "Total Visits",
-        "downloads": "Downloads",
-        "totalDownloads": "Total Downloads",
-        "usage": "Usage",
-        "totalUsage": "Total Usage"
+        "totalVisits": "Total Visits in 24H",
+        "downloads": "Total Traffic",
+        "totalDownloads": "Total Traffic in 24H",
+        "usage": "Total Requests",
+        "totalUsage": "Total Requests in 24H"
       },
       "tabs": {
         "trafficTrends": "Traffic Trends",

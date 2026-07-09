@@ -2,7 +2,9 @@
 import type { AnalysisOverviewItem } from '@vben/common-ui';
 import type { TabOption } from '@vben/types';
 
-import { computed } from 'vue';
+import type { AnalyticApi } from '#/models/analytic';
+
+import { computed, onMounted, ref } from 'vue';
 
 import {
   AnalysisChartCard,
@@ -17,11 +19,70 @@ import {
 } from '@vben/icons';
 import { $t } from '@vben/locales';
 
+import { getAnalyticApi } from '#/api';
+
 import AnalyticsTrends from './analytics-trends.vue';
 import AnalyticsVisitsData from './analytics-visits-data.vue';
 import AnalyticsVisitsSales from './analytics-visits-sales.vue';
 import AnalyticsVisitsSource from './analytics-visits-source.vue';
 import AnalyticsVisits from './analytics-visits.vue';
+
+const analyticData = ref<AnalyticApi.AnalyticResultData | null>(null);
+const analyticError = ref<unknown>(null);
+const analyticLoading = ref(false);
+
+async function loadAnalyticData() {
+  analyticLoading.value = true;
+  analyticError.value = null;
+  try {
+    const response = await getAnalyticApi();
+    analyticData.value = response.data ?? null;
+  } catch (error) {
+    analyticError.value = error;
+    analyticData.value = null;
+  } finally {
+    analyticLoading.value = false;
+  }
+}
+
+onMounted(() => {
+  void loadAnalyticData();
+});
+
+function getAnalyticDetail(type: AnalyticApi.AnalyticDetailType) {
+  return analyticData.value?.details?.find((item) => item.type === type);
+}
+
+function getTotalInDay(type: AnalyticApi.AnalyticDetailType) {
+  return getAnalyticDetail(type)?.totalInDay ?? 0;
+}
+
+function getTotal24h(type: AnalyticApi.AnalyticDetailType) {
+  return getAnalyticDetail(type)?.total24h ?? 0;
+}
+
+function formatBytesValue(bytes: number) {
+  const gb = bytes / 1024 ** 3;
+  if (gb >= 1) {
+    return {
+      suffix: ' GB',
+      value: Number(gb.toFixed(2)),
+    };
+  }
+
+  return {
+    suffix: ' MB',
+    value: Number((bytes / 1024 ** 2).toFixed(2)),
+  };
+}
+
+const trafficInDay = computed(() => {
+  return formatBytesValue(getTotalInDay('TotalBytes'));
+});
+
+const traffic24h = computed(() => {
+  return formatBytesValue(getTotal24h('TotalBytes'));
+});
 
 const overviewItems = computed<AnalysisOverviewItem[]>(() => [
   {
@@ -35,22 +96,25 @@ const overviewItems = computed<AnalysisOverviewItem[]>(() => [
     icon: SvgCakeIcon,
     title: $t('page.dashboard.analyticsPage.overview.visits'),
     totalTitle: $t('page.dashboard.analyticsPage.overview.totalVisits'),
-    totalValue: 500_000,
-    value: 20_000,
+    totalValue: getTotal24h('UniqueVisitors'),
+    value: getTotalInDay('UniqueVisitors'),
   },
   {
+    decimals: 2,
     icon: SvgDownloadIcon,
     title: $t('page.dashboard.analyticsPage.overview.downloads'),
+    totalSuffix: traffic24h.value.suffix,
     totalTitle: $t('page.dashboard.analyticsPage.overview.totalDownloads'),
-    totalValue: 120_000,
-    value: 8000,
+    totalValue: traffic24h.value.value,
+    value: trafficInDay.value.value,
+    valueSuffix: trafficInDay.value.suffix,
   },
   {
     icon: SvgBellIcon,
     title: $t('page.dashboard.analyticsPage.overview.usage'),
     totalTitle: $t('page.dashboard.analyticsPage.overview.totalUsage'),
-    totalValue: 50_000,
-    value: 5000,
+    totalValue: getTotal24h('TotalRequests'),
+    value: getTotalInDay('TotalRequests'),
   },
 ]);
 

@@ -1,11 +1,15 @@
 import type { Component } from 'vue';
 
 interface AnalysisOverviewItem {
+  decimals?: number;
   icon: Component | string;
+  suffix?: string;
   title: string;
+  totalSuffix?: string;
   totalTitle: string;
   totalValue: number;
   value: number;
+  valueSuffix?: string;
 }
 
 interface WorkbenchProjectItem {
