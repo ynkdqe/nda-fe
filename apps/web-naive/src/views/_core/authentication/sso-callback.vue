@@ -15,7 +15,9 @@ onMounted(async () => {
     await authStore.completeSsoLogin(window.location.search);
   } catch (error) {
     errorMessage.value =
-      error instanceof Error ? error.message : 'Không thể hoàn tất đăng nhập SSO.';
+      error instanceof Error
+        ? error.message
+        : 'Không thể hoàn tất đăng nhập SSO.';
   }
 });
 
@@ -25,7 +27,9 @@ async function retryLogin() {
 </script>
 
 <template>
-  <div class="flex min-h-40 flex-col items-center justify-center gap-4 text-center">
+  <div
+    class="flex min-h-40 flex-col items-center justify-center gap-4 text-center"
+  >
     <template v-if="errorMessage">
       <p class="text-destructive">{{ errorMessage }}</p>
       <button class="vben-link" type="button" @click="retryLogin">
@@ -33,7 +37,9 @@ async function retryLogin() {
       </button>
     </template>
     <template v-else>
-      <div class="size-8 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
+      <div
+        class="size-8 animate-spin rounded-full border-2 border-current border-t-transparent"
+      ></div>
       <p>Đang hoàn tất đăng nhập SSO...</p>
     </template>
   </div>

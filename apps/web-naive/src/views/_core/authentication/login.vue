@@ -85,7 +85,9 @@ onMounted(async () => {
     await authStore.startSsoLogin();
   } catch (error) {
     ssoError.value =
-      error instanceof Error ? error.message : 'Không thể chuyển đến trang SSO.';
+      error instanceof Error
+        ? error.message
+        : 'Không thể chuyển đến trang SSO.';
   }
 });
 
@@ -133,7 +135,11 @@ const formSchema = computed((): VbenFormSchema[] => {
   >
     <template v-if="ssoError">
       <p class="text-destructive">{{ ssoError }}</p>
-      <button class="vben-link" type="button" @click="authStore.startSsoLogin()">
+      <button
+        class="vben-link"
+        type="button"
+        @click="authStore.startSsoLogin()"
+      >
         Thử lại
       </button>
     </template>

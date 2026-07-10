@@ -12,7 +12,9 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex min-h-40 flex-col items-center justify-center gap-4 text-center">
+  <div
+    class="flex min-h-40 flex-col items-center justify-center gap-4 text-center"
+  >
     <div
       class="size-8 animate-spin rounded-full border-2 border-current border-t-transparent"
     ></div>
