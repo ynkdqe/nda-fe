@@ -11,6 +11,12 @@ import { defineStore } from 'pinia';
 
 import { notification } from '#/adapter/naive';
 import {
+  completeSsoLogin as completeSsoAuthorization,
+  isSsoAuthMode,
+  redirectToSsoLogin,
+  redirectToSsoLogout,
+} from '#/auth/sso';
+import {
   getUserInfoApi,
   loginApi,
   logoutApi,
@@ -102,15 +108,60 @@ export const useAuthStore = defineStore('auth', () => {
     };
   }
 
-  async function logout(redirect: boolean = true) {
+  async function startSsoLogin(redirectPath?: string) {
+    await redirectToSsoLogin(
+      redirectPath ||
+        (router.currentRoute.value.query.redirect as string | undefined),
+    );
+  }
+
+  async function completeSsoLogin(search: string) {
+    loginLoading.value = true;
     try {
-      await logoutApi();
-    } catch {
-      // 不做任何处理
+      const { redirectPath, tokenInfo } =
+        await completeSsoAuthorization(search);
+      setStoredAuthTokenInfo(tokenInfo);
+      const userInfo = await fetchUserInfo();
+
+      notification.success({
+        content: $t('authentication.loginSuccess'),
+        description: `${$t('authentication.loginSuccessDesc')}:${userInfo.realName}`,
+        duration: 3000,
+      });
+
+      await router.replace(
+        redirectPath === '/'
+          ? userInfo.homePath || preferences.app.defaultHomePath
+          : redirectPath,
+      );
+    } catch (error) {
+      removeStoredAuthTokenInfo();
+      throw error;
+    } finally {
+      loginLoading.value = false;
     }
+  }
+
+  async function logout(redirect: boolean = true) {
+    const ssoMode = isSsoAuthMode();
+    const idToken = accessStore.idToken;
+
+    if (!ssoMode) {
+      try {
+        await logoutApi();
+      } catch {
+        // Ignore server logout errors and always clear the local session.
+      }
+    }
+
     removeStoredAuthTokenInfo();
     resetAllStores();
     accessStore.setLoginExpired(false);
+
+    if (ssoMode) {
+      await redirectToSsoLogout(idToken);
+      return;
+    }
 
     // 回登录页带上当前路由地址
     await router.replace({
@@ -138,8 +189,10 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     $reset,
     authLogin,
+    completeSsoLogin,
     fetchUserInfo,
     loginLoading,
     logout,
+    startSsoLogin,
   };
 });

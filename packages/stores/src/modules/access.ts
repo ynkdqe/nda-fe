@@ -9,6 +9,7 @@ type AccessToken = null | string;
 interface AuthTokenInfo {
   expiresAt?: null | number;
   expiresIn?: null | number;
+  idToken?: null | string;
   scope?: string;
   tenant?: null | string;
   tokenType?: null | string;
@@ -40,6 +41,10 @@ interface AccessState {
    * accessToken 有效秒数
    */
   expiresIn?: null | number;
+  /**
+   * OpenID Connect id token
+   */
+  idToken: AccessToken;
   /**
    * 是否已经检查过权限
    */
@@ -120,6 +125,7 @@ export const useAccessStore = defineStore('core-access', {
       this.refreshToken = null;
       this.expiresAt = null;
       this.expiresIn = null;
+      this.idToken = null;
       this.scope = undefined;
       this.tenant = null;
       this.tokenType = null;
@@ -147,6 +153,7 @@ export const useAccessStore = defineStore('core-access', {
       this.refreshToken = tokenInfo.refreshToken ?? null;
       this.expiresAt = tokenInfo.expiresAt ?? null;
       this.expiresIn = tokenInfo.expiresIn ?? null;
+      this.idToken = tokenInfo.idToken ?? null;
       this.scope = tokenInfo.scope;
       this.tenant = tokenInfo.tenant ?? null;
       this.tokenType = tokenInfo.tokenType ?? null;
@@ -164,6 +171,7 @@ export const useAccessStore = defineStore('core-access', {
       'refreshToken',
       'expiresAt',
       'expiresIn',
+      'idToken',
       'scope',
       'tenant',
       'tokenType',
@@ -180,6 +188,7 @@ export const useAccessStore = defineStore('core-access', {
     accessToken: null,
     expiresAt: null,
     expiresIn: null,
+    idToken: null,
     isAccessChecked: false,
     isLockScreen: false,
     lockScreenPassword: undefined,

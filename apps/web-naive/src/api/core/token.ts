@@ -4,6 +4,7 @@ export interface AuthTokenInfo {
   access_token: string;
   expires_at: number;
   expires_in: number;
+  id_token?: string;
   refresh_token?: string;
   scope?: string;
   tenant?: null | string;
@@ -31,6 +32,7 @@ export function getStoredAuthTokenInfo() {
     access_token: accessStore.accessToken,
     expires_at: accessStore.expiresAt ?? 0,
     expires_in: accessStore.expiresIn ?? 0,
+    id_token: accessStore.idToken ?? undefined,
     refresh_token: accessStore.refreshToken ?? undefined,
     scope: accessStore.scope,
     tenant: accessStore.tenant ?? null,
@@ -61,6 +63,7 @@ export function setStoredAuthTokenInfo(tokenInfo: AuthTokenInfo) {
     accessToken: tokenInfo.access_token,
     expiresAt: tokenInfo.expires_at,
     expiresIn: tokenInfo.expires_in,
+    idToken: tokenInfo.id_token ?? null,
     refreshToken: tokenInfo.refresh_token ?? null,
     scope: tokenInfo.scope,
     tenant: tokenInfo.tenant ?? null,
