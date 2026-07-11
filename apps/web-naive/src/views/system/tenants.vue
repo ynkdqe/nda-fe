@@ -233,7 +233,9 @@ async function handleSubmit(
         <NAvatar
           :fallback-src="undefined"
           :src="row.profile?.logoUrl || undefined"
-          :style="{ backgroundColor: row.profile?.logoUrl ? undefined : '#18a058' }"
+          :style="{
+            backgroundColor: row.profile?.logoUrl ? undefined : '#18a058',
+          }"
           object-fit="contain"
           round
           size="medium"

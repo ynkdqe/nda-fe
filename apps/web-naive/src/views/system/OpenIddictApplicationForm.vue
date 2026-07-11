@@ -7,13 +7,7 @@ import { computed, reactive, ref } from 'vue';
 
 import { useVbenDrawer } from '@vben/common-ui';
 
-import {
-  NDynamicTags,
-  NForm,
-  NFormItem,
-  NInput,
-  NSelect,
-} from 'naive-ui';
+import { NDynamicTags, NForm, NFormItem, NInput, NSelect } from 'naive-ui';
 
 const emit = defineEmits<{
   submit: [data: OpenIddictApplicationApi.ApplicationFormPayload];

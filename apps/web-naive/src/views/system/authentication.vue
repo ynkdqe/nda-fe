@@ -146,9 +146,10 @@ const gridOptions: VxeGridProps<OpenIddictApplicationApi.ApplicationItem> = {
   },
 };
 
-const [Grid, gridApi] = useVbenVxeGrid<OpenIddictApplicationApi.ApplicationItem>({
-  gridOptions,
-});
+const [Grid, gridApi] =
+  useVbenVxeGrid<OpenIddictApplicationApi.ApplicationItem>({
+    gridOptions,
+  });
 
 const [Drawer, drawerApi] = useVbenDrawer({
   connectedComponent: OpenIddictApplicationForm,
@@ -161,8 +162,7 @@ function handleAdd() {
 
 async function handleEdit(row: OpenIddictApplicationApi.ApplicationItem) {
   const response = await getOpenIddictApplicationByIdApi(row.id);
-  const record =
-    'data' in response && response.data ? response.data : response;
+  const record = 'data' in response && response.data ? response.data : response;
 
   drawerApi.setData({ record });
   drawerApi.open();
@@ -278,7 +278,11 @@ async function handleSubmit(
           v-if="row.redirectUris?.length"
           class="list-disc space-y-1 py-1 pl-4"
         >
-          <li v-for="uri in row.redirectUris" :key="uri" class="break-all text-xs">
+          <li
+            v-for="uri in row.redirectUris"
+            :key="uri"
+            class="break-all text-xs"
+          >
             {{ uri }}
           </li>
         </ul>
