@@ -4,7 +4,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { LOGIN_PATH } from '@vben/constants';
-import { preferences } from '@vben/preferences';
+import { preferences, updatePreferences } from '@vben/preferences';
 import { resetAllStores, useAccessStore, useUserStore } from '@vben/stores';
 
 import { defineStore } from 'pinia';
@@ -24,6 +24,7 @@ import {
   setStoredAuthTokenInfo,
 } from '#/api';
 import { $t } from '#/locales';
+import { DEFAULT_APP_LOGO, DEFAULT_APP_TITLE } from '#/preferences';
 
 export const useAuthStore = defineStore('auth', () => {
   const accessStore = useAccessStore();
@@ -142,6 +143,34 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  function applyTenantBranding(profile?: Recordable<any>) {
+    const tenant = profile?.tenant;
+    const tenantName = tenant?.name?.trim();
+    const tenantLogo = tenant?.profile?.logoUrl?.trim();
+
+    updatePreferences({
+      app: {
+        name: tenantName || DEFAULT_APP_TITLE,
+      },
+      logo: {
+        source: tenantLogo || DEFAULT_APP_LOGO,
+        sourceDark: tenantLogo || DEFAULT_APP_LOGO,
+      },
+    });
+  }
+
+  function resetTenantBranding() {
+    updatePreferences({
+      app: {
+        name: DEFAULT_APP_TITLE,
+      },
+      logo: {
+        source: DEFAULT_APP_LOGO,
+        sourceDark: DEFAULT_APP_LOGO,
+      },
+    });
+  }
+
   async function logout(redirect: boolean = true) {
     const ssoMode = isSsoAuthMode();
     const idToken = accessStore.idToken;
@@ -156,6 +185,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     removeStoredAuthTokenInfo();
     resetAllStores();
+    resetTenantBranding();
     accessStore.setLoginExpired(false);
 
     if (ssoMode) {
@@ -176,6 +206,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function fetchUserInfo() {
     const profile = await getUserInfoApi();
+    applyTenantBranding(profile);
     const userInfo = normalizeUserInfo(profile, accessStore.accessToken ?? '');
     userStore.setUserInfo(userInfo);
     accessStore.setAccessCodes(profile.permissions ?? []);
