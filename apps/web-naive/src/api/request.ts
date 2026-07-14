@@ -14,6 +14,7 @@ import {
 import { useAccessStore } from '@vben/stores';
 
 import { message } from '#/adapter/naive';
+import { isSsoAuthMode, refreshSsoToken } from '#/auth/sso';
 import { useAuthStore } from '#/store';
 
 import { refreshTokenApi } from './core';
@@ -74,7 +75,9 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
         throw new Error('Refresh token is missing.');
       }
 
-      const resp = await refreshTokenApi(refreshToken);
+      const resp = isSsoAuthMode()
+        ? await refreshSsoToken(refreshToken)
+        : await refreshTokenApi(refreshToken);
       const newToken = resp.access_token;
       const newRefreshToken = resp.refresh_token ?? refreshToken;
 
@@ -82,8 +85,9 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
         access_token: newToken,
         expires_at: Date.now() + resp.expires_in * 1000,
         expires_in: resp.expires_in,
+        id_token: resp.id_token ?? storedTokenInfo?.id_token,
         refresh_token: newRefreshToken,
-        scope: import.meta.env.VITE_APP_SCOPE,
+        scope: resp.scope ?? storedTokenInfo?.scope,
         tenant: storedTokenInfo?.tenant ?? null,
         token_type: resp.token_type,
         username: storedTokenInfo?.username,

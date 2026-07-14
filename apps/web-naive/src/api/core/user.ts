@@ -30,12 +30,24 @@ export namespace AccountApi {
     newPassword: string;
   }
 
+  export interface TenantProfile {
+    logoUrl?: null | string;
+  }
+
+  export interface Tenant {
+    id: string;
+    name?: null | string;
+    profile?: null | TenantProfile;
+  }
+
   export interface Profile extends Recordable<any> {
     avatar: null | string;
     id: string;
     name: string;
     permissions?: string[];
     roles?: string[];
+    tenant?: null | Tenant;
+    tenantId?: null | string;
     userName: string;
   }
 }
