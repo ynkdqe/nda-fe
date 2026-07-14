@@ -1,8 +1,5 @@
-# syntax=docker/dockerfile:1.7
-
 FROM node:22-slim AS builder
 
-ARG TARGETARCH
 ARG APP_NAME=web-naive
 ARG PACKAGE_FILTER=@vben/web-naive
 ARG BUILD_MODE=development
@@ -15,16 +12,14 @@ ENV CI=true
 
 WORKDIR /app
 
-RUN corepack enable && pnpm config set store-dir /pnpm/store
+RUN corepack enable
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .node-version ./
-RUN --mount=type=cache,id=pnpm-store-${TARGETARCH},target=/pnpm/store \
-    pnpm fetch --frozen-lockfile
+RUN pnpm fetch
 
 COPY . .
 
-RUN --mount=type=cache,id=pnpm-store-${TARGETARCH},target=/pnpm/store \
-    pnpm install --frozen-lockfile --offline
+RUN pnpm install --frozen-lockfile --offline
 RUN test -f apps/${APP_NAME}/.env.${BUILD_MODE}
 RUN pnpm --filter ${PACKAGE_FILTER} exec vite build --mode ${BUILD_MODE}
 

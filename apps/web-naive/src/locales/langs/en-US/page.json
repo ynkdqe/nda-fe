@@ -186,6 +186,15 @@
     "workShifts": "Work Shifts",
     "workSchedules": "Work Schedules",
     "dayOffs": "Days Off",
+    "dayOffPage": {
+      "fields": {
+        "isPaid": "Paid"
+      },
+      "values": {
+        "no": "No",
+        "yes": "Yes"
+      }
+    },
     "attendancePage": {
       "calendar": {
         "nextMonth": "Next",

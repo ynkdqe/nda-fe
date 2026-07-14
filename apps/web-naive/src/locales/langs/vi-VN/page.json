@@ -186,6 +186,15 @@
     "workShifts": "Ca làm việc",
     "workSchedules": "Lịch làm việc",
     "dayOffs": "Ngày nghỉ",
+    "dayOffPage": {
+      "fields": {
+        "isPaid": "Tính công"
+      },
+      "values": {
+        "no": "Không",
+        "yes": "Có"
+      }
+    },
     "attendancePage": {
       "calendar": {
         "nextMonth": "Tháng sau",

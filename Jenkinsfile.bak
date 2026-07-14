@@ -91,22 +91,17 @@ pipeline {
       }
       steps {
         sh '''
-          set -eu
-
-          echo "Login to Docker Registry for cache pull..."
-          echo "$REGISTRY_PASS" | docker login "$REGISTRY_URL_NORMALIZED" -u "$REGISTRY_USER" --password-stdin
-
           CACHE_FROM=""
-          if docker pull "$REGISTRY_IMAGE:$LATEST_TAG"; then
+
+          if docker image inspect "$REGISTRY_IMAGE:$LATEST_TAG" >/dev/null 2>&1; then
             CACHE_FROM="--cache-from $REGISTRY_IMAGE:$LATEST_TAG"
-            echo "Using registry Docker cache from $REGISTRY_IMAGE:$LATEST_TAG"
+            echo "Using Docker cache from $REGISTRY_IMAGE:$LATEST_TAG"
           else
-            echo "No registry Docker cache found for $REGISTRY_IMAGE:$LATEST_TAG"
+            echo "No local Docker cache image found for $REGISTRY_IMAGE:$LATEST_TAG"
           fi
 
-          DOCKER_BUILDKIT=1 docker build \
+          docker build \
             $CACHE_FROM \
-            --build-arg BUILDKIT_INLINE_CACHE=1 \
             --build-arg BUILD_MODE="$APP_ENV" \
             -f "$DOCKERFILE" \
             -t "$REGISTRY_IMAGE:$IMAGE_TAG" \
@@ -116,7 +111,7 @@ pipeline {
       }
     }
 
-    stage('Push Docker image') {
+    stage('Login and push Docker image') {
       when {
         anyOf {
           branch 'dev'

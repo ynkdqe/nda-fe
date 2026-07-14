@@ -5,6 +5,7 @@ export namespace HolidayApi {
     description?: null | string;
     holidayType?: null | number | string;
     id: number | string;
+    isPaid?: boolean | null;
     name?: null | string;
     type?: null | number | string;
   }
@@ -53,6 +54,7 @@ export interface HolidayFormState {
   dates: string[];
   description: string;
   holidayType: null | number | string;
+  isPaid: boolean;
   name: string;
   saturdayOnly: boolean;
   sundayOnly: boolean;

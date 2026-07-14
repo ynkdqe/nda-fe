@@ -7,6 +7,7 @@ import { onMounted, ref } from 'vue';
 
 import { Page, useVbenDrawer } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
+import { $t } from '@vben/locales';
 import { formatDate } from '@vben/utils';
 
 import { NButton, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui';
@@ -151,6 +152,13 @@ const gridOptions: VxeGridProps<HolidayApi.HolidayItem> = {
       title: 'Mô tả',
     },
     {
+      align: 'center',
+      field: 'isPaid',
+      slots: { default: 'isPaidCell' },
+      title: $t('page.hr.dayOffPage.fields.isPaid'),
+      width: 120,
+    },
+    {
       field: 'creationTime',
       formatter: ({ cellValue }: any) => formatHolidayDateTime(cellValue),
       title: 'Ngày tạo',
@@ -251,6 +259,16 @@ onMounted(loadHolidayTypes);
       <template #typeCell="{ row }">
         <NTag :bordered="false" type="info">
           {{ getHolidayTypeLabel(row.holidayType ?? row.type) }}
+        </NTag>
+      </template>
+
+      <template #isPaidCell="{ row }">
+        <NTag :bordered="false" :type="row.isPaid ? 'success' : 'warning'">
+          {{
+            row.isPaid
+              ? $t('page.hr.dayOffPage.values.yes')
+              : $t('page.hr.dayOffPage.values.no')
+          }}
         </NTag>
       </template>
 

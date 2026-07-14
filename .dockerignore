@@ -13,5 +13,5 @@ test-results
 *.log
 *.md
 Dockerfile*
-Jenkinsfile
+Jenkinsfile*
 k8s

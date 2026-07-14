@@ -9,6 +9,7 @@ import type {
 import { computed, ref, watch } from 'vue';
 
 import { useVbenDrawer } from '@vben/common-ui';
+import { $t } from '@vben/locales';
 import { formatDate } from '@vben/utils';
 
 import {
@@ -19,6 +20,7 @@ import {
   NRadioButton,
   NRadioGroup,
   NSelect,
+  NSwitch,
   NTag,
 } from 'naive-ui';
 
@@ -92,6 +94,7 @@ function createDefaultForm(): HolidayFormState {
     dates: [],
     description: '',
     holidayType: null,
+    isPaid: true,
     name: '',
     saturdayOnly: false,
     sundayOnly: false,
@@ -191,6 +194,7 @@ function syncRecord(record?: HolidayApi.HolidayItem | null) {
     ...form.value,
     description: record.description ?? '',
     holidayType: record.holidayType ?? record.type ?? null,
+    isPaid: record.isPaid ?? true,
     name: record.name ?? '',
   };
 
@@ -433,15 +437,24 @@ defineExpose({
           </NTag>
         </div>
 
-        <NFormItem label="Mô tả">
-          <NInput
-            v-model:value="form.description"
-            clearable
-            placeholder="Nhập mô tả"
-            :rows="3"
-            type="textarea"
-          />
-        </NFormItem>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <NFormItem label="Mô tả">
+            <NInput
+              v-model:value="form.description"
+              clearable
+              placeholder="Nhập mô tả"
+              :rows="3"
+              type="textarea"
+            />
+          </NFormItem>
+
+          <NFormItem
+            class="paid-form-item"
+            :label="$t('page.hr.dayOffPage.fields.isPaid')"
+          >
+            <NSwitch v-model:value="form.isPaid" />
+          </NFormItem>
+        </div>
       </NForm>
     </div>
   </Drawer>
@@ -450,6 +463,10 @@ defineExpose({
 <style scoped>
 .holiday-form-wrap {
   padding: 4px;
+}
+
+.paid-form-item :deep(.n-form-item-blank) {
+  display: block;
 }
 
 .holiday-calendar {

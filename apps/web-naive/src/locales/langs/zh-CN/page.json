@@ -186,6 +186,15 @@
     "workShifts": "班次",
     "workSchedules": "工作日程",
     "dayOffs": "休假日",
+    "dayOffPage": {
+      "fields": {
+        "isPaid": "带薪"
+      },
+      "values": {
+        "no": "否",
+        "yes": "是"
+      }
+    },
     "attendancePage": {
       "calendar": {
         "nextMonth": "下个月",
