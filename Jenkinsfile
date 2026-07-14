@@ -104,9 +104,8 @@ pipeline {
             echo "No registry Docker cache found for $REGISTRY_IMAGE:$LATEST_TAG"
           fi
 
-          DOCKER_BUILDKIT=1 docker build \
+          docker build \
             $CACHE_FROM \
-            --build-arg BUILDKIT_INLINE_CACHE=1 \
             --build-arg BUILD_MODE="$APP_ENV" \
             -f "$DOCKERFILE" \
             -t "$REGISTRY_IMAGE:$IMAGE_TAG" \
