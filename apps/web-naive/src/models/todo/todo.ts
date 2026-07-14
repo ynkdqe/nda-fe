@@ -1,3 +1,5 @@
+import type { MResult } from '#/models/common';
+
 type Id = number | string;
 type NullableString = null | string;
 
@@ -26,12 +28,4 @@ export interface TodoDto {
   userName?: NullableString;
 }
 
-export interface TodoListResult {
-  current?: null | number;
-  data?: TodoDto[];
-  dataExtend?: unknown;
-  message?: null | string;
-  pageSize?: null | number;
-  success?: boolean;
-  total?: number;
-}
+export type TodoListResult = MResult<TodoDto[]>;

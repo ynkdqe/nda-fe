@@ -56,7 +56,7 @@ async function loadNotifications() {
     pageSize: 10,
   });
 
-  const items = response.data ?? response.items ?? [];
+  const items = response.data ?? [];
   notifications.value = items.map((item) => mapNotificationItem(item));
   unreadCount.value =
     response.dataExtend?.unreadCount ??

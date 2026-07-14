@@ -1,3 +1,5 @@
+import type { MResult } from '#/models/common';
+
 import { requestClient } from '#/api/request';
 
 export namespace EmployeeApi {
@@ -64,7 +66,7 @@ export namespace EmployeeApi {
     email?: null | string;
     employeeCode?: null | string;
     enrollDate?: null | string;
-    extraProperties?: null | Record<string, any>;
+    extraProperties?: Record<string, any>;
     gender?: null | number;
     identification?: null | string;
     maritalStatus?: null | number;
@@ -107,29 +109,11 @@ export namespace EmployeeApi {
     userName?: string;
   }
 
-  export interface EmployeeListResult {
-    current: number;
-    data: EmployeeItem[];
-    dataExtend?: unknown;
-    message?: null | string;
-    pageSize: number;
-    success: boolean;
-    total: number;
-  }
+  export type EmployeeListResult = MResult<EmployeeItem[]>;
 
-  export type EmployeeDetailResult =
-    | EmployeeItem
-    | {
-        data?: EmployeeItem;
-      };
+  export type EmployeeDetailResult = MResult<EmployeeItem>;
 
-  export interface BankListResult {
-    current: number;
-    data: Bank[];
-    pageSize: number;
-    success: boolean;
-    total: number;
-  }
+  export type BankListResult = MResult<Bank[]>;
 }
 
 let bankListRequest: null | Promise<EmployeeApi.BankListResult> = null;

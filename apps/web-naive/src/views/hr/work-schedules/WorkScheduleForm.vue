@@ -66,7 +66,7 @@ const InlineSwitch = defineComponent({
 });
 
 function normalizeWorkShiftOptions(response: WorkShiftApi.WorkShiftListResult) {
-  const items = response?.data ?? response?.items ?? [];
+  const items = response.data ?? [];
 
   return items
     .map((item) => {

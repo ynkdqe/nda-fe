@@ -31,7 +31,7 @@ function handleAdd() {
 async function loadProviders() {
   try {
     const response = await fetchSmsProviderList({ page: 1, pageSize: 1000 });
-    const mapEntries = (response.data ?? response.items ?? []).map(
+    const mapEntries = (response.data ?? []).map(
       (provider: SmsMessageApi.SmsProvider) =>
         [String(provider.id), provider.name || String(provider.id)] as const,
     );
@@ -154,7 +154,7 @@ const gridOptions: VxeGridProps<SmsMessageApi.SmsTemplate> = {
         });
 
         return {
-          items: response.data ?? response.items ?? [],
+          items: response.data ?? [],
           total: response.total ?? 0,
         };
       },

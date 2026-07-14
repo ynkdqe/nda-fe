@@ -47,18 +47,7 @@ function normalizeFormValues(formValues?: Record<string, any>) {
   };
 }
 
-function normalizeContractTypeDetail(
-  response: ContractTypeApi.ContractTypeDetailResult,
-): ContractTypeApi.ContractTypeItem {
-  const detailData = (response as { data?: ContractTypeApi.ContractTypeItem })
-    .data;
 
-  if (detailData) {
-    return detailData;
-  }
-
-  return response as ContractTypeApi.ContractTypeItem;
-}
 
 const formOptions: VbenFormProps = {
   collapsed: false,
@@ -153,7 +142,7 @@ const gridOptions: VxeGridProps<ContractTypeApi.ContractTypeItem> = {
         });
 
         return {
-          items: response.data ?? response.items ?? [],
+          items: response.data ?? [],
           total: response.total ?? 0,
         };
       },
@@ -190,9 +179,12 @@ function handleAdd() {
 
 async function handleEdit(row: ContractTypeApi.ContractTypeItem) {
   const response = await getContractTypeByIdApi(row.id);
-  const record = normalizeContractTypeDetail(response);
+  if (!response.data) {
+    message.error(response.message ?? 'Không tìm thấy loại hợp đồng');
+    return;
+  }
 
-  drawerApi.setData({ record });
+  drawerApi.setData({ record: response.data });
   drawerApi.open();
 }
 

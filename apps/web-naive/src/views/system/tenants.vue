@@ -161,6 +161,11 @@ const [Drawer, drawerApi] = useVbenDrawer({
 
 async function handleEdit(row: TenantManagementApi.TenantItem) {
   const response = await getTenantProfileByIdApi(row.id);
+  if (!response.data) {
+    message.error(response.message ?? 'Không tìm thấy thông tin tenant');
+    return;
+  }
+
   drawerApi.setData({ record: response.data });
   drawerApi.open();
 }

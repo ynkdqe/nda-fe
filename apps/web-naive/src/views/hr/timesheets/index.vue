@@ -173,7 +173,7 @@ watch(calendarValue, (value) => {
           :loading="loading"
           :max-month="maxAllowedMonth"
           :min-month="minAllowedMonth"
-          :timesheet-data="dataSource?.data"
+          :timesheet-data="dataSource?.data ?? []"
         />
         <TimesheetMonthlyDetail
           :month-label="formatMonthLabel(calendarValue)"

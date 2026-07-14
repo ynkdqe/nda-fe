@@ -1,3 +1,5 @@
+import type { MResult } from '#/models/common';
+
 type Id = number | string;
 type NullableNumber = null | number;
 type UnknownRecord = Record<string, unknown>;
@@ -43,22 +45,9 @@ export namespace ContractTypeApi {
     pageSize: number;
   }
 
-  export interface ContractTypeListResult {
-    current?: number;
-    data?: ContractTypeItem[];
-    dataExtend?: unknown;
-    items?: ContractTypeItem[];
-    message?: null | string;
-    pageSize?: number;
-    success?: boolean;
-    total?: number;
-  }
+  export type ContractTypeListResult = MResult<ContractTypeItem[]>;
 
-  export type ContractTypeDetailResult =
-    | ContractTypeItem
-    | {
-        data?: ContractTypeItem;
-      };
+  export type ContractTypeDetailResult = MResult<ContractTypeItem>;
 }
 
 export type ContractDurationItem = ContractTypeApi.DurationItem;

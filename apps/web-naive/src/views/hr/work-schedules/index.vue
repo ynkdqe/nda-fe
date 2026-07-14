@@ -195,7 +195,7 @@ const gridOptions: VxeGridProps<WorkScheduleApi.WorkScheduleItem> = {
         });
 
         return {
-          items: response.data ?? response.items ?? [],
+          items: response.data ?? [],
           total: response.total ?? 0,
         };
       },

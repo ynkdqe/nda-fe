@@ -1,3 +1,5 @@
+import type { MResult } from '#/models/common';
+
 export namespace TimesheetApi {
   export interface WorkshiftInfo {
     name?: null | string;
@@ -43,12 +45,10 @@ export namespace TimesheetApi {
     year?: number;
   }
 
-  export interface TimesheetListResult {
-    data?: TimesheetItem[];
-    dataExtend?: TimesheetDataExtend;
-    message?: null | string;
-    success?: boolean;
-  }
+  export type TimesheetListResult = MResult<
+    TimesheetItem[],
+    TimesheetDataExtend
+  >;
 }
 
 export type TimesheetCalendarEntryType = 'absent' | 'holiday' | 'late' | 'missing' | 'work';

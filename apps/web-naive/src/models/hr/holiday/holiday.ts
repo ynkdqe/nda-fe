@@ -1,3 +1,5 @@
+import type { MResult } from '#/models/common';
+
 export namespace HolidayApi {
   export interface HolidayItem {
     creationTime?: null | string;
@@ -18,16 +20,7 @@ export namespace HolidayApi {
     startDate?: string;
   }
 
-  export interface HolidayListResult {
-    current?: number;
-    data?: HolidayItem[];
-    dataExtend?: unknown;
-    items?: HolidayItem[];
-    message?: null | string;
-    pageSize?: number;
-    success?: boolean;
-    total?: number;
-  }
+  export type HolidayListResult = MResult<HolidayItem[]>;
 
   export interface HolidayTypeItem {
     code?: null | number | string;

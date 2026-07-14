@@ -1,4 +1,5 @@
-import type { HrId, MResult } from "#/models/hr/common";
+import type { MResult } from '#/models/common';
+import type { HrId } from "#/models/hr/common";
 
 export namespace WorkShiftApi {
   export interface WorkShiftItem {
@@ -22,13 +23,9 @@ export namespace WorkShiftApi {
     pageSize: number;
   }
 
-  export type WorkShiftListResult = MResult<WorkShiftItem>;
+  export type WorkShiftListResult = MResult<WorkShiftItem[]>;
 
-  export type WorkShiftDetailResult =
-    | WorkShiftItem
-    | {
-        data?: WorkShiftItem;
-      };
+  export type WorkShiftDetailResult = MResult<WorkShiftItem>;
 }
 
 export interface WorkShiftFormModel {

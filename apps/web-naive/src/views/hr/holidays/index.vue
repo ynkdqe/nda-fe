@@ -187,7 +187,7 @@ const gridOptions: VxeGridProps<HolidayApi.HolidayItem> = {
         });
 
         return {
-          items: response.data ?? response.items ?? [],
+          items: response.data ?? [],
           total: response.total ?? 0,
         };
       },

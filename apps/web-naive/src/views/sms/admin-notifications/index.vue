@@ -125,7 +125,7 @@ const gridOptions: VxeGridProps<SmsNotificationApi.NotificationItem> = {
         });
 
         return {
-          items: response.data ?? response.items ?? [],
+          items: response.data ?? [],
           total: response.total ?? 0,
         };
       },

@@ -34,11 +34,7 @@ function normalizeFormValues(formValues?: Record<string, any>) {
   };
 }
 
-function normalizeWorkShiftDetail(
-  response: WorkShiftApi.WorkShiftDetailResult,
-) {
-  return 'data' in response && response.data ? response.data : response;
-}
+
 
 const formOptions: VbenFormProps = {
   collapsed: false,
@@ -138,7 +134,7 @@ const gridOptions: VxeGridProps<WorkShiftApi.WorkShiftItem> = {
         });
 
         return {
-          items: response.data ?? response.items ?? [],
+          items: response.data ?? [],
           total: response.total ?? 0,
         };
       },
@@ -172,10 +168,13 @@ function handleAdd() {
 
 async function handleEdit(row: WorkShiftApi.WorkShiftItem) {
   const response = await getWorkShiftByIdApi(row.id);
-  const record = normalizeWorkShiftDetail(response);
+  if (!response.data) {
+    message.error(response.message ?? 'Không tìm thấy ca làm việc');
+    return;
+  }
 
   currentEditId.value = row.id;
-  drawerApi.setData({ record });
+  drawerApi.setData({ record: response.data });
   drawerApi.open();
 }
 

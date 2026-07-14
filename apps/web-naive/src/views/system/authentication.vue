@@ -162,9 +162,12 @@ function handleAdd() {
 
 async function handleEdit(row: OpenIddictApplicationApi.ApplicationItem) {
   const response = await getOpenIddictApplicationByIdApi(row.id);
-  const record = 'data' in response && response.data ? response.data : response;
+  if (!response.data) {
+    message.error(response.message ?? 'Không tìm thấy ứng dụng xác thực');
+    return;
+  }
 
-  drawerApi.setData({ record });
+  drawerApi.setData({ record: response.data });
   drawerApi.open();
 }
 

@@ -252,7 +252,7 @@ function normalizeExtraPropertiesPayload() {
     extraProperties[propertyKey] = item.value;
   }
 
-  return Object.keys(extraProperties).length > 0 ? extraProperties : null;
+  return extraProperties;
 }
 
 function normalizeOptionResponse(
@@ -291,7 +291,7 @@ function normalizeOptionResponse(
 function normalizeBankOptionResponse(
   response: EmployeeApi.BankListResult,
 ): SelectOption[] {
-  return response.data
+  return (response.data ?? [])
     .map((bank) => {
       const value = bank.id;
       const shortName = bank.shortName ?? bank.short_name ?? bank.code;

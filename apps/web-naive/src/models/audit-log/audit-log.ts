@@ -1,3 +1,5 @@
+import type { MResult } from '#/models/common';
+
 type Id = string;
 type NullableString = null | string;
 type UnknownRecord = Record<string, unknown>;
@@ -40,12 +42,4 @@ export interface AuditLogDto {
   userName?: NullableString;
 }
 
-export interface AuditLogListResult {
-  current?: null | number;
-  data?: AuditLogDto[];
-  dataExtend?: unknown;
-  message?: null | string;
-  pageSize?: null | number;
-  success?: boolean;
-  total?: number;
-}
+export type AuditLogListResult = MResult<AuditLogDto[]>;

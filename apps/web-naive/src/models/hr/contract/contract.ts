@@ -1,3 +1,5 @@
+import type { MResult } from '#/models/common';
+
 import type { SelectOption } from "naive-ui";
 
 export type { ContractTypeItem } from "#/models/hr/contract-type";
@@ -66,22 +68,9 @@ export namespace ContractApi {
     status?: Id | null;
   }
 
-  export interface ContractListResult {
-    current?: number;
-    data?: ContractItem[];
-    dataExtend?: unknown;
-    items?: ContractItem[];
-    message?: null | string;
-    pageSize?: number;
-    success?: boolean;
-    total?: number;
-  }
+  export type ContractListResult = MResult<ContractItem[]>;
 
-  export type ContractDetailResult =
-    | ContractItem
-    | {
-        data?: ContractItem;
-      };
+  export type ContractDetailResult = MResult<ContractItem>;
 
   export interface ContractOptionItem {
     id: Id;

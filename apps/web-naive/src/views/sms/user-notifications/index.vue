@@ -100,7 +100,7 @@ async function loadData() {
     });
 
     total.value = response.total ?? 0;
-    list.value = (response.data ?? response.items ?? []).map((item) =>
+    list.value = (response.data ?? []).map((item) =>
       mapToUiItem(item),
     );
   } catch (error: any) {

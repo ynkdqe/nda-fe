@@ -86,7 +86,7 @@ async function loadContractTypes() {
       page: 1,
       pageSize: 1000,
     });
-    const list = response.data ?? response.items ?? [];
+    const list = response.data ?? [];
 
     contractTypeList.value = list;
     contractTypes.value = mapContractTypeOptions(list);
@@ -130,17 +130,7 @@ function getStatusType(status?: null | number | string) {
   return 'default';
 }
 
-function normalizeContractDetail(
-  response: ContractApi.ContractDetailResult,
-): ContractApi.ContractItem {
-  const detailData = (response as { data?: ContractApi.ContractItem }).data;
 
-  if (detailData) {
-    return detailData;
-  }
-
-  return response as ContractApi.ContractItem;
-}
 
 function toApiDate(value?: null | number | string) {
   return value ? formatDate(value, 'YYYY-MM-DD') : undefined;
@@ -329,7 +319,7 @@ const gridOptions: VxeGridProps<ContractApi.ContractItem> = {
         });
 
         return {
-          items: response.data ?? response.items ?? [],
+          items: response.data ?? [],
           total: response.total ?? 0,
         };
       },
@@ -400,8 +390,13 @@ async function onEdit(row: ContractApi.ContractItem) {
     return;
   }
 
-  const record = normalizeContractDetail(await getContractByIdApi(row.id));
+  const response = await getContractByIdApi(row.id);
+  if (!response.data) {
+    message.error(response.message ?? 'Không tìm thấy hợp đồng');
+    return;
+  }
 
+  const record = response.data;
   currentRecord.value = record;
   drawerApi.setData({
     contractTypeList: contractTypeList.value,

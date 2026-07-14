@@ -1,3 +1,5 @@
+import type { MResult } from '#/models/common';
+
 import { requestClient } from '#/api/request';
 
 export namespace SmsNotificationApi {
@@ -59,19 +61,15 @@ export namespace SmsNotificationApi {
     status?: number | string;
   }
 
-  export interface NotificationListResult<T = NotificationUserItem> {
-    current?: number;
-    data?: T[];
-    dataExtend?: {
-      unreadCount?: number;
-      [key: string]: unknown;
-    } | null;
-    items?: T[];
-    message?: null | string;
-    pageSize?: number;
-    success?: boolean;
-    total?: number;
+  export interface NotificationDataExtend {
+    unreadCount?: number;
+    [key: string]: unknown;
   }
+
+  export type NotificationListResult<T = NotificationUserItem> = MResult<
+    T[],
+    NotificationDataExtend
+  >;
 }
 
 export async function fetchNotificationList(params: SmsNotificationApi.NotificationListParams) {

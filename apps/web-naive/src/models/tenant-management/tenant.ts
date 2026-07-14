@@ -1,3 +1,5 @@
+import type { MResult } from '#/models/common';
+
 export namespace TenantManagementApi {
   export interface TenantProfile {
     expiresAt: null | string;
@@ -38,23 +40,12 @@ export namespace TenantManagementApi {
     tenantId: string;
   };
 
-  export interface TenantDetailResult {
-    data: TenantItem;
-    success: boolean;
-  }
+  export type TenantDetailResult = MResult<TenantItem>;
 
   export interface TenantListParams {
     current: number;
     pageSize: number;
   }
 
-  export interface TenantListResult {
-    current: number;
-    data: TenantItem[];
-    dataExtend: unknown;
-    message: null | string;
-    pageSize: number;
-    success: boolean;
-    total: number;
-  }
+  export type TenantListResult = MResult<TenantItem[]>;
 }

@@ -73,15 +73,7 @@ function formatEmployeeDateTime(value?: null | string) {
   return value ? formatDate(value, 'DD-MM-YYYY HH:mm:ss') : '-';
 }
 
-function normalizeEmployeeDetail(
-  response: EmployeeApi.EmployeeDetailResult,
-): EmployeeApi.EmployeeItem {
-  if ('data' in response && response.data) {
-    return response.data;
-  }
 
-  return response as EmployeeApi.EmployeeItem;
-}
 
 const formOptions: VbenFormProps = {
   collapsed: false,
@@ -235,9 +227,12 @@ function openCreate() {
 async function onEdit(row: EmployeeApi.EmployeeItem) {
   try {
     const response = await getEmployeeByIdApi(row.id);
-    const record = normalizeEmployeeDetail(response);
+    if (!response.data) {
+      message.error(response.message ?? 'Không tìm thấy nhân viên');
+      return;
+    }
 
-    drawerApi.setData({ record });
+    drawerApi.setData({ record: response.data });
     drawerApi.open();
   } catch {
     message.error(

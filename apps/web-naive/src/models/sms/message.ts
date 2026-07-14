@@ -1,3 +1,5 @@
+import type { MResult } from '#/models/common';
+
 export namespace SmsMessageApi {
   export interface SmsMessage {
     id: number | string;
@@ -52,16 +54,7 @@ export namespace SmsMessageApi {
     status?: boolean | number | string;
   }
 
-  export interface ListResult<T> {
-    current?: number;
-    data?: T[];
-    dataExtend?: unknown;
-    items?: T[];
-    message?: null | string;
-    pageSize?: number;
-    success?: boolean;
-    total?: number;
-  }
+  export type ListResult<T> = MResult<T[]>;
 
   export interface SendSmsPayload {
     clientId?: string;

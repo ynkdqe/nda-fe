@@ -160,12 +160,12 @@ watch(selectedProviderId, (value) => {
 
 async function loadTemplates() {
   const response = await fetchSmsTemplateList({ page: 1, pageSize: 1000 });
-  templates.value = response.data ?? response.items ?? [];
+  templates.value = response.data ?? [];
 }
 
 async function loadProviders() {
   const response = await fetchSmsProviderList({ page: 1, pageSize: 1000 });
-  providers.value = response.data ?? response.items ?? [];
+  providers.value = response.data ?? [];
 }
 
 async function loadOptions() {

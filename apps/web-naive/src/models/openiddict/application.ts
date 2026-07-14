@@ -1,3 +1,5 @@
+import type { MResult } from '#/models/common';
+
 export namespace OpenIddictApplicationApi {
   export interface ApplicationItem {
     applicationType: null | string;
@@ -45,19 +47,7 @@ export namespace OpenIddictApplicationApi {
     id?: string;
   };
 
-  export type ApplicationDetailResult =
-    | ApplicationItem
-    | {
-        data?: ApplicationItem;
-      };
+  export type ApplicationDetailResult = MResult<ApplicationItem>;
 
-  export interface ApplicationListResult {
-    current: number;
-    data: ApplicationItem[];
-    dataExtend: unknown;
-    message: null | string;
-    pageSize: number;
-    success: boolean;
-    total: number;
-  }
+  export type ApplicationListResult = MResult<ApplicationItem[]>;
 }

@@ -29,7 +29,7 @@ const providerMap = ref<Record<string, string>>({});
 const templateMap = ref<Record<string, string>>({});
 
 function normalizeList<T>(response: SmsMessageApi.ListResult<T>) {
-  return response.data ?? response.items ?? [];
+  return response.data ?? [];
 }
 
 async function loadProviders() {
@@ -189,7 +189,7 @@ const gridOptions: VxeGridProps<SmsMessageApi.SmsMessage> = {
         });
 
         return {
-          items: response.data ?? response.items ?? [],
+          items: response.data ?? [],
           total: response.total ?? 0,
         };
       },
