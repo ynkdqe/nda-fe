@@ -73,8 +73,6 @@ function formatEmployeeDateTime(value?: null | string) {
   return value ? formatDate(value, 'DD-MM-YYYY HH:mm:ss') : '-';
 }
 
-
-
 const formOptions: VbenFormProps = {
   collapsed: false,
   resetButtonOptions: { content: 'Đặt lại' },

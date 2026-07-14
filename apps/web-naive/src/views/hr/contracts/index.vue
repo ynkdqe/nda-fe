@@ -130,8 +130,6 @@ function getStatusType(status?: null | number | string) {
   return 'default';
 }
 
-
-
 function toApiDate(value?: null | number | string) {
   return value ? formatDate(value, 'YYYY-MM-DD') : undefined;
 }

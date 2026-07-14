@@ -34,8 +34,6 @@ function normalizeFormValues(formValues?: Record<string, any>) {
   };
 }
 
-
-
 const formOptions: VbenFormProps = {
   collapsed: false,
   resetButtonOptions: { content: 'Đặt lại' },

@@ -100,9 +100,7 @@ async function loadData() {
     });
 
     total.value = response.total ?? 0;
-    list.value = (response.data ?? []).map((item) =>
-      mapToUiItem(item),
-    );
+    list.value = (response.data ?? []).map((item) => mapToUiItem(item));
   } catch (error: any) {
     message.error(
       error?.message || t('page.sms.notification.personalPage.loadError'),
