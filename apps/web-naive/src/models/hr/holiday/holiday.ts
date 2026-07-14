@@ -11,9 +11,9 @@ export namespace HolidayApi {
   }
 
   export interface HolidayListParams {
+    current?: number;
     endDate?: string;
     keyword?: string;
-    page?: number;
     pageSize?: number;
     startDate?: string;
   }

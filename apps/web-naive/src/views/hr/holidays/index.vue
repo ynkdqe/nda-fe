@@ -181,7 +181,7 @@ const gridOptions: VxeGridProps<HolidayApi.HolidayItem> = {
     ajax: {
       query: async ({ page }: any, formValues: Record<string, any>) => {
         const response = await getHolidayListApi({
-          page: page.currentPage,
+          current: page.currentPage,
           pageSize: page.pageSize,
           ...normalizeFormValues(formValues),
         });
