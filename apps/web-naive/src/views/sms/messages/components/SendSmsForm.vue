@@ -38,7 +38,7 @@ const selectedTemplateId = ref<number | string>();
 const selectedProviderId = ref<number | string>();
 
 const form = reactive({
-  clientId: 'nlana',
+  clientId: 'nda',
   data: {} as Record<string, string>,
   phoneNumber: '',
   smsProviderId: undefined as number | string | undefined,

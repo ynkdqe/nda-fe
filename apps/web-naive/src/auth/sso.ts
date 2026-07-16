@@ -26,7 +26,7 @@ interface SsoTokenResponse {
 const DEFAULT_AUTHORITY = 'https://api-dev.anhnd.me/';
 const DEFAULT_CLIENT_ID = 'NDA_App';
 const DEFAULT_SCOPE =
-  'openid offline_access profile email phone address roles nlana';
+  'openid offline_access profile email phone address roles nda';
 const TRANSACTION_STORAGE_KEY = 'web-naive:sso-authorization-transaction';
 
 let discoveryPromise: null | Promise<OpenIdConfiguration> = null;
