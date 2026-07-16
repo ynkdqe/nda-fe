@@ -25,10 +25,12 @@ import {
 } from '#/api';
 import { $t } from '#/locales';
 import { DEFAULT_APP_LOGO, DEFAULT_APP_TITLE } from '#/preferences';
+import { useRealtimeStore } from '#/store/realtime';
 
 export const useAuthStore = defineStore('auth', () => {
   const accessStore = useAccessStore();
   const userStore = useUserStore();
+  const realtimeStore = useRealtimeStore();
   const router = useRouter();
 
   const loginLoading = ref(false);
@@ -183,6 +185,7 @@ export const useAuthStore = defineStore('auth', () => {
       }
     }
 
+    await realtimeStore.stop();
     removeStoredAuthTokenInfo();
     resetAllStores();
     resetTenantBranding();

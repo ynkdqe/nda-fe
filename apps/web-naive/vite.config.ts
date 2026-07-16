@@ -13,6 +13,11 @@ export default defineConfig(async () => {
             target: 'http://localhost:5320/api',
             ws: true,
           },
+          '/hub': {
+            changeOrigin: true,
+            target: 'http://localhost:5320',
+            ws: true,
+          },
         },
       },
     },

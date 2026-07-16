@@ -3,6 +3,8 @@ import type { VbenFormProps } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { IdentityUserApi } from '#/api';
 
+import type { UserFormModel } from './UserForm.vue';
+
 import { ref } from 'vue';
 
 import { Page, useVbenDrawer, useVbenModal } from '@vben/common-ui';
@@ -13,7 +15,11 @@ import { NButton, NDropdown, NTag } from 'naive-ui';
 
 import { message } from '#/adapter/naive';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { getIdentityUsers } from '#/api';
+import {
+  getIdentityUserDetail,
+  getIdentityUsers,
+  updateIdentityUser,
+} from '#/api';
 import Permission from '#/components/Permission.vue';
 
 import SetPasswordModal from './SetPasswordModal.vue';
@@ -196,9 +202,27 @@ function openCreate() {
   drawerApi.open();
 }
 
-function onEdit(row: IdentityUserApi.UserItem) {
-  drawerApi.setData({ record: row });
-  drawerApi.open();
+async function onEdit(row: IdentityUserApi.UserItem) {
+  try {
+    const response = await getIdentityUserDetail(row.id);
+    const record = response.data;
+
+    if (!response.success || !record) {
+      message.error(response.message ?? 'Không tìm thấy người dùng');
+      return;
+    }
+
+    drawerApi.setData({
+      record: {
+        ...record,
+        organizationUnits: record.organizationUnitIds ?? [],
+        roles: record.roles ?? [],
+      },
+    });
+    drawerApi.open();
+  } catch {
+    // Request errors are handled by the request interceptor.
+  }
 }
 
 function onDelete(row: IdentityUserApi.UserItem) {
@@ -243,10 +267,35 @@ function handleMenu(row: IdentityUserApi.UserItem, key: DropdownSelectKey) {
   }
 }
 
-async function onFormSubmit() {
-  message.success('Thao tác thành công');
-  drawerApi.close();
-  await gridApi.query();
+async function onFormSubmit(formData: UserFormModel) {
+  if (!formData.id) {
+    message.warning('Chưa hỗ trợ API thêm người dùng');
+    return;
+  }
+
+  drawerApi.setState({ confirmLoading: true });
+  try {
+    await updateIdentityUser(formData.id, {
+      concurrencyStamp: formData.concurrencyStamp?.trim() ?? '',
+      email: formData.email?.trim() ?? '',
+      isActive: !!formData.isActive,
+      lockoutEnabled: !!formData.lockoutEnabled,
+      name: formData.name?.trim() ?? '',
+      organizationUnitIds: formData.organizationUnits ?? [],
+      password: '',
+      phoneNumber: formData.phoneNumber?.trim() ?? '',
+      roleNames: formData.roles ?? [],
+      surname: formData.surname?.trim() ?? '',
+      userName: formData.userName?.trim() ?? '',
+    });
+    message.success('Cập nhật người dùng thành công');
+    drawerApi.close();
+    await gridApi.query();
+  } catch {
+    // Request errors are handled by the request interceptor.
+  } finally {
+    drawerApi.setState({ confirmLoading: false });
+  }
 }
 </script>
 

@@ -15,9 +15,9 @@ export namespace SmsNotificationApi {
 
   export interface NotificationItem {
     creationTime?: string;
-    creatorId?: string;
-    creatorName?: string;
-    icon?: string;
+    creatorId?: null | string;
+    creatorName?: null | string;
+    icon?: null | string;
     id?: string;
     isSystem?: boolean;
     message?: string;
@@ -25,9 +25,27 @@ export namespace SmsNotificationApi {
     senderId?: null | string;
     senderName?: null | string;
     senderUserName?: null | string;
+    status?: boolean | null | number | string;
     title?: string;
-    type?: 0 | 1;
+    type?: number;
     url?: null | string;
+  }
+
+  export interface NotificationHubItem extends NotificationItem {
+    CreationTime?: string;
+    CreatorId?: null | string;
+    CreatorName?: null | string;
+    Icon?: null | string;
+    Id?: string;
+    IsSystem?: boolean;
+    Message?: string;
+    SenderId?: null | string;
+    SenderName?: null | string;
+    SenderUserName?: null | string;
+    Status?: boolean | null | number | string;
+    Title?: string;
+    Type?: number;
+    Url?: null | string;
   }
 
   export interface NotificationUserItem {

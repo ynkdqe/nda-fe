@@ -17,7 +17,8 @@ import {
 
 import { requestClient } from '#/api/request';
 
-type UserFormModel = {
+export type UserFormModel = {
+  concurrencyStamp?: null | string;
   email?: null | string;
   id?: number | string;
   isActive?: boolean;
@@ -26,6 +27,7 @@ type UserFormModel = {
   organizationUnits?: string[];
   phoneNumber?: null | string;
   roles?: string[];
+  surname?: null | string;
   userName?: null | string;
 };
 
@@ -40,6 +42,7 @@ const emit = defineEmits<{
 const formRef = ref<FormInst | null>(null);
 
 const form = reactive<UserFormModel>({
+  concurrencyStamp: null,
   email: null,
   isActive: true,
   lockoutEnabled: false,
@@ -47,6 +50,7 @@ const form = reactive<UserFormModel>({
   organizationUnits: [],
   phoneNumber: null,
   roles: [],
+  surname: null,
   userName: null,
 });
 
@@ -89,6 +93,7 @@ const orgPageSize = 50;
 
 function resetForm() {
   Object.assign(form, {
+    concurrencyStamp: null,
     email: null,
     id: undefined,
     isActive: true,
@@ -97,6 +102,7 @@ function resetForm() {
     organizationUnits: [],
     phoneNumber: null,
     roles: [],
+    surname: null,
     userName: null,
   });
   formRef.value?.restoreValidation();
@@ -104,6 +110,7 @@ function resetForm() {
 
 function fillForm(record?: null | Partial<UserFormModel>) {
   Object.assign(form, {
+    concurrencyStamp: record?.concurrencyStamp ?? null,
     email: record?.email ?? null,
     id: record?.id,
     isActive: record?.isActive ?? true,
@@ -112,6 +119,7 @@ function fillForm(record?: null | Partial<UserFormModel>) {
     organizationUnits: record?.organizationUnits ?? [],
     phoneNumber: record?.phoneNumber ?? null,
     roles: record?.roles ?? [],
+    surname: record?.surname ?? null,
     userName: record?.userName ?? null,
   });
   formRef.value?.restoreValidation();
@@ -225,6 +233,7 @@ async function handleSubmit() {
     email: form.email?.trim() || null,
     name: form.name?.trim() || null,
     phoneNumber: form.phoneNumber?.trim() || null,
+    surname: form.surname?.trim() || null,
     userName: form.userName?.trim() || null,
   });
 }
@@ -275,8 +284,17 @@ defineExpose({ drawerApi, resetForm });
             </NFormItem>
 
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <NFormItem label="Họ tên" path="name">
-                <NInput v-model:value="form.name" placeholder="Nhập họ tên" />
+              <NFormItem label="Tên" path="name">
+                <NInput v-model:value="form.name" placeholder="Nhập tên" />
+              </NFormItem>
+              <NFormItem label="Họ" path="surname">
+                <NInput v-model:value="form.surname" placeholder="Nhập họ" />
+              </NFormItem>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <NFormItem label="Email" path="email" required>
+                <NInput v-model:value="form.email" placeholder="Nhập email" />
               </NFormItem>
               <NFormItem label="Số điện thoại" path="phoneNumber">
                 <NInput
@@ -285,10 +303,6 @@ defineExpose({ drawerApi, resetForm });
                 />
               </NFormItem>
             </div>
-
-            <NFormItem label="Email" path="email" required>
-              <NInput v-model:value="form.email" placeholder="Nhập email" />
-            </NFormItem>
 
             <div class="mt-2 flex flex-wrap items-center gap-6">
               <div class="flex items-center gap-3">

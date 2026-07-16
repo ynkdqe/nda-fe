@@ -3,6 +3,7 @@ import { requestClient } from '#/api/request';
 export namespace IdentityUserApi {
   export interface UserItem {
     accessFailedCount?: number;
+    concurrencyStamp?: null | string;
     creationTime?: null | string;
     email?: null | string;
     id: number | string;
@@ -11,8 +12,45 @@ export namespace IdentityUserApi {
     lockoutEnabled?: boolean;
     lockoutEnd?: null | string;
     name?: null | string;
+    organizationUnitIds?: string[];
     phoneNumber?: null | string;
+    roleNames?: string[];
+    surname?: null | string;
     userName?: null | string;
+  }
+
+  export interface UserDetailItem {
+    concurrencyStamp?: null | string;
+    email?: null | string;
+    id: number | string;
+    isActive?: boolean;
+    lockoutEnabled?: boolean;
+    name?: null | string;
+    organizationUnitIds?: string[];
+    phoneNumber?: null | string;
+    roles?: string[];
+    surname?: null | string;
+    userName?: null | string;
+  }
+
+  export interface UserDetailResult {
+    data?: null | UserDetailItem;
+    message?: null | string;
+    success?: boolean;
+  }
+
+  export interface UpdateUserPayload {
+    concurrencyStamp: string;
+    email: string;
+    isActive: boolean;
+    lockoutEnabled: boolean;
+    name: string;
+    organizationUnitIds: string[];
+    password: string;
+    phoneNumber: string;
+    roleNames: string[];
+    surname: string;
+    userName: string;
   }
 
   export interface UserListParams {
@@ -43,6 +81,28 @@ export async function getIdentityUsers(params: IdentityUserApi.UserListParams) {
     params,
     responseReturn: 'body',
   });
+}
+
+export async function getIdentityUserDetail(id: number | string) {
+  return requestClient.get<IdentityUserApi.UserDetailResult>(
+    `/api/identity/users/detail/${id}`,
+    {
+      responseReturn: 'body',
+    },
+  );
+}
+
+export async function updateIdentityUser(
+  id: number | string,
+  data: IdentityUserApi.UpdateUserPayload,
+) {
+  return requestClient.put<IdentityUserApi.UserItem>(
+    `/api/identity/users/update/${id}`,
+    data,
+    {
+      responseReturn: 'body',
+    },
+  );
 }
 
 export async function setIdentityUserPassword(data: IdentityUserApi.SetPasswordPayload) {

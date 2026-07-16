@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import type { NotificationItem } from '@vben/layouts';
 
-import { computed, onMounted, ref, watch } from 'vue';
+import type { SmsNotificationApi } from '#/api/sms/notification';
+
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { AuthenticationLoginExpiredModal } from '@vben/common-ui';
@@ -20,7 +22,11 @@ import { formatDate, openWindow } from '@vben/utils';
 
 import { fetchNotificationUserList, updateNotificationStatus } from '#/api';
 import { $t } from '#/locales';
-import { useAuthStore } from '#/store';
+import {
+  NOTIFICATION_REALTIME_EVENT,
+  REALTIME_MESSAGE_TYPE,
+} from '#/services/signalr';
+import { useAuthStore, useRealtimeStore } from '#/store';
 import LoginForm from '#/views/_core/authentication/login.vue';
 
 const notifications = ref<NotificationItem[]>([]);
@@ -29,24 +35,55 @@ const unreadCount = ref(0);
 const router = useRouter();
 const userStore = useUserStore();
 const authStore = useAuthStore();
+const realtimeStore = useRealtimeStore();
 const accessStore = useAccessStore();
 const { destroyWatermark, updateWatermark } = useWatermark();
 const { isDark } = usePreferences();
 const showDot = computed(() => unreadCount.value > 0);
 
-function mapNotificationItem(item: any): NotificationItem {
-  const id = item.id ?? crypto.randomUUID?.() ?? String(Math.random());
+function getHubNotificationValue<T>(
+  item: SmsNotificationApi.NotificationHubItem,
+  camelCaseKey: keyof SmsNotificationApi.NotificationItem,
+  pascalCaseKey: keyof SmsNotificationApi.NotificationHubItem,
+) {
+  return (item[camelCaseKey] ?? item[pascalCaseKey]) as T | undefined;
+}
+
+function mapNotificationItem(
+  item:
+    | SmsNotificationApi.NotificationHubItem
+    | SmsNotificationApi.NotificationUserItem,
+): NotificationItem {
+  const hubItem = item as SmsNotificationApi.NotificationHubItem;
+  const id =
+    getHubNotificationValue<string>(hubItem, 'id', 'Id') ??
+    crypto.randomUUID?.() ??
+    String(Math.random());
+  const icon = getHubNotificationValue<null | string>(hubItem, 'icon', 'Icon');
+  const creationTime = getHubNotificationValue<string>(
+    hubItem,
+    'creationTime',
+    'CreationTime',
+  );
+  const message = getHubNotificationValue<string>(hubItem, 'message', 'Message');
+  const status = getHubNotificationValue<boolean | null | number | string>(
+    hubItem,
+    'status',
+    'Status',
+  );
+  const title = getHubNotificationValue<string>(hubItem, 'title', 'Title');
+  const url = getHubNotificationValue<null | string>(hubItem, 'url', 'Url');
   return {
     id,
-    avatar: item.icon || `https://avatar.vercel.sh/${encodeURIComponent(id)}`,
-    date: item.creationTime
-      ? (formatDate(item.creationTime, 'DD-MM-YYYY HH:mm:ss') as string) || ''
+    avatar: icon || `https://avatar.vercel.sh/${encodeURIComponent(id)}`,
+    date: creationTime
+      ? (formatDate(creationTime, 'DD-MM-YYYY HH:mm:ss') as string) || ''
       : '',
-    isRead: item.status === 1,
-    link: item.url || undefined,
-    message: item.message ?? '',
+    isRead: status === true || status === 1 || status === '1',
+    link: url || undefined,
+    message: message ?? '',
     raw: item,
-    title: item.title ?? $t('page.sms.notification.personalPage.defaultTitle'),
+    title: title ?? $t('page.sms.notification.personalPage.defaultTitle'),
   };
 }
 
@@ -62,6 +99,14 @@ async function loadNotifications() {
     response.dataExtend?.unreadCount ??
     items[0]?.unreadCount ??
     notifications.value.filter((item) => !item.isRead).length;
+}
+
+async function safeLoadNotifications() {
+  try {
+    await loadNotifications();
+  } catch (error) {
+    console.error('Unable to load notifications.', error);
+  }
 }
 
 const menus = computed(() => [
@@ -179,9 +224,147 @@ function navigateTo(
   }
 }
 
+function getRealtimeNotificationId(
+  item: SmsNotificationApi.NotificationHubItem,
+) {
+  return getHubNotificationValue<string>(item, 'id', 'Id') ?? null;
+}
+
+function addRealtimeNotification(
+  item: SmsNotificationApi.NotificationHubItem,
+  incrementUnread = true,
+) {
+  const notification = mapNotificationItem(item);
+  const existingIndex = notifications.value.findIndex(
+    (currentItem) => currentItem.id === notification.id,
+  );
+
+  if (existingIndex >= 0) {
+    const existingItem = notifications.value[existingIndex];
+    if (existingItem) {
+      notification.isRead = existingItem.isRead;
+    }
+    notifications.value.splice(existingIndex, 1);
+  } else if (incrementUnread) {
+    unreadCount.value += 1;
+  }
+
+  notifications.value.unshift(notification);
+  notifications.value = notifications.value.slice(0, 10);
+}
+
+function updateRealtimeNotificationStatus(
+  item: SmsNotificationApi.NotificationHubItem,
+) {
+  const id = getRealtimeNotificationId(item);
+  if (!id) {
+    return;
+  }
+
+  const notification = notifications.value.find(
+    (currentItem) => String(currentItem.id) === id,
+  );
+  if (!notification) {
+    return;
+  }
+
+  const status = getHubNotificationValue<boolean | null | number | string>(
+    item,
+    'status',
+    'Status',
+  );
+  const isRead = status === true || status === 1 || status === '1';
+
+  if (notification.isRead === isRead) {
+    return;
+  }
+
+  notification.isRead = isRead;
+  unreadCount.value = Math.max(0, unreadCount.value + (isRead ? -1 : 1));
+}
+
+function deleteRealtimeNotification(
+  item: SmsNotificationApi.NotificationHubItem,
+) {
+  const id = getRealtimeNotificationId(item);
+  if (!id) {
+    return;
+  }
+
+  const existingItem = notifications.value.find(
+    (notification) => String(notification.id) === id,
+  );
+  notifications.value = notifications.value.filter(
+    (notification) => String(notification.id) !== id,
+  );
+
+  if (existingItem && !existingItem.isRead) {
+    unreadCount.value = Math.max(0, unreadCount.value - 1);
+  }
+}
+
 onMounted(() => {
-  loadNotifications();
+  void safeLoadNotifications();
+  void realtimeStore.start().catch((error) => {
+    console.error('Unable to start realtime connection.', error);
+  });
 });
+
+onBeforeUnmount(() => {
+  void realtimeStore.stop().catch((error) => {
+    console.error('Unable to stop realtime connection.', error);
+  });
+});
+
+watch(
+  () => realtimeStore.revisions[REALTIME_MESSAGE_TYPE.NOTIFICATION] ?? 0,
+  (revision, previousRevision) => {
+    if (revision <= previousRevision) {
+      return;
+    }
+
+    const realtimeEvent = realtimeStore.latestEvent;
+    if (
+      !realtimeEvent ||
+      realtimeEvent.type !== REALTIME_MESSAGE_TYPE.NOTIFICATION
+    ) {
+      return;
+    }
+
+    const action = realtimeEvent.event;
+    const notification = realtimeEvent.data as
+      | SmsNotificationApi.NotificationHubItem
+      | null;
+
+    if (notification === null || notification === undefined) {
+      return;
+    }
+
+    switch (action) {
+      case NOTIFICATION_REALTIME_EVENT.DELETED: {
+        deleteRealtimeNotification(notification);
+        break;
+      }
+      case NOTIFICATION_REALTIME_EVENT.NEW: {
+        addRealtimeNotification(notification);
+        break;
+      }
+      case NOTIFICATION_REALTIME_EVENT.STATUS: {
+        updateRealtimeNotificationStatus(notification);
+        break;
+      }
+    }
+  },
+);
+
+watch(
+  () => realtimeStore.status,
+  (status, previousStatus) => {
+    if (status === 'connected' && previousStatus === 'reconnecting') {
+      void safeLoadNotifications();
+    }
+  },
+);
 
 watch(
   () => ({
