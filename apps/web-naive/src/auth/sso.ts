@@ -1,5 +1,7 @@
 import type { AuthTokenInfo } from '#/api/core/token';
 
+import { useAppConfig } from '@vben/hooks';
+
 export interface OpenIdConfiguration {
   authorization_endpoint: string;
   end_session_endpoint?: string;
@@ -23,7 +25,6 @@ interface SsoTokenResponse {
   token_type: string;
 }
 
-const DEFAULT_AUTHORITY = 'https://api-dev.anhnd.me/';
 const DEFAULT_CLIENT_ID = 'NDA_App';
 const DEFAULT_SCOPE =
   'openid offline_access profile email phone address roles nda';
@@ -36,10 +37,8 @@ export function isSsoAuthMode() {
 }
 
 function getAuthority() {
-  return (import.meta.env.VITE_SSO_AUTHORITY || DEFAULT_AUTHORITY).replace(
-    /\/?$/,
-    '/',
-  );
+  const { apiURL } = useAppConfig(import.meta.env, import.meta.env.PROD);
+  return (import.meta.env.VITE_SSO_AUTHORITY || apiURL).replace(/\/?$/, '/');
 }
 
 function getClientId() {
