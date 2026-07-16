@@ -13,7 +13,7 @@ pipeline {
 
   environment {
     IMAGE_NAME = 'nda-fe-web-naive'
-    KUBE_APP_NAME = 'nda-fe-web-naive'
+    KUBE_APP_NAME = 'nda-fe'
     KUBE_CONTAINER_PORT = '8080'
     KUBE_SERVICE_PORT = '80'
     KUBE_IMAGE_PULL_SECRET = 'github-registry-secret'
@@ -47,7 +47,7 @@ pipeline {
 
           if (branch == 'dev') {
             env.APP_ENV = 'development'
-            env.KUBE_NAMESPACE = 'nda-dev'
+            env.KUBE_NAMESPACE = 'nda-fe-dev'
             env.DOCKERFILE = 'scripts/deploy/Dockerfile.Development'
             env.IMAGE_TAG = "dev-${env.BUILD_NUMBER}"
             env.LATEST_TAG = 'dev-latest'
@@ -55,7 +55,7 @@ pipeline {
             env.TLS_SECRET_NAME = 'admin-dev-anhnd-me-tls'
           } else if (branch == 'main') {
             env.APP_ENV = 'production'
-            env.KUBE_NAMESPACE = 'nda-prod'
+            env.KUBE_NAMESPACE = 'nda-fe-prod'
             env.DOCKERFILE = 'scripts/deploy/Dockerfile.Production'
             env.IMAGE_TAG = "prod-${env.BUILD_NUMBER}"
             env.LATEST_TAG = 'prod-latest'
