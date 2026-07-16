@@ -18,6 +18,10 @@ pipeline {
     KUBE_SERVICE_PORT = '80'
     KUBE_IMAGE_PULL_SECRET = 'github-registry-secret'
     CERT_MANAGER_CLUSTER_ISSUER = 'letsencrypt-prod'
+    DOCKER_BUILDKIT = '1'
+    BUILDKIT_PROGRESS = 'plain'
+    BUILDX_BUILDER = 'nda-fe-builder'
+    DOCKER_PLATFORM = 'linux/arm64'
     K3S_HOST = credentials('ampere-mrdua9x-ip')
     REGISTRY_URL = credentials('docker-registry-personal-url')
     REGISTRY_USER = credentials('docker-registry-user')
@@ -76,12 +80,16 @@ pipeline {
           echo "Dockerfile: ${env.DOCKERFILE}"
           echo "Ingress host: ${env.INGRESS_HOST}"
           echo "TLS secret: ${env.TLS_SECRET_NAME}"
+          env.BUILDX_CACHE_REF = "${env.REGISTRY_IMAGE}:${env.LATEST_TAG}-buildcache"
+
           echo "Image tag: ${env.REGISTRY_IMAGE}:${env.IMAGE_TAG}"
+          echo "Buildx cache: ${env.BUILDX_CACHE_REF}"
+          echo "Docker platform: ${env.DOCKER_PLATFORM}"
         }
       }
     }
 
-    stage('Build Docker image') {
+    stage('Build and push Docker image') {
       when {
         anyOf {
           branch 'dev'
@@ -93,43 +101,26 @@ pipeline {
         sh '''
           set -eu
 
-          echo "Login to Docker Registry for cache pull..."
-          echo "$REGISTRY_PASS" | docker login "$REGISTRY_URL_NORMALIZED" -u "$REGISTRY_USER" --password-stdin
-
-          CACHE_FROM=""
-          if docker pull "$REGISTRY_IMAGE:$LATEST_TAG"; then
-            CACHE_FROM="--cache-from $REGISTRY_IMAGE:$LATEST_TAG"
-            echo "Using registry Docker cache from $REGISTRY_IMAGE:$LATEST_TAG"
-          else
-            echo "No registry Docker cache found for $REGISTRY_IMAGE:$LATEST_TAG"
-          fi
-
-          docker build \
-            $CACHE_FROM \
-            --build-arg BUILD_MODE="$APP_ENV" \
-            -f "$DOCKERFILE" \
-            -t "$REGISTRY_IMAGE:$IMAGE_TAG" \
-            -t "$REGISTRY_IMAGE:$LATEST_TAG" \
-            .
-        '''
-      }
-    }
-
-    stage('Push Docker image') {
-      when {
-        anyOf {
-          branch 'dev'
-          branch 'main'
-          expression { env.GIT_BRANCH == 'origin/dev' || env.GIT_BRANCH == 'origin/main' }
-        }
-      }
-      steps {
-        sh '''
           echo "Login to Docker Registry..."
           echo "$REGISTRY_PASS" | docker login "$REGISTRY_URL_NORMALIZED" -u "$REGISTRY_USER" --password-stdin
 
-          docker push "$REGISTRY_IMAGE:$IMAGE_TAG"
-          docker push "$REGISTRY_IMAGE:$LATEST_TAG"
+          if ! docker buildx inspect "$BUILDX_BUILDER" >/dev/null 2>&1; then
+            docker buildx create --name "$BUILDX_BUILDER" --driver docker-container --use
+          else
+            docker buildx use "$BUILDX_BUILDER"
+          fi
+          docker buildx inspect --bootstrap
+
+          docker buildx build \
+            --platform "$DOCKER_PLATFORM" \
+            --build-arg BUILD_MODE="$APP_ENV" \
+            --cache-from "type=registry,ref=$BUILDX_CACHE_REF" \
+            --cache-to "type=registry,ref=$BUILDX_CACHE_REF,mode=max" \
+            -f "$DOCKERFILE" \
+            -t "$REGISTRY_IMAGE:$IMAGE_TAG" \
+            -t "$REGISTRY_IMAGE:$LATEST_TAG" \
+            --push \
+            .
 
           docker logout "$REGISTRY_URL_NORMALIZED"
         '''
