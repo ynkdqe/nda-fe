@@ -47,7 +47,11 @@ function getClientId() {
 }
 
 function getScope() {
-  return import.meta.env.VITE_SSO_SCOPE || DEFAULT_SCOPE;
+  return (
+    import.meta.env.VITE_SSO_SCOPE ||
+    import.meta.env.VITE_APP_SCOPE ||
+    DEFAULT_SCOPE
+  );
 }
 
 function getRedirectUri() {
