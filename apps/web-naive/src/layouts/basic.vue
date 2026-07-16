@@ -65,7 +65,11 @@ function mapNotificationItem(
     'creationTime',
     'CreationTime',
   );
-  const message = getHubNotificationValue<string>(hubItem, 'message', 'Message');
+  const message = getHubNotificationValue<string>(
+    hubItem,
+    'message',
+    'Message',
+  );
   const status = getHubNotificationValue<boolean | null | number | string>(
     hubItem,
     'status',
@@ -332,9 +336,8 @@ watch(
     }
 
     const action = realtimeEvent.event;
-    const notification = realtimeEvent.data as
-      | SmsNotificationApi.NotificationHubItem
-      | null;
+    const notification =
+      realtimeEvent.data as SmsNotificationApi.NotificationHubItem | null;
 
     if (notification === null || notification === undefined) {
       return;
