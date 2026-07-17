@@ -39,9 +39,8 @@ type GridPage = {
 
 const DEFAULT_PAGE_SIZE = 20;
 const showUriDetailsModal = ref(false);
-const selectedApplication = ref<
-  null | OpenIddictApplicationApi.ApplicationItem
->(null);
+const selectedApplication =
+  ref<null | OpenIddictApplicationApi.ApplicationItem>(null);
 
 function formatNullableDate(value?: null | string) {
   return value ? formatDateTime(value) : '-';
@@ -169,9 +168,7 @@ function handleAdd() {
   drawerApi.open();
 }
 
-function handleViewUriDetails(
-  row: OpenIddictApplicationApi.ApplicationItem,
-) {
+function handleViewUriDetails(row: OpenIddictApplicationApi.ApplicationItem) {
   selectedApplication.value = row;
   showUriDetailsModal.value = true;
 }
@@ -344,11 +341,7 @@ async function handleSubmit(
 
           <section>
             <h3 class="mb-2 font-semibold">
-              {{
-                $t(
-                  'page.system.authenticationPage.postLogoutRedirectUris',
-                )
-              }}
+              {{ $t('page.system.authenticationPage.postLogoutRedirectUris') }}
             </h3>
             <ul
               v-if="selectedApplication?.postLogoutRedirectUris?.length"
