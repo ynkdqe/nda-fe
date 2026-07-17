@@ -16,10 +16,7 @@ import {
   NSelect,
 } from 'naive-ui';
 
-import {
-  TenantStatus,
-  TenantSubscription,
-} from '#/models/tenant-management';
+import { TenantStatus, TenantSubscription } from '#/models/tenant-management';
 
 const emit = defineEmits<{
   submit: [data: TenantManagementApi.UpdateTenantProfilePayload];

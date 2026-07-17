@@ -20,9 +20,7 @@ const props = withDefaults(defineProps<Props>(), {
 const keyword = ref('');
 
 const normalizedItems = computed(() => [
-  ...new Set(
-    (props.items ?? []).map((item) => item.trim()).filter(Boolean),
-  ),
+  ...new Set((props.items ?? []).map((item) => item.trim()).filter(Boolean)),
 ]);
 
 const visibleItems = computed(() =>
@@ -70,12 +68,7 @@ function handlePopoverVisibility(show: boolean) {
       @update:show="handlePopoverVisibility"
     >
       <template #trigger>
-        <NTag
-          :bordered="false"
-          class="cursor-pointer"
-          size="small"
-          type="info"
-        >
+        <NTag :bordered="false" class="cursor-pointer" size="small" type="info">
           +{{ remainingCount }}
         </NTag>
       </template>
@@ -89,7 +82,10 @@ function handlePopoverVisibility(show: boolean) {
         />
 
         <NScrollbar class="max-h-64">
-          <div v-if="filteredItems.length > 0" class="flex flex-wrap gap-2 pr-2">
+          <div
+            v-if="filteredItems.length > 0"
+            class="flex flex-wrap gap-2 pr-2"
+          >
             <NTag
               v-for="item in filteredItems"
               :key="item"

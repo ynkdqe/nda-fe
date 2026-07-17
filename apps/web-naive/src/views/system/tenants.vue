@@ -24,10 +24,7 @@ import {
   updateTenantProfileApi,
 } from '#/api';
 import { $t } from '#/locales';
-import {
-  TenantStatus,
-  TenantSubscription,
-} from '#/models/tenant-management';
+import { TenantStatus, TenantSubscription } from '#/models/tenant-management';
 
 import TenantProfileForm from './TenantProfileForm.vue';
 
@@ -108,7 +105,7 @@ const gridOptions: VxeGridProps<TenantManagementApi.TenantItem> = {
       title: '#',
       type: 'seq',
       width: 60,
-      fixed: 'left'
+      fixed: 'left',
     },
     {
       field: 'name',
@@ -345,7 +342,10 @@ async function handleSubmit(
 
       <template #subscriptionCell="{ row }">
         <NTag
-          v-if="row.profile?.subscription !== null && row.profile?.subscription !== undefined"
+          v-if="
+            row.profile?.subscription !== null &&
+            row.profile?.subscription !== undefined
+          "
           :bordered="false"
           size="small"
           :type="getTenantSubscriptionMeta(row.profile.subscription)?.type"
@@ -357,7 +357,9 @@ async function handleSubmit(
 
       <template #statusCell="{ row }">
         <NTag
-          v-if="row.profile?.status !== null && row.profile?.status !== undefined"
+          v-if="
+            row.profile?.status !== null && row.profile?.status !== undefined
+          "
           :bordered="false"
           size="small"
           :type="getTenantStatusMeta(row.profile.status)?.type"
