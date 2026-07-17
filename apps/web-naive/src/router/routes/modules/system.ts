@@ -32,7 +32,7 @@ const routes: RouteRecordRaw[] = [
       },
       {
         name: 'SystemAuthentication',
-        path: '/system/authentication',
+        path: '/system/oidc',
         component: () => import('#/views/system/authentication.vue'),
         meta: {
           icon: 'lucide:key-round',

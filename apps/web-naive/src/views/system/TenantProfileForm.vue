@@ -16,6 +16,11 @@ import {
   NSelect,
 } from 'naive-ui';
 
+import {
+  TenantStatus,
+  TenantSubscription,
+} from '#/models/tenant-management';
+
 const emit = defineEmits<{
   submit: [data: TenantManagementApi.UpdateTenantProfilePayload];
 }>();
@@ -26,14 +31,17 @@ type TenantProfileFormModel = {
   lockedEnd: null | number;
   logoUrl: string;
   name: string;
-  status: null | number;
-  subscription: null | number;
+  status: null | TenantStatus;
+  subscription: null | TenantSubscription;
   url: string;
 };
 
 const statusOptions: SelectOption[] = [
-  { label: '0', value: 0 },
-  { label: '1', value: 1 },
+  { label: '0', value: TenantStatus.Inactive },
+  { label: '1', value: TenantStatus.Active },
+  { label: '2', value: TenantStatus.Suspended },
+  { label: '3', value: TenantStatus.Expired },
+  { label: '4', value: TenantStatus.Locked },
 ];
 
 const formRef = ref<FormInst | null>(null);

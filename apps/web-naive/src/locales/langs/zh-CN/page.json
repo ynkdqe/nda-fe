@@ -493,6 +493,8 @@
       "description": "租户及其订阅资料列表。",
       "actions": "操作",
       "edit": "编辑",
+      "copyId": "复制租户 ID",
+      "copyIdSuccess": "租户 ID 已复制",
       "delete": "删除",
       "cancel": "取消",
       "deleteConfirm": "确定要删除租户 {0} 吗？",
@@ -502,7 +504,20 @@
       "id": "租户 ID",
       "url": "系统地址",
       "subscription": "订阅",
+      "subscriptions": {
+        "trial": "试用版",
+        "basic": "基础版",
+        "professional": "专业版",
+        "enterprise": "企业版"
+      },
       "status": "状态",
+      "statuses": {
+        "inactive": "未启用",
+        "active": "启用",
+        "suspended": "已暂停",
+        "expired": "已过期",
+        "locked": "已锁定"
+      },
       "expiresAt": "到期时间",
       "lockedEnd": "锁定至",
       "creationTime": "创建时间",

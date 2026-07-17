@@ -17,6 +17,7 @@ import {
   getOpenIddictApplicationsApi,
   updateOpenIddictApplicationApi,
 } from '#/api';
+import SearchableTagList from '#/components/SearchableTagList.vue';
 import { $t } from '#/locales';
 
 import OpenIddictApplicationForm from './OpenIddictApplicationForm.vue';
@@ -91,7 +92,7 @@ const gridOptions: VxeGridProps<OpenIddictApplicationApi.ApplicationItem> = {
     },
     {
       field: 'grantTypes',
-      minWidth: 240,
+      minWidth: 300,
       slots: { default: 'grantTypesCell' },
       title: $t('page.system.authenticationPage.grantTypes'),
     },
@@ -309,32 +310,15 @@ async function handleSubmit(
       </template>
 
       <template #grantTypesCell="{ row }">
-        <div v-if="row.grantTypes?.length" class="flex flex-wrap gap-1 py-1">
-          <NTag
-            v-for="grantType in row.grantTypes"
-            :key="grantType"
-            :bordered="false"
-            size="small"
-            type="primary"
-          >
-            {{ grantType }}
-          </NTag>
-        </div>
-        <span v-else>-</span>
+        <SearchableTagList
+          :items="row.grantTypes"
+          :max-visible="2"
+          tag-type="primary"
+        />
       </template>
 
       <template #scopesCell="{ row }">
-        <div v-if="row.scopes?.length" class="flex flex-wrap gap-1 py-1">
-          <NTag
-            v-for="scope in row.scopes"
-            :key="scope"
-            :bordered="false"
-            size="small"
-          >
-            {{ scope }}
-          </NTag>
-        </div>
-        <span v-else>-</span>
+        <SearchableTagList :items="row.scopes" :max-visible="4" />
       </template>
     </Grid>
 

@@ -493,6 +493,8 @@
       "description": "Tenants and their subscription profiles.",
       "actions": "Actions",
       "edit": "Edit",
+      "copyId": "Copy tenant ID",
+      "copyIdSuccess": "Tenant ID copied",
       "delete": "Delete",
       "cancel": "Cancel",
       "deleteConfirm": "Are you sure you want to delete tenant {0}?",
@@ -502,7 +504,20 @@
       "id": "Tenant ID",
       "url": "System URL",
       "subscription": "Subscription",
+      "subscriptions": {
+        "trial": "Trial",
+        "basic": "Basic",
+        "professional": "Professional",
+        "enterprise": "Enterprise"
+      },
       "status": "Status",
+      "statuses": {
+        "inactive": "Inactive",
+        "active": "Active",
+        "suspended": "Suspended",
+        "expired": "Expired",
+        "locked": "Locked"
+      },
       "expiresAt": "Expires At",
       "lockedEnd": "Locked Until",
       "creationTime": "Created At",

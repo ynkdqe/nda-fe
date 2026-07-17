@@ -493,6 +493,8 @@
       "description": "Danh sách người thuê và thông tin hồ sơ đăng ký.",
       "actions": "Hành động",
       "edit": "Sửa",
+      "copyId": "Sao chép ID người thuê",
+      "copyIdSuccess": "Đã sao chép ID người thuê",
       "delete": "Xóa",
       "cancel": "Hủy",
       "deleteConfirm": "Bạn có chắc muốn xóa người thuê {0} không?",
@@ -502,7 +504,20 @@
       "id": "ID người thuê",
       "url": "Địa chỉ hệ thống",
       "subscription": "Gói đăng ký",
+      "subscriptions": {
+        "trial": "Dùng thử",
+        "basic": "Cơ bản",
+        "professional": "Chuyên nghiệp",
+        "enterprise": "Doanh nghiệp"
+      },
       "status": "Trạng thái",
+      "statuses": {
+        "inactive": "Không hoạt động",
+        "active": "Đang hoạt động",
+        "suspended": "Tạm ngưng",
+        "expired": "Đã hết hạn",
+        "locked": "Đã khóa"
+      },
       "expiresAt": "Ngày hết hạn",
       "lockedEnd": "Khóa đến",
       "creationTime": "Ngày tạo",

@@ -24,6 +24,10 @@ import {
   updateTenantProfileApi,
 } from '#/api';
 import { $t } from '#/locales';
+import {
+  TenantStatus,
+  TenantSubscription,
+} from '#/models/tenant-management';
 
 import TenantProfileForm from './TenantProfileForm.vue';
 
@@ -38,6 +42,50 @@ function formatNullableDate(value?: null | string) {
   return value ? formatDateTime(value) : '-';
 }
 
+const tenantStatusMeta = {
+  [TenantStatus.Inactive]: { key: 'inactive', type: 'default' },
+  [TenantStatus.Active]: { key: 'active', type: 'success' },
+  [TenantStatus.Suspended]: { key: 'suspended', type: 'warning' },
+  [TenantStatus.Expired]: { key: 'expired', type: 'error' },
+  [TenantStatus.Locked]: { key: 'locked', type: 'error' },
+} as const;
+
+const tenantSubscriptionMeta = {
+  [TenantSubscription.Trial]: { key: 'trial', type: 'default' },
+  [TenantSubscription.Basic]: { key: 'basic', type: 'info' },
+  [TenantSubscription.Professional]: {
+    key: 'professional',
+    type: 'success',
+  },
+  [TenantSubscription.Enterprise]: { key: 'enterprise', type: 'warning' },
+} as const;
+
+function getTenantStatusMeta(status?: null | number) {
+  return status === null || status === undefined
+    ? null
+    : tenantStatusMeta[status as TenantStatus];
+}
+
+function getTenantStatusLabel(status?: null | number) {
+  const meta = getTenantStatusMeta(status);
+  return meta
+    ? $t(`page.system.tenantsPage.statuses.${meta.key}`)
+    : (status?.toString() ?? '-');
+}
+
+function getTenantSubscriptionMeta(subscription?: null | number) {
+  return subscription === null || subscription === undefined
+    ? null
+    : tenantSubscriptionMeta[subscription as TenantSubscription];
+}
+
+function getTenantSubscriptionLabel(subscription?: null | number) {
+  const meta = getTenantSubscriptionMeta(subscription);
+  return meta
+    ? $t(`page.system.tenantsPage.subscriptions.${meta.key}`)
+    : (subscription?.toString() ?? '-');
+}
+
 const gridOptions: VxeGridProps<TenantManagementApi.TenantItem> = {
   border: 'full',
   columns: [
@@ -46,13 +94,7 @@ const gridOptions: VxeGridProps<TenantManagementApi.TenantItem> = {
       fixed: 'left',
       slots: { default: 'actions' },
       title: $t('page.system.tenantsPage.actions'),
-      width: 110,
-    },
-    {
-      align: 'center',
-      title: '#',
-      type: 'seq',
-      width: 60,
+      width: 150,
     },
     {
       align: 'center',
@@ -62,15 +104,17 @@ const gridOptions: VxeGridProps<TenantManagementApi.TenantItem> = {
       width: 90,
     },
     {
+      align: 'center',
+      title: '#',
+      type: 'seq',
+      width: 60,
+      fixed: 'left'
+    },
+    {
       field: 'name',
       fixed: 'left',
       minWidth: 180,
       title: $t('page.system.tenantsPage.name'),
-    },
-    {
-      field: 'id',
-      minWidth: 280,
-      title: $t('page.system.tenantsPage.id'),
     },
     {
       field: 'profile.url',
@@ -170,6 +214,23 @@ async function handleEdit(row: TenantManagementApi.TenantItem) {
   drawerApi.open();
 }
 
+async function copyTenantId(tenantId: string) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(tenantId);
+  } else {
+    const textarea = document.createElement('textarea');
+    textarea.value = tenantId;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.append(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    textarea.remove();
+  }
+
+  message.success($t('page.system.tenantsPage.copyIdSuccess'));
+}
+
 async function handleDelete(row: TenantManagementApi.TenantItem) {
   await deleteTenantApi(row.id);
   message.success($t('page.system.tenantsPage.deleteSuccess'));
@@ -212,6 +273,23 @@ async function handleSubmit(
             {{ $t('page.system.tenantsPage.edit') }}
           </NTooltip>
 
+          <NTooltip trigger="hover">
+            <template #trigger>
+              <NButton
+                circle
+                quaternary
+                size="small"
+                type="info"
+                @click="copyTenantId(row.id)"
+              >
+                <template #icon>
+                  <IconifyIcon class="size-4" icon="lucide:copy" />
+                </template>
+              </NButton>
+            </template>
+            {{ $t('page.system.tenantsPage.copyId') }}
+          </NTooltip>
+
           <NPopconfirm
             :negative-text="$t('page.system.tenantsPage.cancel')"
             :positive-text="$t('page.system.tenantsPage.delete')"
@@ -236,14 +314,17 @@ async function handleSubmit(
 
       <template #logoCell="{ row }">
         <NAvatar
-          :fallback-src="undefined"
-          :src="row.profile?.logoUrl || undefined"
-          :style="{
-            backgroundColor: row.profile?.logoUrl ? undefined : '#18a058',
-          }"
+          v-if="row.profile?.logoUrl"
+          :src="row.profile.logoUrl"
           object-fit="contain"
           round
           size="medium"
+        />
+        <NAvatar
+          v-else
+          round
+          size="medium"
+          :style="{ backgroundColor: '#18a058' }"
         >
           {{ row.name?.charAt(0)?.toUpperCase() || 'T' }}
         </NAvatar>
@@ -263,20 +344,25 @@ async function handleSubmit(
       </template>
 
       <template #subscriptionCell="{ row }">
-        <NTag v-if="row.profile" :bordered="false" size="small" type="info">
-          {{ row.profile.subscription ?? '-' }}
+        <NTag
+          v-if="row.profile?.subscription !== null && row.profile?.subscription !== undefined"
+          :bordered="false"
+          size="small"
+          :type="getTenantSubscriptionMeta(row.profile.subscription)?.type"
+        >
+          {{ getTenantSubscriptionLabel(row.profile.subscription) }}
         </NTag>
         <span v-else>-</span>
       </template>
 
       <template #statusCell="{ row }">
         <NTag
-          v-if="row.profile"
+          v-if="row.profile?.status !== null && row.profile?.status !== undefined"
           :bordered="false"
           size="small"
-          :type="row.profile.status === 1 ? 'success' : 'default'"
+          :type="getTenantStatusMeta(row.profile.status)?.type"
         >
-          {{ row.profile.status ?? '-' }}
+          {{ getTenantStatusLabel(row.profile.status) }}
         </NTag>
         <span v-else>-</span>
       </template>
