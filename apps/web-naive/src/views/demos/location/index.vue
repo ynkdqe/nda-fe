@@ -96,7 +96,9 @@ const validationMessage = ref('');
 const validationResult = ref<LocationApi.ValidationResult | null>(null);
 
 function isValidLatitude(value: null | number): value is number {
-  return value !== null && Number.isFinite(value) && value >= -90 && value <= 90;
+  return (
+    value !== null && Number.isFinite(value) && value >= -90 && value <= 90
+  );
 }
 
 function isValidLongitude(value: null | number): value is number {
@@ -105,7 +107,10 @@ function isValidLongitude(value: null | number): value is number {
   );
 }
 
-function validateCoordinates(latitude: null | number, longitude: null | number) {
+function validateCoordinates(
+  latitude: null | number,
+  longitude: null | number,
+) {
   if (latitude === null || longitude === null) {
     return $t('demos.location.validation.requiredCoordinates');
   }
