@@ -2,11 +2,21 @@
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { OpenIddictApplicationApi } from '#/models/openiddict';
 
+import { ref } from 'vue';
+
 import { Page, useVbenDrawer } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
 import { formatDateTime } from '@vben/utils';
 
-import { NButton, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui';
+import {
+  NButton,
+  NModal,
+  NPopconfirm,
+  NScrollbar,
+  NSpace,
+  NTag,
+  NTooltip,
+} from 'naive-ui';
 
 import { message } from '#/adapter/naive';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
@@ -28,6 +38,10 @@ type GridPage = {
 };
 
 const DEFAULT_PAGE_SIZE = 20;
+const showUriDetailsModal = ref(false);
+const selectedApplication = ref<
+  null | OpenIddictApplicationApi.ApplicationItem
+>(null);
 
 function formatNullableDate(value?: null | string) {
   return value ? formatDateTime(value) : '-';
@@ -79,16 +93,10 @@ const gridOptions: VxeGridProps<OpenIddictApplicationApi.ApplicationItem> = {
       width: 140,
     },
     {
-      field: 'redirectUris',
-      minWidth: 280,
-      slots: { default: 'redirectUrisCell' },
-      title: $t('page.system.authenticationPage.redirectUris'),
-    },
-    {
-      field: 'postLogoutRedirectUris',
-      minWidth: 280,
-      slots: { default: 'postLogoutRedirectUrisCell' },
-      title: $t('page.system.authenticationPage.postLogoutRedirectUris'),
+      align: 'center',
+      slots: { default: 'uriDetailsCell' },
+      title: $t('page.system.authenticationPage.details'),
+      width: 130,
     },
     {
       field: 'grantTypes',
@@ -159,6 +167,13 @@ const [Drawer, drawerApi] = useVbenDrawer({
 function handleAdd() {
   drawerApi.setData({ record: null });
   drawerApi.open();
+}
+
+function handleViewUriDetails(
+  row: OpenIddictApplicationApi.ApplicationItem,
+) {
+  selectedApplication.value = row;
+  showUriDetailsModal.value = true;
 }
 
 async function handleEdit(row: OpenIddictApplicationApi.ApplicationItem) {
@@ -277,36 +292,10 @@ async function handleSubmit(
         </NTag>
       </template>
 
-      <template #redirectUrisCell="{ row }">
-        <ul
-          v-if="row.redirectUris?.length"
-          class="list-disc space-y-1 py-1 pl-4"
-        >
-          <li
-            v-for="uri in row.redirectUris"
-            :key="uri"
-            class="break-all text-xs"
-          >
-            {{ uri }}
-          </li>
-        </ul>
-        <span v-else>-</span>
-      </template>
-
-      <template #postLogoutRedirectUrisCell="{ row }">
-        <ul
-          v-if="row.postLogoutRedirectUris?.length"
-          class="list-disc space-y-1 py-1 pl-4"
-        >
-          <li
-            v-for="uri in row.postLogoutRedirectUris"
-            :key="uri"
-            class="break-all text-xs"
-          >
-            {{ uri }}
-          </li>
-        </ul>
-        <span v-else>-</span>
+      <template #uriDetailsCell="{ row }">
+        <NButton text type="primary" @click="handleViewUriDetails(row)">
+          {{ $t('page.system.authenticationPage.viewDetails') }}
+        </NButton>
       </template>
 
       <template #grantTypesCell="{ row }">
@@ -323,5 +312,62 @@ async function handleSubmit(
     </Grid>
 
     <Drawer @submit="handleSubmit" />
+
+    <NModal
+      v-model:show="showUriDetailsModal"
+      preset="card"
+      :title="$t('page.system.authenticationPage.uriDetailsTitle')"
+      class="max-w-[760px]"
+    >
+      <NScrollbar class="max-h-[70vh] pr-2">
+        <NSpace vertical :size="20">
+          <section>
+            <h3 class="mb-2 font-semibold">
+              {{ $t('page.system.authenticationPage.redirectUris') }}
+            </h3>
+            <ul
+              v-if="selectedApplication?.redirectUris?.length"
+              class="list-disc space-y-2 pl-5"
+            >
+              <li
+                v-for="uri in selectedApplication.redirectUris"
+                :key="uri"
+                class="break-all"
+              >
+                {{ uri }}
+              </li>
+            </ul>
+            <span v-else class="text-muted-foreground">
+              {{ $t('page.system.authenticationPage.emptyUris') }}
+            </span>
+          </section>
+
+          <section>
+            <h3 class="mb-2 font-semibold">
+              {{
+                $t(
+                  'page.system.authenticationPage.postLogoutRedirectUris',
+                )
+              }}
+            </h3>
+            <ul
+              v-if="selectedApplication?.postLogoutRedirectUris?.length"
+              class="list-disc space-y-2 pl-5"
+            >
+              <li
+                v-for="uri in selectedApplication.postLogoutRedirectUris"
+                :key="uri"
+                class="break-all"
+              >
+                {{ uri }}
+              </li>
+            </ul>
+            <span v-else class="text-muted-foreground">
+              {{ $t('page.system.authenticationPage.emptyUris') }}
+            </span>
+          </section>
+        </NSpace>
+      </NScrollbar>
+    </NModal>
   </Page>
 </template>
