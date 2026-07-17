@@ -3,14 +3,62 @@
   "naive": "Naive UI",
   "table": "Table",
   "form": "表单",
+  "location": {
+    "title": "位置",
+    "description": "验证坐标并判断目标位置是否在允许距离内。",
+    "tabs": {
+      "coordinates": "通过经纬度获取位置",
+      "distance": "根据默认经纬度验证位置"
+    },
+    "latitude": "纬度 (Lat)",
+    "longitude": "经度 (Long)",
+    "vendor": "地图服务商",
+    "defaultLocation": "默认位置",
+    "targetLocation": "待检查位置",
+    "allowedDistance": "允许距离",
+    "check": "获取地址",
+    "submit": "检查",
+    "openMap": "打开地图",
+    "placeholders": {
+      "vendor": "选择地图服务商",
+      "latitude": "输入 -90 到 90 之间的纬度",
+      "longitude": "输入 -180 到 180 之间的经度",
+      "allowedDistance": "输入距离（米）"
+    },
+    "validation": {
+      "requiredCoordinates": "请输入完整的纬度和经度。",
+      "invalidLatitude": "纬度必须在 -90 到 90 之间。",
+      "invalidLongitude": "经度必须在 -180 到 180 之间。",
+      "invalidDistance": "允许距离必须大于或等于 0。"
+    },
+    "table": {
+      "address": "地址",
+      "latitude": "纬度",
+      "longitude": "经度"
+    },
+    "errors": {
+      "requestFailed": "无法获取位置数据。",
+      "validationFailed": "无法验证位置。"
+    },
+    "result": {
+      "validCoordinates": "坐标有效",
+      "invalidCoordinates": "坐标无效",
+      "validLocation": "位置有效",
+      "invalidLocation": "位置超出允许范围",
+      "invalidData": "数据无效",
+      "calculatedDistance": "计算距离",
+      "defaultLatitude": "默认纬度",
+      "defaultLongitude": "默认经度",
+      "targetLatitude": "目标纬度",
+      "targetLongitude": "目标经度",
+      "isValid": "有效",
+      "yes": "是",
+      "no": "否"
+    }
+  },
   "vben": {
     "title": "项目",
     "about": "关于",
-    "document": "文档",
-    "antdv": "Ant Design Vue 版本",
-    "antdv-next": "Antdv Next 版本",
-    "naive-ui": "Naive UI 版本",
-    "element-plus": "Element Plus 版本",
-    "tdesign": "TDesign Vue 版本"
+    "document": "文档"
   }
 }

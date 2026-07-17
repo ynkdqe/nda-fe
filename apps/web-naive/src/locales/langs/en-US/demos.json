@@ -3,14 +3,62 @@
   "naive": "Naive UI",
   "table": "Table",
   "form": "Form",
+  "location": {
+    "title": "Location",
+    "description": "Validate coordinates and determine whether a location is within an allowed distance.",
+    "tabs": {
+      "coordinates": "Get location from Lat/Long",
+      "distance": "Validate location from default Lat/Long"
+    },
+    "latitude": "Latitude (Lat)",
+    "longitude": "Longitude (Long)",
+    "vendor": "Vendor",
+    "defaultLocation": "Default location",
+    "targetLocation": "Location to check",
+    "allowedDistance": "Allowed distance",
+    "check": "Get address",
+    "submit": "Check",
+    "openMap": "Open map",
+    "placeholders": {
+      "vendor": "Select a map provider",
+      "latitude": "Enter latitude from -90 to 90",
+      "longitude": "Enter longitude from -180 to 180",
+      "allowedDistance": "Enter distance in meters"
+    },
+    "validation": {
+      "requiredCoordinates": "Please enter both latitude and longitude.",
+      "invalidLatitude": "Latitude must be between -90 and 90.",
+      "invalidLongitude": "Longitude must be between -180 and 180.",
+      "invalidDistance": "Allowed distance must be greater than or equal to 0."
+    },
+    "table": {
+      "address": "Address",
+      "latitude": "Latitude",
+      "longitude": "Longitude"
+    },
+    "errors": {
+      "requestFailed": "Unable to retrieve location data.",
+      "validationFailed": "Unable to validate the location."
+    },
+    "result": {
+      "validCoordinates": "Valid coordinates",
+      "invalidCoordinates": "Invalid coordinates",
+      "validLocation": "Valid location",
+      "invalidLocation": "Location is outside the allowed range",
+      "invalidData": "Invalid data",
+      "calculatedDistance": "Calculated distance",
+      "defaultLatitude": "Default latitude",
+      "defaultLongitude": "Default longitude",
+      "targetLatitude": "Target latitude",
+      "targetLongitude": "Target longitude",
+      "isValid": "Valid",
+      "yes": "Yes",
+      "no": "No"
+    }
+  },
   "vben": {
     "title": "Project",
     "about": "About",
-    "document": "Document",
-    "antdv": "Ant Design Vue Version",
-    "antdv-next": "Antdv Next Version",
-    "naive-ui": "Naive UI Version",
-    "element-plus": "Element Plus Version",
-    "tdesign": "TDesign Vue Version"
+    "document": "Document"
   }
 }

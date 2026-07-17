@@ -3,14 +3,62 @@
   "naive": "Naive UI",
   "table": "Bảng",
   "form": "Biểu mẫu",
+  "location": {
+    "title": "Vị trí",
+    "description": "Kiểm tra tọa độ và xác định vị trí có nằm trong khoảng cách hợp lệ hay không.",
+    "tabs": {
+      "coordinates": "Lấy vị trí từ Lat/Long",
+      "distance": "Check vị trí hợp lệ từ default Lat/Long"
+    },
+    "latitude": "Vĩ độ (Lat)",
+    "longitude": "Kinh độ (Long)",
+    "vendor": "Vendor",
+    "defaultLocation": "Vị trí mặc định",
+    "targetLocation": "Vị trí cần kiểm tra",
+    "allowedDistance": "Khoảng cách hợp lệ",
+    "check": "Lấy địa chỉ",
+    "submit": "Kiểm tra",
+    "openMap": "Mở bản đồ",
+    "placeholders": {
+      "vendor": "Chọn nhà cung cấp bản đồ",
+      "latitude": "Nhập vĩ độ từ -90 đến 90",
+      "longitude": "Nhập kinh độ từ -180 đến 180",
+      "allowedDistance": "Nhập khoảng cách theo mét"
+    },
+    "validation": {
+      "requiredCoordinates": "Vui lòng nhập đầy đủ vĩ độ và kinh độ.",
+      "invalidLatitude": "Vĩ độ phải nằm trong khoảng từ -90 đến 90.",
+      "invalidLongitude": "Kinh độ phải nằm trong khoảng từ -180 đến 180.",
+      "invalidDistance": "Khoảng cách hợp lệ phải lớn hơn hoặc bằng 0."
+    },
+    "table": {
+      "address": "Địa chỉ",
+      "latitude": "Vĩ độ",
+      "longitude": "Kinh độ"
+    },
+    "errors": {
+      "requestFailed": "Không thể lấy dữ liệu vị trí.",
+      "validationFailed": "Không thể kiểm tra tính hợp lệ của vị trí."
+    },
+    "result": {
+      "validCoordinates": "Tọa độ hợp lệ",
+      "invalidCoordinates": "Tọa độ không hợp lệ",
+      "validLocation": "Vị trí hợp lệ",
+      "invalidLocation": "Vị trí nằm ngoài phạm vi cho phép",
+      "invalidData": "Dữ liệu không hợp lệ",
+      "calculatedDistance": "Khoảng cách tính được",
+      "defaultLatitude": "Vĩ độ mặc định",
+      "defaultLongitude": "Kinh độ mặc định",
+      "targetLatitude": "Vĩ độ cần kiểm tra",
+      "targetLongitude": "Kinh độ cần kiểm tra",
+      "isValid": "Hợp lệ",
+      "yes": "Có",
+      "no": "Không"
+    }
+  },
   "vben": {
     "title": "Dự án",
     "about": "Giới thiệu",
-    "document": "Tài liệu",
-    "antdv": "Phiên bản Ant Design Vue",
-    "antdv-next": "Phiên bản Antdv Next",
-    "naive-ui": "Phiên bản Naive UI",
-    "element-plus": "Phiên bản Element Plus",
-    "tdesign": "Phiên bản TDesign Vue"
+    "document": "Tài liệu"
   }
 }

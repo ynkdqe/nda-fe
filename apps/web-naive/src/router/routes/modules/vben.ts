@@ -1,19 +1,10 @@
 import type { RouteRecordRaw } from 'vue-router';
 
 import {
-  VBEN_ANT_PREVIEW_URL,
-  VBEN_ANTDV_NEXT_PREVIEW_URL,
   VBEN_DOC_URL,
-  VBEN_ELE_PREVIEW_URL,
   VBEN_GITHUB_URL,
   VBEN_LOGO_URL,
-  VBEN_TD_PREVIEW_URL,
 } from '@vben/constants';
-import {
-  SvgAntdvLogoIcon,
-  SvgAntdvNextLogoIcon,
-  SvgTDesignIcon,
-} from '@vben/icons';
 
 import { IFrameView } from '#/layouts';
 import { $t } from '#/locales';
@@ -50,47 +41,12 @@ const routes: RouteRecordRaw[] = [
         },
       },
       {
-        name: 'VbenAntd',
-        path: '/vben-admin/antd',
-        component: IFrameView,
+        name: 'LocationDemo',
+        path: '/vben-admin/location',
+        component: () => import('#/views/demos/location/index.vue'),
         meta: {
-          badgeType: 'dot',
-          icon: SvgAntdvLogoIcon,
-          link: VBEN_ANT_PREVIEW_URL,
-          title: $t('demos.vben.antdv'),
-        },
-      },
-      {
-        name: 'VbenAntdVNext',
-        path: '/vben-admin/antdv-next',
-        component: IFrameView,
-        meta: {
-          badgeType: 'dot',
-          icon: SvgAntdvNextLogoIcon,
-          link: VBEN_ANTDV_NEXT_PREVIEW_URL,
-          title: $t('demos.vben.antdv-next'),
-        },
-      },
-      {
-        name: 'VbenTDesign',
-        path: '/vben-admin/tdesign',
-        component: IFrameView,
-        meta: {
-          badgeType: 'dot',
-          icon: SvgTDesignIcon,
-          link: VBEN_TD_PREVIEW_URL,
-          title: $t('demos.vben.tdesign'),
-        },
-      },
-      {
-        name: 'VbenElementPlus',
-        path: '/vben-admin/ele',
-        component: IFrameView,
-        meta: {
-          badgeType: 'dot',
-          icon: 'logos:element',
-          link: VBEN_ELE_PREVIEW_URL,
-          title: $t('demos.vben.element-plus'),
+          icon: 'lucide:map-pin',
+          title: $t('demos.location.title'),
         },
       },
     ],
