@@ -291,6 +291,29 @@
       "sampleDataOne": "Dữ liệu mẫu 1",
       "sampleDataTwo": "Dữ liệu mẫu 2"
     },
+    "messagePage": {
+      "actions": {
+        "send": "Gửi tin nhắn"
+      },
+      "form": {
+        "title": "Gửi tin nhắn",
+        "send": "Gửi",
+        "cancel": "Hủy",
+        "phoneLabel": "Số điện thoại",
+        "phonePlaceholder": "Nhập số điện thoại",
+        "phoneRequired": "Vui lòng nhập số điện thoại",
+        "templateLabel": "Mẫu tin nhắn",
+        "templatePlaceholder": "Chọn mẫu tin nhắn",
+        "templateRequired": "Vui lòng chọn mẫu tin nhắn",
+        "providerLabel": "Nhà cung cấp",
+        "providerPlaceholder": "Nhà cung cấp được chọn theo mẫu tin nhắn",
+        "parameterLabel": "Tham số {key}",
+        "parameterPlaceholder": "Nhập giá trị cho tham số {key}",
+        "previewLabel": "Xem trước nội dung",
+        "sendSuccess": "Gửi tin nhắn thành công",
+        "sendFail": "Gửi tin nhắn thất bại"
+      }
+    },
     "providerPage": {
       "search": {
         "keywordLabel": "Từ khóa",
@@ -434,6 +457,7 @@
         "modal": {
           "title": "Gửi thông báo",
           "ok": "Gửi",
+          "cancel": "Hủy",
           "type": "Loại thông báo",
           "system": "Thông báo hệ thống",
           "recipients": "Người nhận",

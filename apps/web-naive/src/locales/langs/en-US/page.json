@@ -291,6 +291,29 @@
       "sampleDataOne": "Sample Data 1",
       "sampleDataTwo": "Sample Data 2"
     },
+    "messagePage": {
+      "actions": {
+        "send": "Send message"
+      },
+      "form": {
+        "title": "Send message",
+        "send": "Send",
+        "cancel": "Cancel",
+        "phoneLabel": "Phone number",
+        "phonePlaceholder": "Enter phone number",
+        "phoneRequired": "Please enter a phone number",
+        "templateLabel": "Message template",
+        "templatePlaceholder": "Select a message template",
+        "templateRequired": "Please select a message template",
+        "providerLabel": "Provider",
+        "providerPlaceholder": "Provider selected from the message template",
+        "parameterLabel": "Parameter {key}",
+        "parameterPlaceholder": "Enter a value for parameter {key}",
+        "previewLabel": "Message preview",
+        "sendSuccess": "Message sent successfully",
+        "sendFail": "Failed to send message"
+      }
+    },
     "providerPage": {
       "search": {
         "keywordLabel": "Keyword",
@@ -434,6 +457,7 @@
         "modal": {
           "title": "Send notification",
           "ok": "Send",
+          "cancel": "Cancel",
           "type": "Notification type",
           "system": "System notification",
           "recipients": "Recipients",

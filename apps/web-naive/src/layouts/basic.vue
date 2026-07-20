@@ -23,6 +23,10 @@ import { formatDate, openWindow } from '@vben/utils';
 import { fetchNotificationUserList, updateNotificationStatus } from '#/api';
 import { $t } from '#/locales';
 import {
+  requestBrowserNotificationPermissionOnInteraction,
+  showBrowserNotification,
+} from '#/services/browser-notification';
+import {
   NOTIFICATION_REALTIME_EVENT,
   REALTIME_MESSAGE_TYPE,
 } from '#/services/signalr';
@@ -40,6 +44,7 @@ const accessStore = useAccessStore();
 const { destroyWatermark, updateWatermark } = useWatermark();
 const { isDark } = usePreferences();
 const showDot = computed(() => unreadCount.value > 0);
+let cleanupNotificationPermissionRequest: (() => void) | null = null;
 
 function getHubNotificationValue<T>(
   item: SmsNotificationApi.NotificationHubItem,
@@ -234,6 +239,26 @@ function getRealtimeNotificationId(
   return getHubNotificationValue<string>(item, 'id', 'Id') ?? null;
 }
 
+function showRealtimeBrowserNotification(
+  item: SmsNotificationApi.NotificationHubItem,
+) {
+  const notification = mapNotificationItem(item);
+  const icon = getHubNotificationValue<null | string>(item, 'icon', 'Icon');
+
+  showBrowserNotification(notification.title, {
+    body: notification.message,
+    icon: icon || undefined,
+    onClick(browserNotification) {
+      window.focus();
+      if (notification.link) {
+        navigateTo(notification.link, notification.query, notification.state);
+      }
+      browserNotification.close();
+    },
+    tag: String(notification.id),
+  });
+}
+
 function addRealtimeNotification(
   item: SmsNotificationApi.NotificationHubItem,
   incrementUnread = true,
@@ -243,7 +268,7 @@ function addRealtimeNotification(
     (currentItem) => currentItem.id === notification.id,
   );
 
-  if (existingIndex >= 0) {
+  if (existingIndex !== -1) {
     const existingItem = notifications.value[existingIndex];
     if (existingItem) {
       notification.isRead = existingItem.isRead;
@@ -255,6 +280,8 @@ function addRealtimeNotification(
 
   notifications.value.unshift(notification);
   notifications.value = notifications.value.slice(0, 10);
+
+  return existingIndex === -1;
 }
 
 function updateRealtimeNotificationStatus(
@@ -312,9 +339,13 @@ onMounted(() => {
   void realtimeStore.start().catch((error) => {
     console.error('Unable to start realtime connection.', error);
   });
+  cleanupNotificationPermissionRequest =
+    requestBrowserNotificationPermissionOnInteraction();
 });
 
 onBeforeUnmount(() => {
+  cleanupNotificationPermissionRequest?.();
+  cleanupNotificationPermissionRequest = null;
   void realtimeStore.stop().catch((error) => {
     console.error('Unable to stop realtime connection.', error);
   });
@@ -337,7 +368,7 @@ watch(
 
     const action = realtimeEvent.event;
     const notification =
-      realtimeEvent.data as SmsNotificationApi.NotificationHubItem | null;
+      realtimeEvent.data as null | SmsNotificationApi.NotificationHubItem;
 
     if (notification === null || notification === undefined) {
       return;
@@ -349,7 +380,10 @@ watch(
         break;
       }
       case NOTIFICATION_REALTIME_EVENT.NEW: {
-        addRealtimeNotification(notification);
+        const isNewNotification = addRealtimeNotification(notification);
+        if (isNewNotification) {
+          showRealtimeBrowserNotification(notification);
+        }
         break;
       }
       case NOTIFICATION_REALTIME_EVENT.STATUS: {

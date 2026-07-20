@@ -291,6 +291,29 @@
       "sampleDataOne": "示例数据 1",
       "sampleDataTwo": "示例数据 2"
     },
+    "messagePage": {
+      "actions": {
+        "send": "发送短信"
+      },
+      "form": {
+        "title": "发送短信",
+        "send": "发送",
+        "cancel": "取消",
+        "phoneLabel": "手机号码",
+        "phonePlaceholder": "请输入手机号码",
+        "phoneRequired": "请输入手机号码",
+        "templateLabel": "短信模板",
+        "templatePlaceholder": "请选择短信模板",
+        "templateRequired": "请选择短信模板",
+        "providerLabel": "供应商",
+        "providerPlaceholder": "根据短信模板选择供应商",
+        "parameterLabel": "参数 {key}",
+        "parameterPlaceholder": "请输入参数 {key} 的值",
+        "previewLabel": "内容预览",
+        "sendSuccess": "短信发送成功",
+        "sendFail": "短信发送失败"
+      }
+    },
     "providerPage": {
       "search": {
         "keywordLabel": "关键词",
@@ -434,6 +457,7 @@
         "modal": {
           "title": "发送通知",
           "ok": "发送",
+          "cancel": "取消",
           "type": "通知类型",
           "system": "系统通知",
           "recipients": "接收人",

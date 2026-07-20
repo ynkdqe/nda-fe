@@ -7,6 +7,7 @@ import { onMounted, ref, watch } from 'vue';
 
 import { Page } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
+import { useI18n } from '@vben/locales';
 import { formatDate } from '@vben/utils';
 
 import { NButton, NTag } from 'naive-ui';
@@ -20,6 +21,7 @@ import {
 
 import SendSmsForm from './components/SendSmsForm.vue';
 
+const { t } = useI18n();
 const sendFormVisible = ref(false);
 
 const providerOptions = ref<Array<{ label: string; value: string }>>([]);
@@ -290,7 +292,7 @@ function handleSent() {
           <template #icon>
             <IconifyIcon icon="lucide:send" />
           </template>
-          Gửi tin nhắn
+          {{ t('page.sms.messagePage.actions.send') }}
         </NButton>
       </template>
 

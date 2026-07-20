@@ -52,7 +52,7 @@ const rules: FormRules = {
       trigger: ['blur', 'input'],
       validator: (_rule, value) => {
         if (!String(value ?? '').trim()) {
-          return new Error(t('page.sms.messagePage.form.phonePlaceholder'));
+          return new Error(t('page.sms.messagePage.form.phoneRequired'));
         }
         return true;
       },
@@ -64,7 +64,7 @@ const rules: FormRules = {
       trigger: ['blur', 'change'],
       validator: (_rule, value) => {
         if (value === undefined || value === null || value === '') {
-          return new Error(t('page.sms.messagePage.form.templatePlaceholder'));
+          return new Error(t('page.sms.messagePage.form.templateRequired'));
         }
         return true;
       },
@@ -223,8 +223,8 @@ async function handleSend() {
     v-model:show="modalVisible"
     preset="dialog"
     :title="t('page.sms.messagePage.form.title')"
-    :positive-text="t('common.confirm')"
-    :negative-text="t('common.cancel')"
+    :positive-text="t('page.sms.messagePage.form.send')"
+    :negative-text="t('page.sms.messagePage.form.cancel')"
     :loading="loading"
     :mask-closable="false"
     style="width: 600px"

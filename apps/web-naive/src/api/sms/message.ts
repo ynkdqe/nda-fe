@@ -10,7 +10,7 @@ export async function fetchSmsMessageList(params: SmsMessageApi.ListParams) {
 }
 
 export async function sendSmsMessage(data: SmsMessageApi.SendSmsPayload) {
-  return requestClient.post("/api/sms/messages/send", data, {
+  return requestClient.post("/api/sms/message", data, {
     responseReturn: "body",
   });
 }
