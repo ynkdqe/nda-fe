@@ -353,8 +353,8 @@ const recipientsColumns = computed(() => [
       :title="t('page.sms.notification.administrationPage.modal.title')"
       :positive-text="t('page.sms.notification.administrationPage.modal.ok')"
       :negative-text="
-              t('page.sms.notification.administrationPage.modal.cancel')
-            "
+        t('page.sms.notification.administrationPage.modal.cancel')
+      "
       :loading="sendSubmitting"
       style="width: 720px"
       @positive-click="handleSend"
