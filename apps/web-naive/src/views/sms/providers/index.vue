@@ -171,9 +171,7 @@ function handleEdit(row: SmsMessageApi.SmsProvider) {
   drawerApi.open();
 }
 
-async function handleFormSubmit(
-  payload: SmsMessageApi.SmsProviderFormPayload,
-) {
+async function handleFormSubmit(payload: SmsMessageApi.SmsProviderFormPayload) {
   const { id, ...data } = payload;
 
   if (id !== undefined && id !== null && id !== '') {

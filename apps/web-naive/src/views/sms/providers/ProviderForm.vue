@@ -65,7 +65,9 @@ function normalizeStatus(status?: boolean | number | string): 0 | 1 {
     return status ? 1 : 0;
   }
 
-  const normalized = String(status ?? '').trim().toLowerCase();
+  const normalized = String(status ?? '')
+    .trim()
+    .toLowerCase();
   return normalized === '1' || normalized === 'active' || normalized === 'true'
     ? 1
     : 0;
@@ -124,10 +126,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
       :model="form"
       :rules="rules"
     >
-      <NFormItem
-        :label="t('page.sms.providerPage.form.name')"
-        path="name"
-      >
+      <NFormItem :label="t('page.sms.providerPage.form.name')" path="name">
         <NInput
           v-model:value="form.name"
           :placeholder="t('page.sms.providerPage.form.namePlaceholder')"
@@ -144,10 +143,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
         />
       </NFormItem>
 
-      <NFormItem
-        :label="t('page.sms.providerPage.form.status')"
-        path="status"
-      >
+      <NFormItem :label="t('page.sms.providerPage.form.status')" path="status">
         <NSelect v-model:value="form.status" :options="statusOptions" />
       </NFormItem>
 

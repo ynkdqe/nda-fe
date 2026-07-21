@@ -81,7 +81,9 @@ function normalizeStatus(status?: boolean | number | string) {
     return status;
   }
 
-  const normalized = String(status ?? '').trim().toLowerCase();
+  const normalized = String(status ?? '')
+    .trim()
+    .toLowerCase();
   return normalized === '1' || normalized === 'active' || normalized === 'true';
 }
 

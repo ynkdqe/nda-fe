@@ -179,11 +179,12 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
   client.addResponseInterceptor({
     fulfilled: (response) => {
       const responseData = response?.data;
-      if (
-        responseData &&
-        typeof responseData === 'object' &&
-        responseData.success === false
-      ) {
+      const businessSuccess =
+        responseData && typeof responseData === 'object'
+          ? responseData.success
+          : undefined;
+
+      if (businessSuccess === false) {
         const errorMessage = getResponseErrorMessage(
           responseData,
           'Request failed.',
