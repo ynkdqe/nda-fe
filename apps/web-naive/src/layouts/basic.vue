@@ -20,7 +20,12 @@ import { preferences, usePreferences } from '@vben/preferences';
 import { useAccessStore, useUserStore } from '@vben/stores';
 import { formatDate, openWindow } from '@vben/utils';
 
-import { fetchNotificationUserList, updateNotificationStatus } from '#/api';
+import {
+  fetchNotificationUserList,
+  NotificationStatusEnum,
+  readAllNotifications,
+  updateNotificationStatus,
+} from '#/api';
 import { $t } from '#/locales';
 import {
   requestBrowserNotificationPermissionOnInteraction,
@@ -88,7 +93,10 @@ function mapNotificationItem(
     date: creationTime
       ? (formatDate(creationTime, 'DD-MM-YYYY HH:mm:ss') as string) || ''
       : '',
-    isRead: status === true || status === 1 || status === '1',
+    isRead:
+      status === true ||
+      status === NotificationStatusEnum.Read ||
+      status === String(NotificationStatusEnum.Read),
     link: url || undefined,
     message: message ?? '',
     raw: item,
@@ -182,7 +190,7 @@ function handleNoticeClear() {
 }
 
 async function markRead(id: number | string) {
-  await updateNotificationStatus([String(id)], 1);
+  await updateNotificationStatus([String(id)], NotificationStatusEnum.Read);
   const item = notifications.value.find((item) => item.id === id);
   if (item && !item.isRead) {
     item.isRead = true;
@@ -190,21 +198,28 @@ async function markRead(id: number | string) {
   }
 }
 
-function remove(id: number | string) {
-  notifications.value = notifications.value.filter((item) => item.id !== id);
+async function remove(id: number | string) {
+  const response = await updateNotificationStatus(
+    [String(id)],
+    NotificationStatusEnum.Hide,
+  );
+
+  if (response?.success === true) {
+    const item = notifications.value.find((item) => item.id === id);
+    notifications.value = notifications.value.filter((item) => item.id !== id);
+
+    if (item && !item.isRead) {
+      unreadCount.value = Math.max(0, unreadCount.value - 1);
+    }
+  }
 }
 
 async function handleMakeAll() {
-  const unreadIds = notifications.value
-    .filter((item) => !item.isRead)
-    .map((item) => String(item.id));
+  const response = await readAllNotifications();
 
-  if (unreadIds.length > 0) {
-    await updateNotificationStatus(unreadIds, 1);
+  if (response?.success === true) {
+    markAllRealtimeNotificationsRead();
   }
-
-  notifications.value.forEach((item) => (item.isRead = true));
-  unreadCount.value = 0;
 }
 
 const viewAll = () => {
@@ -304,7 +319,10 @@ function updateRealtimeNotificationStatus(
     'status',
     'Status',
   );
-  const isRead = status === true || status === 1 || status === '1';
+  const isRead =
+    status === true ||
+    status === NotificationStatusEnum.Read ||
+    status === String(NotificationStatusEnum.Read);
 
   if (notification.isRead === isRead) {
     return;
@@ -332,6 +350,22 @@ function deleteRealtimeNotification(
   if (existingItem && !existingItem.isRead) {
     unreadCount.value = Math.max(0, unreadCount.value - 1);
   }
+}
+
+function markAllRealtimeNotificationsRead() {
+  notifications.value.forEach((notification) => {
+    notification.isRead = true;
+
+    const raw = notification.raw as
+      | SmsNotificationApi.NotificationHubItem
+      | SmsNotificationApi.NotificationUserItem
+      | undefined;
+    if (raw) {
+      raw.status = NotificationStatusEnum.Read;
+      raw.Status = NotificationStatusEnum.Read;
+    }
+  });
+  unreadCount.value = 0;
 }
 
 onMounted(() => {
@@ -384,6 +418,10 @@ watch(
         if (isNewNotification) {
           showRealtimeBrowserNotification(notification);
         }
+        break;
+      }
+      case NOTIFICATION_REALTIME_EVENT.READ_ALL: {
+        markAllRealtimeNotificationsRead();
         break;
       }
       case NOTIFICATION_REALTIME_EVENT.STATUS: {

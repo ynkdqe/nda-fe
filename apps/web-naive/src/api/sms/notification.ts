@@ -129,11 +129,33 @@ export async function createNotification(data: Record<string, any>) {
   });
 }
 
-export async function updateNotificationStatus(ids: string[], status: 0 | 1) {
-  return requestClient.put(
+export enum NotificationStatusEnum {
+  Unread = 0,
+  Read = 1,
+  Hide = 2,
+}
+
+export async function updateNotificationStatus(
+  ids: string[],
+  status: NotificationStatusEnum,
+) {
+  return requestClient.post(
     '/api/sms/notification/status',
     { ids, status },
     { responseReturn: 'body' },
+  );
+}
+
+export async function readAllNotifications(
+  status = NotificationStatusEnum.Read,
+) {
+  return requestClient.post<MResult<unknown>>(
+    '/api/sms/notification/read',
+    undefined,
+    {
+      params: { status },
+      responseReturn: 'body',
+    },
   );
 }
 

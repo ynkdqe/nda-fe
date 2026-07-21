@@ -121,12 +121,14 @@ const handleClear = () => {
                     class="aspect-square size-full object-cover"
                   />
                 </span>
-                <div class="flex flex-col gap-1 leading-none">
-                  <p class="font-semibold">{{ item.title }}</p>
-                  <p class="my-1 line-clamp-2 text-xs text-muted-foreground">
+                <div class="min-w-0 flex-1 pr-10 flex flex-col gap-1 leading-none">
+                  <p class="line-clamp-2 font-semibold leading-snug">
+                    {{ item.title }}
+                  </p>
+                  <p class="my-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
                     {{ item.message }}
                   </p>
-                  <p class="line-clamp-2 text-xs text-muted-foreground">
+                  <p class="line-clamp-1 text-xs leading-relaxed text-muted-foreground">
                     {{ item.date }}
                   </p>
                 </div>

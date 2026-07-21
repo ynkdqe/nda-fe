@@ -30,6 +30,7 @@ import {
   deleteNotification,
   deleteNotifications,
   fetchNotificationList,
+  NotificationStatusEnum,
   updateNotificationStatus,
 } from '#/api';
 
@@ -68,7 +69,7 @@ function mapToUiItem(item: SmsNotificationApi.NotificationUserItem) {
       ? (formatDate(item.creationTime, 'DD-MM-YYYY HH:mm:ss') as string) || ''
       : '',
     id: item.id ?? crypto.randomUUID?.() ?? String(Math.random()),
-    isRead: item.status === 1,
+    isRead: item.status === NotificationStatusEnum.Read,
     message: item.message ?? '',
     raw: item,
     senderName: item.senderName,
@@ -164,8 +165,10 @@ const allSelected = computed({
 
 async function handleToggleRead(item: UiNotification) {
   try {
-    const toStatus = item.isRead ? 0 : 1;
-    await updateNotificationStatus([item.id], toStatus as 0 | 1);
+    const toStatus = item.isRead
+      ? NotificationStatusEnum.Unread
+      : NotificationStatusEnum.Read;
+    await updateNotificationStatus([item.id], toStatus);
     item.isRead = !item.isRead;
     message.success(
       item.isRead
@@ -218,7 +221,7 @@ async function handleDeleteSelected() {
   }
 }
 
-async function handleMarkSelected(status: 0 | 1) {
+async function handleMarkSelected(status: NotificationStatusEnum) {
   const ids = [...selectedIds.value];
   if (ids.length === 0) {
     return;
@@ -228,11 +231,11 @@ async function handleMarkSelected(status: 0 | 1) {
     await updateNotificationStatus(ids, status);
     list.value = list.value.map((notification) =>
       selectedIds.value.has(notification.id)
-        ? { ...notification, isRead: status === 1 }
+        ? { ...notification, isRead: status === NotificationStatusEnum.Read }
         : notification,
     );
     message.success(
-      status === 1
+      status === NotificationStatusEnum.Read
         ? t('page.sms.notification.personalPage.markReadSuccess')
         : t('page.sms.notification.personalPage.markUnreadSuccess'),
     );
@@ -364,7 +367,7 @@ async function handleMarkSelected(status: 0 | 1) {
             <div class="flex flex-wrap gap-2">
               <NButton
                 :disabled="!hasSelection"
-                @click="() => handleMarkSelected(1)"
+                @click="() => handleMarkSelected(NotificationStatusEnum.Read)"
               >
                 {{
                   t('page.sms.notification.personalPage.actions.markAllRead')

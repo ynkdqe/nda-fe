@@ -5,6 +5,7 @@ export const REALTIME_MESSAGE_TYPE = {
 export const NOTIFICATION_REALTIME_EVENT = {
   DELETED: 'deleted',
   NEW: 'new',
+  READ_ALL: 'ReadAll',
   STATUS: 'status',
 } as const;
 
