@@ -175,6 +175,29 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
     },
   });
 
+  // HTTP 2xx can still represent a failed business operation.
+  client.addResponseInterceptor({
+    fulfilled: (response) => {
+      const responseData = response?.data;
+      if (
+        responseData &&
+        typeof responseData === 'object' &&
+        responseData.success === false
+      ) {
+        const errorMessage = getResponseErrorMessage(
+          responseData,
+          'Request failed.',
+        );
+        throw Object.assign(new Error(errorMessage), {
+          config: response.config,
+          response,
+        });
+      }
+
+      return response;
+    },
+  });
+
   // 处理返回的响应数据格式
   client.addResponseInterceptor(
     defaultResponseInterceptor({

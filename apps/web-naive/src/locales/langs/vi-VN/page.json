@@ -341,10 +341,29 @@
         "active": "Đang hoạt động",
         "inactive": "Ngừng hoạt động"
       },
+      "form": {
+        "addTitle": "Thêm nhà cung cấp",
+        "editTitle": "Sửa nhà cung cấp",
+        "name": "Tên nhà cung cấp",
+        "namePlaceholder": "Nhập tên nhà cung cấp",
+        "nameRequired": "Vui lòng nhập tên nhà cung cấp",
+        "providerUrl": "URL nhà cung cấp",
+        "providerUrlPlaceholder": "Nhập URL nhà cung cấp",
+        "providerUrlRequired": "Vui lòng nhập URL nhà cung cấp",
+        "status": "Trạng thái",
+        "providerConfig": "Cấu hình nhà cung cấp",
+        "providerConfigPlaceholder": "Nhập cấu hình nhà cung cấp",
+        "providerSchema": "Schema nhà cung cấp",
+        "providerSchemaPlaceholder": "Nhập schema nhà cung cấp",
+        "createSuccess": "Thêm nhà cung cấp thành công",
+        "updateSuccess": "Cập nhật nhà cung cấp thành công"
+      },
       "action": {
+        "add": "Thêm mới",
         "notImplemented": "Chức năng chưa được triển khai",
         "edit": "Sửa",
         "delete": "Xóa",
+        "deleteSuccess": "Xóa nhà cung cấp thành công",
         "deleteConfirm": "Bạn có chắc muốn xóa nhà cung cấp này không?",
         "deleteOk": "Xóa",
         "deleteCancel": "Hủy"
@@ -375,10 +394,31 @@
         "active": "Đang hoạt động",
         "inactive": "Ngừng hoạt động"
       },
+      "form": {
+        "addTitle": "Thêm mẫu tin nhắn",
+        "editTitle": "Sửa mẫu tin nhắn",
+        "code": "Mã mẫu",
+        "codePlaceholder": "Nhập mã mẫu",
+        "codeRequired": "Vui lòng nhập mã mẫu",
+        "name": "Tên mẫu",
+        "namePlaceholder": "Nhập tên mẫu",
+        "nameRequired": "Vui lòng nhập tên mẫu",
+        "provider": "Nhà cung cấp",
+        "providerPlaceholder": "Chọn nhà cung cấp",
+        "providerRequired": "Vui lòng chọn nhà cung cấp",
+        "template": "Nội dung mẫu",
+        "templatePlaceholder": "Nhập nội dung mẫu, ví dụ #1#",
+        "templateRequired": "Vui lòng nhập nội dung mẫu",
+        "isActive": "Đang hoạt động",
+        "createSuccess": "Thêm mẫu tin nhắn thành công",
+        "updateSuccess": "Cập nhật mẫu tin nhắn thành công"
+      },
       "action": {
+        "add": "Thêm mới",
         "notImplemented": "Chức năng chưa được triển khai",
         "edit": "Sửa",
         "delete": "Xóa",
+        "deleteSuccess": "Xóa mẫu tin nhắn thành công",
         "deleteConfirm": "Bạn có chắc muốn xóa mẫu tin nhắn này không?",
         "deleteOk": "Xóa",
         "deleteCancel": "Hủy"

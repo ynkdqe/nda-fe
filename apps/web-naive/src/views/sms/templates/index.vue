@@ -5,7 +5,7 @@ import type { SmsMessageApi } from '#/models/sms';
 
 import { onMounted, ref } from 'vue';
 
-import { Page } from '@vben/common-ui';
+import { Page, useVbenDrawer } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
 import { useI18n } from '@vben/locales';
 
@@ -13,24 +13,26 @@ import { NButton, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui';
 
 import { message } from '#/adapter/naive';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { fetchSmsProviderList, fetchSmsTemplateList } from '#/api';
+import {
+  createSmsTemplate,
+  deleteSmsTemplate,
+  fetchSmsProviderList,
+  fetchSmsTemplateList,
+  updateSmsTemplate,
+} from '#/api';
+
+import TemplateForm from './TemplateForm.vue';
 
 const { t } = useI18n();
 
 const providerMap = ref<Record<string, string>>({});
 
-function handleNotImplemented() {
-  message.info(t('page.sms.templatePage.action.notImplemented'));
-}
-
-function handleAdd() {
-  handleNotImplemented();
-  gridApi.reload();
-}
-
 async function loadProviders() {
   try {
-    const response = await fetchSmsProviderList({ page: 1, pageSize: 1000 });
+    const response = await fetchSmsProviderList({
+      current: 1,
+      pageSize: 1000,
+    });
     const mapEntries = (response.data ?? []).map(
       (provider: SmsMessageApi.SmsProvider) =>
         [String(provider.id), provider.name || String(provider.id)] as const,
@@ -148,7 +150,7 @@ const gridOptions: VxeGridProps<SmsMessageApi.SmsTemplate> = {
       query: async ({ page }: any, formValues: Record<string, any>) => {
         const response = await fetchSmsTemplateList({
           keyword: formValues.keyword?.trim?.() || undefined,
-          page: page.currentPage,
+          current: page.currentPage,
           pageSize: page.pageSize,
           status: formValues.status || undefined,
         });
@@ -168,6 +170,43 @@ const [Grid, gridApi] = useVbenVxeGrid<SmsMessageApi.SmsTemplate>({
   formOptions,
   gridOptions,
 });
+
+const [Drawer, drawerApi] = useVbenDrawer({
+  connectedComponent: TemplateForm,
+});
+
+function handleAdd() {
+  drawerApi.setData({ record: null });
+  drawerApi.open();
+}
+
+function handleEdit(row: SmsMessageApi.SmsTemplate) {
+  drawerApi.setData({ record: row });
+  drawerApi.open();
+}
+
+async function handleFormSubmit(
+  payload: SmsMessageApi.SmsTemplateFormPayload,
+) {
+  const { id, ...data } = payload;
+
+  if (id !== undefined && id !== null && id !== '') {
+    await updateSmsTemplate(id, data);
+    message.success(t('page.sms.templatePage.form.updateSuccess'));
+  } else {
+    await createSmsTemplate(data);
+    message.success(t('page.sms.templatePage.form.createSuccess'));
+  }
+
+  drawerApi.close();
+  await gridApi.query();
+}
+
+async function handleDelete(row: SmsMessageApi.SmsTemplate) {
+  await deleteSmsTemplate(row.id);
+  message.success(t('page.sms.templatePage.action.deleteSuccess'));
+  await gridApi.query();
+}
 
 onMounted(() => {
   loadProviders();
@@ -204,6 +243,7 @@ function isActiveStatus(status: SmsMessageApi.SmsTemplate['isActive']) {
           <template #icon>
             <IconifyIcon icon="lucide:plus" />
           </template>
+          {{ t('page.sms.templatePage.action.add') }}
         </NButton>
       </template>
 
@@ -224,7 +264,7 @@ function isActiveStatus(status: SmsMessageApi.SmsTemplate['isActive']) {
         </NTag>
       </template>
 
-      <template #action>
+      <template #action="{ row }">
         <NSpace justify="center" :size="4">
           <NTooltip trigger="hover">
             <template #trigger>
@@ -233,7 +273,7 @@ function isActiveStatus(status: SmsMessageApi.SmsTemplate['isActive']) {
                 quaternary
                 size="small"
                 type="primary"
-                @click="handleNotImplemented"
+                @click="handleEdit(row)"
               >
                 <template #icon>
                   <IconifyIcon class="size-4" icon="lucide:pencil" />
@@ -246,7 +286,7 @@ function isActiveStatus(status: SmsMessageApi.SmsTemplate['isActive']) {
           <NPopconfirm
             :negative-text="t('page.sms.templatePage.action.deleteCancel')"
             :positive-text="t('page.sms.templatePage.action.deleteOk')"
-            @positive-click="handleNotImplemented"
+            @positive-click="() => handleDelete(row)"
           >
             <template #trigger>
               <NTooltip trigger="hover">
@@ -265,5 +305,7 @@ function isActiveStatus(status: SmsMessageApi.SmsTemplate['isActive']) {
         </NSpace>
       </template>
     </Grid>
+
+    <Drawer @submit="handleFormSubmit" />
   </Page>
 </template>

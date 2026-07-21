@@ -34,6 +34,18 @@ export namespace SmsMessageApi {
     status?: boolean | number | string;
   }
 
+  export interface SmsProviderPayload {
+    name: string;
+    providerConfig: string;
+    providerSchema: string;
+    providerUrl: string;
+    status: 0 | 1;
+  }
+
+  export type SmsProviderFormPayload = SmsProviderPayload & {
+    id?: number | string;
+  };
+
   export interface SmsTemplate {
     id: number | string;
     code?: string;
@@ -44,10 +56,21 @@ export namespace SmsMessageApi {
     template?: string;
   }
 
+  export interface SmsTemplatePayload {
+    code: string;
+    isActive: boolean;
+    name: string;
+    smsProviderId: number | string;
+    template: string;
+  }
+
+  export type SmsTemplateFormPayload = SmsTemplatePayload & {
+    id?: number | string;
+  };
+
   export interface ListParams {
-    current?: number;
+    current: number;
     keyword?: string;
-    page?: number;
     pageSize: number;
     smsProviderId?: number | string;
     smsTemplateId?: number | string;

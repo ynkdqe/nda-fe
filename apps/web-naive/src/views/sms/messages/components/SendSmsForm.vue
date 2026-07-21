@@ -159,12 +159,18 @@ watch(selectedProviderId, (value) => {
 });
 
 async function loadTemplates() {
-  const response = await fetchSmsTemplateList({ page: 1, pageSize: 1000 });
+  const response = await fetchSmsTemplateList({
+      current: 1,
+      pageSize: 1000,
+    });
   templates.value = response.data ?? [];
 }
 
 async function loadProviders() {
-  const response = await fetchSmsProviderList({ page: 1, pageSize: 1000 });
+  const response = await fetchSmsProviderList({
+      current: 1,
+      pageSize: 1000,
+    });
   providers.value = response.data ?? [];
 }
 
@@ -288,7 +294,7 @@ async function handleSend() {
           <NInput
             :value="templatePreview"
             :autosize="{ minRows: 4, maxRows: 8 }"
-            disabled
+            readonly
             type="textarea"
           />
         </NFormItem>

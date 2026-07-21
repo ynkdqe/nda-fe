@@ -36,7 +36,7 @@ function normalizeList<T>(response: SmsMessageApi.ListResult<T>) {
 
 async function loadProviders() {
   try {
-    const res = await fetchSmsProviderList({ page: 1, pageSize: 1000 });
+    const res = await fetchSmsProviderList({ current: 1, pageSize: 1000 });
     const optionEntries = normalizeList(res).map(
       (provider: SmsMessageApi.SmsProvider) =>
         [String(provider.id), provider.name || String(provider.id)] as const,
@@ -56,7 +56,7 @@ async function loadProviders() {
 
 async function loadTemplates() {
   try {
-    const res = await fetchSmsTemplateList({ page: 1, pageSize: 1000 });
+    const res = await fetchSmsTemplateList({ current: 1, pageSize: 1000 });
     const optionEntries = normalizeList(res).map(
       (template: SmsMessageApi.SmsTemplate) =>
         [String(template.id), template.name || String(template.id)] as const,
@@ -183,7 +183,7 @@ const gridOptions: VxeGridProps<SmsMessageApi.SmsMessage> = {
       query: async ({ page }: any, formValues: Record<string, any>) => {
         const response = await fetchSmsMessageList({
           keyword: formValues.keyword?.trim?.() || undefined,
-          page: page.currentPage,
+          current: page.currentPage,
           pageSize: page.pageSize,
           smsProviderId: formValues.smsProviderId || undefined,
           smsTemplateId: formValues.smsTemplateId || undefined,

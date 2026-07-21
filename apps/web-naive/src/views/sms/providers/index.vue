@@ -3,7 +3,7 @@ import type { VbenFormProps } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { SmsMessageApi } from '#/models/sms';
 
-import { Page } from '@vben/common-ui';
+import { Page, useVbenDrawer } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
 import { useI18n } from '@vben/locales';
 import { formatDate } from '@vben/utils';
@@ -12,13 +12,16 @@ import { NButton, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui';
 
 import { message } from '#/adapter/naive';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { fetchSmsProviderList } from '#/api';
+import {
+  createSmsProvider,
+  deleteSmsProvider,
+  fetchSmsProviderList,
+  updateSmsProvider,
+} from '#/api';
+
+import ProviderForm from './ProviderForm.vue';
 
 const { t } = useI18n();
-
-function handleAdd() {
-  message.info(t('page.sms.templatePage.action.notImplemented'));
-}
 
 const formOptions: VbenFormProps = {
   collapsed: false,
@@ -133,7 +136,7 @@ const gridOptions: VxeGridProps<SmsMessageApi.SmsProvider> = {
       query: async ({ page }: any, formValues: Record<string, any>) => {
         const response = await fetchSmsProviderList({
           keyword: formValues.keyword?.trim?.() || undefined,
-          page: page.currentPage,
+          current: page.currentPage,
           pageSize: page.pageSize,
           status: formValues.status || undefined,
         });
@@ -149,13 +152,46 @@ const gridOptions: VxeGridProps<SmsMessageApi.SmsProvider> = {
   toolbarConfig,
 };
 
-const [Grid] = useVbenVxeGrid<SmsMessageApi.SmsProvider>({
+const [Grid, gridApi] = useVbenVxeGrid<SmsMessageApi.SmsProvider>({
   formOptions,
   gridOptions,
 });
 
-function handleNotImplemented() {
-  message.info(t('page.sms.providerPage.action.notImplemented'));
+const [Drawer, drawerApi] = useVbenDrawer({
+  connectedComponent: ProviderForm,
+});
+
+function handleAdd() {
+  drawerApi.setData({ record: null });
+  drawerApi.open();
+}
+
+function handleEdit(row: SmsMessageApi.SmsProvider) {
+  drawerApi.setData({ record: row });
+  drawerApi.open();
+}
+
+async function handleFormSubmit(
+  payload: SmsMessageApi.SmsProviderFormPayload,
+) {
+  const { id, ...data } = payload;
+
+  if (id !== undefined && id !== null && id !== '') {
+    await updateSmsProvider(id, data);
+    message.success(t('page.sms.providerPage.form.updateSuccess'));
+  } else {
+    await createSmsProvider(data);
+    message.success(t('page.sms.providerPage.form.createSuccess'));
+  }
+
+  drawerApi.close();
+  await gridApi.query();
+}
+
+async function handleDelete(row: SmsMessageApi.SmsProvider) {
+  await deleteSmsProvider(row.id);
+  message.success(t('page.sms.providerPage.action.deleteSuccess'));
+  await gridApi.query();
 }
 
 function isActiveStatus(status: SmsMessageApi.SmsProvider['status']) {
@@ -197,6 +233,7 @@ function formatDateTime(value?: string) {
           <template #icon>
             <IconifyIcon icon="lucide:plus" />
           </template>
+          {{ t('page.sms.providerPage.action.add') }}
         </NButton>
       </template>
 
@@ -221,7 +258,7 @@ function formatDateTime(value?: string) {
         {{ formatDateTime(row.modificationTime) }}
       </template>
 
-      <template #action>
+      <template #action="{ row }">
         <NSpace justify="center" :size="4">
           <NTooltip trigger="hover">
             <template #trigger>
@@ -230,7 +267,7 @@ function formatDateTime(value?: string) {
                 quaternary
                 size="small"
                 type="primary"
-                @click="handleNotImplemented"
+                @click="handleEdit(row)"
               >
                 <template #icon>
                   <IconifyIcon class="size-4" icon="lucide:pencil" />
@@ -243,7 +280,7 @@ function formatDateTime(value?: string) {
           <NPopconfirm
             :negative-text="t('page.sms.providerPage.action.deleteCancel')"
             :positive-text="t('page.sms.providerPage.action.deleteOk')"
-            @positive-click="handleNotImplemented"
+            @positive-click="() => handleDelete(row)"
           >
             <template #trigger>
               <NTooltip trigger="hover">
@@ -262,5 +299,7 @@ function formatDateTime(value?: string) {
         </NSpace>
       </template>
     </Grid>
+
+    <Drawer @submit="handleFormSubmit" />
   </Page>
 </template>

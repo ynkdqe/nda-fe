@@ -341,10 +341,29 @@
         "active": "启用",
         "inactive": "停用"
       },
+      "form": {
+        "addTitle": "添加供应商",
+        "editTitle": "编辑供应商",
+        "name": "供应商名称",
+        "namePlaceholder": "请输入供应商名称",
+        "nameRequired": "请输入供应商名称",
+        "providerUrl": "供应商地址",
+        "providerUrlPlaceholder": "请输入供应商地址",
+        "providerUrlRequired": "请输入供应商地址",
+        "status": "状态",
+        "providerConfig": "供应商配置",
+        "providerConfigPlaceholder": "请输入供应商配置",
+        "providerSchema": "供应商 Schema",
+        "providerSchemaPlaceholder": "请输入供应商 Schema",
+        "createSuccess": "供应商添加成功",
+        "updateSuccess": "供应商更新成功"
+      },
       "action": {
+        "add": "新增",
         "notImplemented": "功能尚未实现",
         "edit": "编辑",
         "delete": "删除",
+        "deleteSuccess": "供应商删除成功",
         "deleteConfirm": "确定要删除此供应商吗？",
         "deleteOk": "删除",
         "deleteCancel": "取消"
@@ -375,10 +394,31 @@
         "active": "启用",
         "inactive": "停用"
       },
+      "form": {
+        "addTitle": "添加短信模板",
+        "editTitle": "编辑短信模板",
+        "code": "模板编码",
+        "codePlaceholder": "请输入模板编码",
+        "codeRequired": "请输入模板编码",
+        "name": "模板名称",
+        "namePlaceholder": "请输入模板名称",
+        "nameRequired": "请输入模板名称",
+        "provider": "供应商",
+        "providerPlaceholder": "请选择供应商",
+        "providerRequired": "请选择供应商",
+        "template": "模板内容",
+        "templatePlaceholder": "请输入模板内容，例如 #1#",
+        "templateRequired": "请输入模板内容",
+        "isActive": "启用",
+        "createSuccess": "短信模板添加成功",
+        "updateSuccess": "短信模板更新成功"
+      },
       "action": {
+        "add": "新增",
         "notImplemented": "功能尚未实现",
         "edit": "编辑",
         "delete": "删除",
+        "deleteSuccess": "短信模板删除成功",
         "deleteConfirm": "确定要删除此短信模板吗？",
         "deleteOk": "删除",
         "deleteCancel": "取消"
