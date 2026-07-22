@@ -198,10 +198,9 @@ async function markRead(id: number | string) {
 }
 
 async function remove(id: number | string) {
-  const response = await updateNotificationStatus(
-    NotificationStatusEnum.Hide,
-    [String(id)],
-  );
+  const response = await updateNotificationStatus(NotificationStatusEnum.Hide, [
+    String(id),
+  ]);
 
   if (response?.success === true) {
     const item = notifications.value.find((item) => item.id === id);
