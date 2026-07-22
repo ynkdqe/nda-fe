@@ -23,7 +23,6 @@ import { formatDate, openWindow } from '@vben/utils';
 import {
   fetchNotificationUserList,
   NotificationStatusEnum,
-  readAllNotifications,
   updateNotificationStatus,
 } from '#/api';
 import { $t } from '#/locales';
@@ -190,7 +189,7 @@ function handleNoticeClear() {
 }
 
 async function markRead(id: number | string) {
-  await updateNotificationStatus([String(id)], NotificationStatusEnum.Read);
+  await updateNotificationStatus(NotificationStatusEnum.Read, [String(id)]);
   const item = notifications.value.find((item) => item.id === id);
   if (item && !item.isRead) {
     item.isRead = true;
@@ -200,8 +199,8 @@ async function markRead(id: number | string) {
 
 async function remove(id: number | string) {
   const response = await updateNotificationStatus(
-    [String(id)],
     NotificationStatusEnum.Hide,
+    [String(id)],
   );
 
   if (response?.success === true) {
@@ -215,7 +214,7 @@ async function remove(id: number | string) {
 }
 
 async function handleMakeAll() {
-  const response = await readAllNotifications();
+  const response = await updateNotificationStatus(NotificationStatusEnum.Read);
 
   if (response?.success === true) {
     markAllRealtimeNotificationsRead();

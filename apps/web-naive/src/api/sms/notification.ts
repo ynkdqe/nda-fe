@@ -136,26 +136,13 @@ export enum NotificationStatusEnum {
 }
 
 export async function updateNotificationStatus(
-  ids: string[],
   status: NotificationStatusEnum,
-) {
-  return requestClient.post(
-    '/api/sms/notification/status',
-    { ids, status },
-    { responseReturn: 'body' },
-  );
-}
-
-export async function readAllNotifications(
-  status = NotificationStatusEnum.Read,
+  ids?: string[],
 ) {
   return requestClient.post<MResult<unknown>>(
-    '/api/sms/notification/read',
-    undefined,
-    {
-      params: { status },
-      responseReturn: 'body',
-    },
+    '/api/sms/notification/status',
+    ids ? { ids, status } : { status },
+    { responseReturn: 'body' },
   );
 }
 

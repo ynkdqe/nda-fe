@@ -168,7 +168,7 @@ async function handleToggleRead(item: UiNotification) {
     const toStatus = item.isRead
       ? NotificationStatusEnum.Unread
       : NotificationStatusEnum.Read;
-    await updateNotificationStatus([item.id], toStatus);
+    await updateNotificationStatus(toStatus, [item.id]);
     item.isRead = !item.isRead;
     message.success(
       item.isRead
@@ -228,7 +228,7 @@ async function handleMarkSelected(status: NotificationStatusEnum) {
   }
 
   try {
-    await updateNotificationStatus(ids, status);
+    await updateNotificationStatus(status, ids);
     list.value = list.value.map((notification) =>
       selectedIds.value.has(notification.id)
         ? { ...notification, isRead: status === NotificationStatusEnum.Read }
