@@ -552,6 +552,24 @@
   "system": {
     "title": "系统",
     "settings": "设置",
+    "settingsPage": {
+      "description": "系统设置及其当前值列表。",
+      "filter": "关键词",
+      "filterPlaceholder": "输入设置名称或值",
+      "search": "搜索",
+      "reset": "重置",
+      "name": "设置名称",
+      "value": "当前值",
+      "defaultValue": "默认值",
+      "displayName": "显示名称",
+      "descriptionColumn": "描述",
+      "visibleToClients": "客户端可见",
+      "sensitive": "敏感",
+      "encrypted": "已加密",
+      "providers": "提供者",
+      "yes": "是",
+      "no": "否"
+    },
     "tenants": "租户",
     "tenantsPage": {
       "description": "租户及其订阅资料列表。",

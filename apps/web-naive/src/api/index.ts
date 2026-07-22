@@ -4,5 +4,6 @@ export * from "./hr";
 export * from "./identity";
 export * from './location';
 export * from './openiddict';
+export * from './settings';
 export * from "./sms";
 export * from './tenant-management';

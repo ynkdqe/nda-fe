@@ -552,6 +552,24 @@
   "system": {
     "title": "Hệ thống",
     "settings": "Cài đặt",
+    "settingsPage": {
+      "description": "Danh sách cấu hình hệ thống và giá trị hiện tại.",
+      "filter": "Từ khóa",
+      "filterPlaceholder": "Nhập tên hoặc giá trị cấu hình",
+      "search": "Tìm kiếm",
+      "reset": "Đặt lại",
+      "name": "Tên cấu hình",
+      "value": "Giá trị hiện tại",
+      "defaultValue": "Giá trị mặc định",
+      "displayName": "Tên hiển thị",
+      "descriptionColumn": "Mô tả",
+      "visibleToClients": "Hiển thị cho client",
+      "sensitive": "Nhạy cảm",
+      "encrypted": "Mã hóa",
+      "providers": "Providers",
+      "yes": "Có",
+      "no": "Không"
+    },
     "tenants": "Người thuê",
     "tenantsPage": {
       "description": "Danh sách người thuê và thông tin hồ sơ đăng ký.",

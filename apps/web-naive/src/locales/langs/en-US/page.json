@@ -552,6 +552,24 @@
   "system": {
     "title": "System",
     "settings": "Settings",
+    "settingsPage": {
+      "description": "System settings and their current values.",
+      "filter": "Keyword",
+      "filterPlaceholder": "Enter a setting name or value",
+      "search": "Search",
+      "reset": "Reset",
+      "name": "Setting Name",
+      "value": "Current Value",
+      "defaultValue": "Default Value",
+      "displayName": "Display Name",
+      "descriptionColumn": "Description",
+      "visibleToClients": "Visible to Clients",
+      "sensitive": "Sensitive",
+      "encrypted": "Encrypted",
+      "providers": "Providers",
+      "yes": "Yes",
+      "no": "No"
+    },
     "tenants": "Tenants",
     "tenantsPage": {
       "description": "Tenants and their subscription profiles.",
