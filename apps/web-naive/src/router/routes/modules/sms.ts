@@ -2,9 +2,17 @@ import type { RouteRecordRaw } from "vue-router";
 
 import { $t } from "#/locales";
 
+const smsPermissions = [
+  "Sms.SmsMessage",
+  "Sms.SmsProvider",
+  "Sms.SmsTemplate",
+  "Sms.Notification",
+];
+
 const routes: RouteRecordRaw[] = [
   {
     meta: {
+      authority: smsPermissions,
       icon: "lucide:message-square-text",
       order: 30,
       title: $t("page.sms.title"),
@@ -17,6 +25,7 @@ const routes: RouteRecordRaw[] = [
         path: "/sms/messages",
         component: () => import("#/views/sms/messages/index.vue"),
         meta: {
+          authority: ["Sms.SmsMessage"],
           icon: "lucide:messages-square",
           title: $t("page.sms.messages"),
           keepAlive: true,
@@ -27,6 +36,7 @@ const routes: RouteRecordRaw[] = [
         path: "/sms/providers",
         component: () => import("#/views/sms/providers/index.vue"),
         meta: {
+          authority: ["Sms.SmsProvider"],
           icon: "lucide:radio-tower",
           title: $t("page.sms.providers"),
           keepAlive: true,
@@ -37,6 +47,7 @@ const routes: RouteRecordRaw[] = [
         path: "/sms/templates",
         component: () => import("#/views/sms/templates/index.vue"),
         meta: {
+          authority: ["Sms.SmsTemplate"],
           icon: "lucide:file-text",
           title: $t("page.sms.templates"),
           keepAlive: true,
@@ -47,6 +58,7 @@ const routes: RouteRecordRaw[] = [
         path: "/sms/admin-notifications",
         component: () => import("#/views/sms/admin-notifications/index.vue"),
         meta: {
+          authority: ["Sms.Notification"],
           icon: "lucide:bell-ring",
           title: $t("page.sms.adminNotifications"),
           keepAlive: true,
@@ -57,6 +69,7 @@ const routes: RouteRecordRaw[] = [
         path: "/sms/user-notifications",
         component: () => import("#/views/sms/user-notifications/index.vue"),
         meta: {
+          authority: ["Sms.Notification"],
           icon: "lucide:bell",
           title: $t("page.sms.personalNotifications"),
           keepAlive: true,
