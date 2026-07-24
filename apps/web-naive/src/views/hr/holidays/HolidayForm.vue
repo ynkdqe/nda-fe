@@ -479,7 +479,11 @@ defineExpose({
     <template #footer>
       <NSpace justify="end">
         <NButton @click="drawerApi.close()">Hủy</NButton>
-        <NButton type="primary" :disabled="!canCreateHoliday" @click="handleSubmit">
+        <NButton
+          type="primary"
+          :disabled="!canCreateHoliday"
+          @click="handleSubmit"
+        >
           Lưu
         </NButton>
       </NSpace>

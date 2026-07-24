@@ -52,7 +52,9 @@ const canSubmit = computed(() => {
     record: null | WorkScheduleApi.WorkScheduleItem;
   }>();
 
-  return data.record ? canUpdateWorkSchedule.value : canCreateWorkSchedule.value;
+  return data.record
+    ? canUpdateWorkSchedule.value
+    : canCreateWorkSchedule.value;
 });
 
 const InlineSwitch = defineComponent({
@@ -411,7 +413,11 @@ onMounted(loadWorkShifts);
     <template #footer>
       <NSpace justify="end">
         <NButton @click="drawerApi.close()">Hủy</NButton>
-        <NButton type="primary" :disabled="!canSubmit" @click="drawerApi.onConfirm()">
+        <NButton
+          type="primary"
+          :disabled="!canSubmit"
+          @click="drawerApi.onConfirm()"
+        >
           Lưu
         </NButton>
       </NSpace>

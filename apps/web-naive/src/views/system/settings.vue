@@ -48,7 +48,11 @@ function normalizeProvider(provider: unknown) {
 function isTenantProvider(provider: unknown) {
   const record = normalizeProvider(provider);
   const providerName = String(
-    record.providerName ?? record.ProviderName ?? record.name ?? record.Name ?? '',
+    record.providerName ??
+      record.ProviderName ??
+      record.name ??
+      record.Name ??
+      '',
   ).toLowerCase();
 
   return (
@@ -71,7 +75,9 @@ const editingValue = ref('');
 
 const tenantProviders = computed(() => {
   const providers = selectedSetting.value?.providers ?? [];
-  const tenantItems = providers.filter((provider) => isTenantProvider(provider));
+  const tenantItems = providers.filter((provider) =>
+    isTenantProvider(provider),
+  );
 
   return (tenantItems.length > 0 ? tenantItems : providers).map((provider) =>
     normalizeProvider(provider),
@@ -366,7 +372,8 @@ async function handleSubmitEdit() {
               v-for="(provider, index) in tenantProviders"
               :key="index"
               class="max-h-48 overflow-auto whitespace-pre-wrap break-all rounded bg-muted p-3 text-xs"
-            >{{ JSON.stringify(provider, null, 2) }}</pre>
+              >{{ JSON.stringify(provider, null, 2) }}</pre
+            >
           </NSpace>
         </NDescriptionsItem>
       </NDescriptions>
