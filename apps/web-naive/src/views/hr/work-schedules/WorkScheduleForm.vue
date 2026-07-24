@@ -15,21 +15,45 @@ import {
   reactive,
 } from 'vue';
 
+import { useAccess } from '@vben/access';
 import { useVbenDrawer } from '@vben/common-ui';
 
-import { NSwitch } from 'naive-ui';
+import { NButton, NSpace, NSwitch } from 'naive-ui';
 
 import { useVbenForm } from '#/adapter/form';
 import { message } from '#/adapter/naive';
 import { getWorkShiftListApi } from '#/api';
 import EmployeeSearchSelect from '#/components/EmployeeSearchSelect.vue';
+import { $t } from '#/locales';
 
 const emit = defineEmits<{
   submit: [Record<string, any>, null | WorkScheduleApi.WorkScheduleItem];
 }>();
 
+const WORK_SCHEDULE_PERMISSIONS = {
+  create: 'Hrms.WorkSchedule.Create',
+  update: 'Hrms.WorkSchedule.Update',
+} as const;
+
+const { hasAccessByCodes } = useAccess();
+
 const workshiftOptions = reactive<WorkScheduleSelectOption[]>([]);
 const DATE_RANGE_WARNING = 'Đến ngày phải lớn hơn hoặc bằng Từ ngày';
+
+const canCreateWorkSchedule = computed(() =>
+  hasAccessByCodes([WORK_SCHEDULE_PERMISSIONS.create]),
+);
+const canUpdateWorkSchedule = computed(() =>
+  hasAccessByCodes([WORK_SCHEDULE_PERMISSIONS.update]),
+);
+
+const canSubmit = computed(() => {
+  const data = drawerApi.getData<{
+    record: null | WorkScheduleApi.WorkScheduleItem;
+  }>();
+
+  return data.record ? canUpdateWorkSchedule.value : canCreateWorkSchedule.value;
+});
 
 const InlineSwitch = defineComponent({
   name: 'InlineSwitch',
@@ -295,10 +319,16 @@ function normalizeEmployeeIds(value: unknown) {
 }
 
 const [Drawer, drawerApi] = useVbenDrawer({
+  showConfirmButton: false,
   onCancel() {
     drawerApi.close();
   },
   async onConfirm() {
+    if (!canSubmit.value) {
+      message.warning($t('page.common.noPermissionAction'));
+      return;
+    }
+
     const { valid } = await formApi.validate();
     if (!valid) {
       return;
@@ -377,6 +407,15 @@ onMounted(loadWorkShifts);
 <template>
   <Drawer :title="title" class="md:w-[800px]">
     <Form />
+
+    <template #footer>
+      <NSpace justify="end">
+        <NButton @click="drawerApi.close()">Hủy</NButton>
+        <NButton type="primary" :disabled="!canSubmit" @click="drawerApi.onConfirm()">
+          Lưu
+        </NButton>
+      </NSpace>
+    </template>
   </Drawer>
 </template>
 

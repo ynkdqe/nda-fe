@@ -28,7 +28,7 @@ const defaultPreferences: Preferences = {
     layout: 'sidebar-nav',
     locale: 'vi-VN',
     loginExpiredMode: 'page',
-    name: 'Vben Admin',
+    name: 'NDA',
     preferencesButtonPosition: 'auto',
     watermark: false,
     watermarkContent: '',

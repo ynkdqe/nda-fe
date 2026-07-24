@@ -7,6 +7,9 @@
     "forgetPassword": "Quên mật khẩu",
     "profile": "Hồ sơ cá nhân"
   },
+  "common": {
+    "noPermissionAction": "Bạn không có quyền thực hiện thao tác này"
+  },
   "dashboard": {
     "title": "Bảng điều khiển",
     "analytics": "Phân tích",
@@ -180,6 +183,7 @@
     "title": "Nhân sự",
     "attendance": "Chấm công",
     "employees": "Nhân viên",
+    "organizationUnits": "Phòng ban",
     "payroll": "Bảng tính",
     "contracts": "Hợp đồng",
     "contractTypes": "Loại hợp đồng",
@@ -567,6 +571,12 @@
       "sensitive": "Nhạy cảm",
       "encrypted": "Mã hóa",
       "providers": "Providers",
+      "actions": "Thao tác",
+      "tenantDetail": "Chi tiết tenant",
+      "edit": "Sửa",
+      "save": "Lưu",
+      "cancel": "Hủy",
+      "valuePlaceholder": "Nhập giá trị cấu hình",
       "yes": "Có",
       "no": "Không"
     },
@@ -638,6 +648,22 @@
       "sampleDataOne": "Dữ liệu mẫu 1",
       "sampleDataTwo": "Dữ liệu mẫu 2"
     }
+  },
+  "about": {
+    "title": "Giới thiệu dự án",
+    "description": "là một giải pháp quản trị hiện đại, sẵn sàng sử dụng, được xây dựng với Vue 3, Vite, TailwindCSS và TypeScript. Dự án cung cấp cấu trúc rõ ràng, cấu hình linh hoạt và các ví dụ phong phú để hỗ trợ phát triển hệ thống quản trị quy mô vừa và lớn.",
+    "basicInfo": "Thông tin cơ bản",
+    "version": "Phiên bản",
+    "license": "Giấy phép mã nguồn mở",
+    "buildTime": "Thời gian build cuối",
+    "homepage": "Trang chủ",
+    "document": "Tài liệu",
+    "preview": "Xem trước",
+    "github": "Github",
+    "author": "Tác giả",
+    "view": "Xem chi tiết",
+    "dependencies": "Phụ thuộc production",
+    "devDependencies": "Phụ thuộc development"
   },
   "profile": {
     "title": "Hồ sơ cá nhân",

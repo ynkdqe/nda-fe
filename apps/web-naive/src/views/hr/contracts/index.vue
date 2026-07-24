@@ -7,8 +7,9 @@ import type {
   ContractTypeItem,
 } from '#/models/hr/contract';
 
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
+import { useAccess } from '@vben/access';
 import { Page, useVbenDrawer } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
 import { formatDate } from '@vben/utils';
@@ -26,12 +27,36 @@ import {
   getContractTypeListApi,
   updateContractApi,
 } from '#/api';
+import { $t } from '#/locales';
 
 import ContractForm from './ContractForm.vue';
 
 type SelectOption = ContractSelectOption;
 
 const DEFAULT_PAGE_SIZE = 10;
+
+const CONTRACT_PERMISSIONS = {
+  create: 'Hrms.Contract.Insert',
+  delete: 'Hrms.Contract.Delete',
+  update: 'Hrms.Contract.Update',
+  view: 'Hrms.Contract',
+} as const;
+
+const { hasAccessByCodes } = useAccess();
+
+const canCreateContract = computed(() =>
+  hasAccessByCodes([CONTRACT_PERMISSIONS.create]),
+);
+const canDeleteContract = computed(() =>
+  hasAccessByCodes([CONTRACT_PERMISSIONS.delete]),
+);
+const canUpdateContract = computed(() =>
+  hasAccessByCodes([CONTRACT_PERMISSIONS.update]),
+);
+
+function showNoPermissionMessage() {
+  message.warning($t('page.common.noPermissionAction'));
+}
 
 const statusOptions = ref<SelectOption[]>([]);
 const statusMap = ref<Record<string, string>>({});
@@ -373,6 +398,11 @@ function syncFormSelectOptions() {
 }
 
 function openCreate() {
+  if (!canCreateContract.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   currentRecord.value = null;
   drawerApi.setData({
     contractTypeList: contractTypeList.value,
@@ -384,6 +414,11 @@ function openCreate() {
 }
 
 async function onEdit(row: ContractApi.ContractItem) {
+  if (!canUpdateContract.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   if (!row.id) {
     return;
   }
@@ -406,6 +441,11 @@ async function onEdit(row: ContractApi.ContractItem) {
 }
 
 async function onDelete(row: ContractApi.ContractItem) {
+  if (!canDeleteContract.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   if (!row.id) {
     return;
   }
@@ -417,6 +457,16 @@ async function onDelete(row: ContractApi.ContractItem) {
 
 async function onFormSubmit(formData: Record<string, any>) {
   const id = currentRecord.value?.id;
+
+  if (id && !canUpdateContract.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
+  if (!id && !canCreateContract.value) {
+    showNoPermissionMessage();
+    return;
+  }
 
   if (id) {
     await updateContractApi(id, formData);
@@ -442,7 +492,11 @@ onMounted(async () => {
   <Page>
     <Grid>
       <template #toolbar-actions>
-        <NButton type="primary" @click="openCreate">
+        <NButton
+          type="primary"
+          :disabled="!canCreateContract"
+          @click="openCreate"
+        >
           <template #icon>
             <IconifyIcon icon="lucide:plus" />
           </template>
@@ -465,6 +519,7 @@ onMounted(async () => {
                 quaternary
                 size="small"
                 type="primary"
+                :disabled="!canUpdateContract"
                 @click="onEdit(row)"
               >
                 <template #icon>
@@ -483,7 +538,13 @@ onMounted(async () => {
             <template #trigger>
               <NTooltip trigger="hover">
                 <template #trigger>
-                  <NButton circle quaternary size="small" type="error">
+                  <NButton
+                    circle
+                    quaternary
+                    size="small"
+                    type="error"
+                    :disabled="!canDeleteContract"
+                  >
                     <template #icon>
                       <IconifyIcon class="size-4" icon="lucide:trash-2" />
                     </template>

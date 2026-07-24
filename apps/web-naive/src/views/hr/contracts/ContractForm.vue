@@ -14,12 +14,14 @@ import type { ContractSalaryChangedField } from '#/utils/contract-salary';
 
 import { computed, reactive, ref, watch } from 'vue';
 
+import { useAccess } from '@vben/access';
 import { useVbenDrawer } from '@vben/common-ui';
 import { formatDate } from '@vben/utils';
 
-import { NDatePicker, NForm, NFormItem, NSelect } from 'naive-ui';
+import { NButton, NDatePicker, NForm, NFormItem, NSelect, NSpace } from 'naive-ui';
 
 import { message } from '#/adapter/naive';
+import { $t } from '#/locales';
 import {
   calculateContractSalaryState,
   isContractSocialInsuranceEnabled,
@@ -53,6 +55,13 @@ const emit = defineEmits<{
   submit: [value: UnknownRecord];
   'update:modelValue': [value: Partial<ContractFormModel>];
 }>();
+
+const CONTRACT_PERMISSIONS = {
+  create: 'Hrms.Contract.Insert',
+  update: 'Hrms.Contract.Update',
+} as const;
+
+const { hasAccessByCodes } = useAccess();
 
 function createInitialForm(): ContractFormModel {
   return {
@@ -153,6 +162,15 @@ const feesTotal = computed(() => {
 });
 
 const title = computed(() => (form.id ? 'Sửa hợp đồng' : 'Tạo hợp đồng'));
+const canCreateContract = computed(() =>
+  hasAccessByCodes([CONTRACT_PERMISSIONS.create]),
+);
+const canUpdateContract = computed(() =>
+  hasAccessByCodes([CONTRACT_PERMISSIONS.update]),
+);
+const canSubmit = computed(() =>
+  form.id ? canUpdateContract.value : canCreateContract.value,
+);
 
 function isRecord(value: unknown): value is UnknownRecord {
   return Boolean(value && typeof value === 'object' && !Array.isArray(value));
@@ -490,6 +508,11 @@ function applyDuration(months: number) {
 }
 
 function handleSubmit() {
+  if (!canSubmit.value) {
+    message.warning($t('page.common.noPermissionAction'));
+    return;
+  }
+
   const payload: UnknownRecord = {
     allowance: form.allowance ?? 0,
     approver: form.approver,
@@ -536,6 +559,7 @@ function resetFormWithRecord(
 }
 
 const [Drawer, drawerApi] = useVbenDrawer({
+  showConfirmButton: false,
   onCancel() {
     emit('cancel');
     drawerApi.close();
@@ -698,6 +722,15 @@ void loadContractTypes();
         @update:form="(value) => Object.assign(form, value)"
       />
     </NForm>
+
+    <template #footer>
+      <NSpace justify="end">
+        <NButton @click="drawerApi.close()">Hủy</NButton>
+        <NButton type="primary" :disabled="!canSubmit" @click="handleSubmit">
+          Lưu
+        </NButton>
+      </NSpace>
+    </template>
   </Drawer>
 </template>
 

@@ -3,6 +3,9 @@ import type { VbenFormProps } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { EmployeeApi } from '#/api';
 
+import { computed } from 'vue';
+
+import { useAccess } from '@vben/access';
 import { Page, useVbenDrawer } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
 import { formatDate } from '@vben/utils';
@@ -12,10 +15,37 @@ import { NButton, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui';
 import { message } from '#/adapter/naive';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { getEmployeeByIdApi, getEmployeeListApi } from '#/api';
+import { $t } from '#/locales';
 
 import EmployeeForm from './EmployeeForm.vue';
 
 const DEFAULT_PAGE_SIZE = 10;
+
+const EMPLOYEE_PERMISSIONS = {
+  create: 'Hrms.Employee.Create',
+  delete: 'Hrms.Employee.Delete',
+  update: 'Hrms.Employee.Update',
+  view: 'Hrms.Employee',
+} as const;
+
+const { hasAccessByCodes } = useAccess();
+
+const canCreateEmployee = computed(() =>
+  hasAccessByCodes([EMPLOYEE_PERMISSIONS.create]),
+);
+const canDeleteEmployee = computed(() =>
+  hasAccessByCodes([EMPLOYEE_PERMISSIONS.delete]),
+);
+const canUpdateEmployee = computed(() =>
+  hasAccessByCodes([EMPLOYEE_PERMISSIONS.update]),
+);
+const canViewEmployee = computed(() =>
+  hasAccessByCodes([EMPLOYEE_PERMISSIONS.view]),
+);
+
+function showNoPermissionMessage() {
+  message.warning($t('page.common.noPermissionAction'));
+}
 
 const STATUS_TYPE_MAP: Record<
   string,
@@ -218,11 +248,21 @@ const [Drawer, drawerApi] = useVbenDrawer({
 });
 
 function openCreate() {
+  if (!canCreateEmployee.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   drawerApi.setData({ record: null });
   drawerApi.open();
 }
 
 async function onEdit(row: EmployeeApi.EmployeeItem) {
+  if (!canUpdateEmployee.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   try {
     const response = await getEmployeeByIdApi(row.id);
     if (!response.data) {
@@ -240,12 +280,22 @@ async function onEdit(row: EmployeeApi.EmployeeItem) {
 }
 
 function onDelete(row: EmployeeApi.EmployeeItem) {
+  if (!canDeleteEmployee.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   message.info(
     `Chưa có API xóa nhân viên: ${row?.name || row?.userName || ''}`,
   );
 }
 
 function onDetail(row: EmployeeApi.EmployeeItem) {
+  if (!canViewEmployee.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   message.info(`Chi tiết nhân viên: ${row?.name || row?.userName || ''}`);
 }
 
@@ -258,7 +308,11 @@ function onFormSubmit(_formData: Record<string, any>) {
   <Page>
     <Grid>
       <template #toolbar-actions>
-        <NButton type="primary" @click="openCreate">
+        <NButton
+          type="primary"
+          :disabled="!canCreateEmployee"
+          @click="openCreate"
+        >
           <template #icon>
             <IconifyIcon icon="lucide:plus" />
           </template>
@@ -281,6 +335,7 @@ function onFormSubmit(_formData: Record<string, any>) {
                 quaternary
                 size="small"
                 type="primary"
+                :disabled="!canUpdateEmployee"
                 @click="onEdit(row)"
               >
                 <template #icon>
@@ -299,7 +354,13 @@ function onFormSubmit(_formData: Record<string, any>) {
             <template #trigger>
               <NTooltip trigger="hover">
                 <template #trigger>
-                  <NButton circle quaternary size="small" type="error">
+                  <NButton
+                    circle
+                    quaternary
+                    size="small"
+                    type="error"
+                    :disabled="!canDeleteEmployee"
+                  >
                     <template #icon>
                       <IconifyIcon class="size-4" icon="lucide:trash-2" />
                     </template>
@@ -318,6 +379,7 @@ function onFormSubmit(_formData: Record<string, any>) {
                 quaternary
                 size="small"
                 type="info"
+                :disabled="!canViewEmployee"
                 @click="onDetail(row)"
               >
                 <template #icon>

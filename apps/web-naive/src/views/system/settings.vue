@@ -3,15 +3,27 @@ import type { VbenFormProps } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { SettingsApi } from '#/models/settings';
 
-import { Page } from '@vben/common-ui';
+import { computed, ref } from 'vue';
 
-import { NTag, NTooltip } from 'naive-ui';
+import { Page } from '@vben/common-ui';
+import { IconifyIcon } from '@vben/icons';
+
+import {
+  NButton,
+  NDescriptions,
+  NDescriptionsItem,
+  NInput,
+  NModal,
+  NSpace,
+  NTag,
+  NTooltip,
+} from 'naive-ui';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { getSettingsApi } from '#/api';
+import { getSettingsApi, updateSettingApi } from '#/api';
 import { $t } from '#/locales';
 
-const DEFAULT_PAGE_SIZE = 50;
+const DEFAULT_PAGE_SIZE = 20;
 
 function normalizeFormValues(formValues?: Record<string, any>) {
   const filter = formValues?.filter?.trim?.();
@@ -23,6 +35,58 @@ function normalizeFormValues(formValues?: Record<string, any>) {
 
 function formatValue(value?: null | string) {
   return value === null || value === undefined || value === '' ? '-' : value;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function normalizeProvider(provider: unknown) {
+  return isRecord(provider) ? provider : { value: provider };
+}
+
+function isTenantProvider(provider: unknown) {
+  const record = normalizeProvider(provider);
+  const providerName = String(
+    record.providerName ?? record.ProviderName ?? record.name ?? record.Name ?? '',
+  ).toLowerCase();
+
+  return (
+    providerName === 't' ||
+    providerName === 'tenant' ||
+    providerName.includes('tenant') ||
+    Object.values(record).some((value) =>
+      String(value ?? '')
+        .toLowerCase()
+        .includes('tenant'),
+    )
+  );
+}
+
+const selectedSetting = ref<null | SettingsApi.SettingItem>(null);
+const tenantDetailVisible = ref(false);
+const editVisible = ref(false);
+const editLoading = ref(false);
+const editingValue = ref('');
+
+const tenantProviders = computed(() => {
+  const providers = selectedSetting.value?.providers ?? [];
+  const tenantItems = providers.filter((provider) => isTenantProvider(provider));
+
+  return (tenantItems.length > 0 ? tenantItems : providers).map((provider) =>
+    normalizeProvider(provider),
+  );
+});
+
+function handleViewTenantDetail(row: SettingsApi.SettingItem) {
+  selectedSetting.value = row;
+  tenantDetailVisible.value = true;
+}
+
+function handleEdit(row: SettingsApi.SettingItem) {
+  selectedSetting.value = row;
+  editingValue.value = row.value ?? '';
+  editVisible.value = true;
 }
 
 const formOptions: VbenFormProps = {
@@ -54,9 +118,17 @@ const gridOptions: VxeGridProps<SettingsApi.SettingItem> = {
   columns: [
     {
       align: 'center',
+      fixed: 'left',
       title: '#',
       type: 'seq',
       width: 60,
+    },
+    {
+      align: 'center',
+      fixed: 'left',
+      slots: { default: 'actions' },
+      title: $t('page.system.settingsPage.actions'),
+      width: 110,
     },
     {
       field: 'name',
@@ -121,11 +193,12 @@ const gridOptions: VxeGridProps<SettingsApi.SettingItem> = {
   proxyConfig: {
     ajax: {
       query: async ({ page }: any, formValues: Record<string, any>) => {
-        const response = await getSettingsApi({
+        const params: SettingsApi.SettingListParams = {
           current: page.currentPage ?? 1,
           pageSize: page.pageSize ?? DEFAULT_PAGE_SIZE,
           ...normalizeFormValues(formValues),
-        });
+        };
+        const response = await getSettingsApi(params);
         const items = response.data ?? [];
 
         return {
@@ -145,10 +218,28 @@ const gridOptions: VxeGridProps<SettingsApi.SettingItem> = {
   },
 };
 
-const [Grid] = useVbenVxeGrid<SettingsApi.SettingItem>({
+const [Grid, gridApi] = useVbenVxeGrid<SettingsApi.SettingItem>({
   formOptions,
   gridOptions,
 });
+
+async function handleSubmitEdit() {
+  if (!selectedSetting.value) {
+    return;
+  }
+
+  editLoading.value = true;
+  try {
+    await updateSettingApi({
+      name: selectedSetting.value.name,
+      value: editingValue.value || null,
+    });
+    editVisible.value = false;
+    await gridApi.query();
+  } finally {
+    editLoading.value = false;
+  }
+}
 </script>
 
 <template>
@@ -157,6 +248,44 @@ const [Grid] = useVbenVxeGrid<SettingsApi.SettingItem>({
     :title="$t('page.system.settings')"
   >
     <Grid>
+      <template #actions="{ row }">
+        <NSpace :size="4" justify="center">
+          <NTooltip trigger="hover">
+            <template #trigger>
+              <NButton
+                circle
+                quaternary
+                size="small"
+                type="info"
+                @click="handleViewTenantDetail(row)"
+              >
+                <template #icon>
+                  <IconifyIcon class="size-4" icon="lucide:building-2" />
+                </template>
+              </NButton>
+            </template>
+            {{ $t('page.system.settingsPage.tenantDetail') }}
+          </NTooltip>
+
+          <NTooltip trigger="hover">
+            <template #trigger>
+              <NButton
+                circle
+                quaternary
+                size="small"
+                type="primary"
+                @click="handleEdit(row)"
+              >
+                <template #icon>
+                  <IconifyIcon class="size-4" icon="lucide:pencil" />
+                </template>
+              </NButton>
+            </template>
+            {{ $t('page.system.settingsPage.edit') }}
+          </NTooltip>
+        </NSpace>
+      </template>
+
       <template #valueCell="{ row }">
         <NTooltip v-if="row.value" trigger="hover">
           <template #trigger>
@@ -213,5 +342,64 @@ const [Grid] = useVbenVxeGrid<SettingsApi.SettingItem>({
         </NTooltip>
       </template>
     </Grid>
+
+    <NModal
+      v-model:show="tenantDetailVisible"
+      preset="card"
+      :title="$t('page.system.settingsPage.tenantDetail')"
+      class="max-w-[720px]"
+    >
+      <NDescriptions
+        v-if="selectedSetting"
+        bordered
+        :column="1"
+        label-placement="left"
+        size="small"
+      >
+        <NDescriptionsItem :label="$t('page.system.settingsPage.name')">
+          {{ selectedSetting.name }}
+        </NDescriptionsItem>
+        <NDescriptionsItem :label="$t('page.system.settingsPage.providers')">
+          <span v-if="tenantProviders.length === 0">-</span>
+          <NSpace v-else vertical :size="8">
+            <pre
+              v-for="(provider, index) in tenantProviders"
+              :key="index"
+              class="max-h-48 overflow-auto whitespace-pre-wrap break-all rounded bg-muted p-3 text-xs"
+            >{{ JSON.stringify(provider, null, 2) }}</pre>
+          </NSpace>
+        </NDescriptionsItem>
+      </NDescriptions>
+    </NModal>
+
+    <NModal
+      v-model:show="editVisible"
+      preset="dialog"
+      :title="$t('page.system.settingsPage.edit')"
+      :positive-text="$t('page.system.settingsPage.save')"
+      :negative-text="$t('page.system.settingsPage.cancel')"
+      :loading="editLoading"
+      @positive-click="handleSubmitEdit"
+    >
+      <NSpace v-if="selectedSetting" vertical :size="12">
+        <NDescriptions bordered :column="1" label-placement="left" size="small">
+          <NDescriptionsItem :label="$t('page.system.settingsPage.name')">
+            {{ selectedSetting.name }}
+          </NDescriptionsItem>
+          <NDescriptionsItem
+            :label="$t('page.system.settingsPage.defaultValue')"
+          >
+            {{ formatValue(selectedSetting.defaultValue) }}
+          </NDescriptionsItem>
+        </NDescriptions>
+        <NInput
+          v-model:value="editingValue"
+          clearable
+          type="textarea"
+          :autosize="{ minRows: 3, maxRows: 8 }"
+          :placeholder="$t('page.system.settingsPage.valuePlaceholder')"
+        />
+      </NSpace>
+    </NModal>
   </Page>
 </template>

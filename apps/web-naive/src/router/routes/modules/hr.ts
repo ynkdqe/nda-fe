@@ -5,6 +5,7 @@ import { $t } from "#/locales";
 const hrPermissions = [
   "Hrms.Spreedsheet",
   "Hrms.Employee",
+  "Hrms.OrganizationUnit",
   "Hrms.Payroll",
   "Hrms.Contract",
   "Hrms.ContractType",
@@ -43,6 +44,17 @@ const routes: RouteRecordRaw[] = [
           authority: ["Hrms.Employee"],
           icon: "lucide:user-round",
           title: $t("page.hr.employees"),
+          keepAlive: true,
+        },
+      },
+      {
+        name: "HrOrganizationUnits",
+        path: "/hr/organization-units",
+        component: () => import("#/views/identity/organizations/index.vue"),
+        meta: {
+          authority: ["Hrms.OrganizationUnit"],
+          icon: "lucide:building-2",
+          title: $t("page.hr.organizationUnits"),
           keepAlive: true,
         },
       },

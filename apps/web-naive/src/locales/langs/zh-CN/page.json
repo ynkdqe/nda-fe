@@ -7,6 +7,9 @@
     "forgetPassword": "忘记密码",
     "profile": "个人中心"
   },
+  "common": {
+    "noPermissionAction": "您没有权限执行此操作"
+  },
   "dashboard": {
     "title": "概览",
     "analytics": "分析页",
@@ -180,6 +183,7 @@
     "title": "人力资源",
     "attendance": "考勤",
     "employees": "员工",
+    "organizationUnits": "组织单位",
     "payroll": "工资表",
     "contracts": "合同",
     "contractTypes": "合同类型",
@@ -567,6 +571,12 @@
       "sensitive": "敏感",
       "encrypted": "已加密",
       "providers": "提供者",
+      "actions": "操作",
+      "tenantDetail": "租户详情",
+      "edit": "编辑",
+      "save": "保存",
+      "cancel": "取消",
+      "valuePlaceholder": "请输入设置值",
       "yes": "是",
       "no": "否"
     },
@@ -638,6 +648,22 @@
       "sampleDataOne": "示例数据 1",
       "sampleDataTwo": "示例数据 2"
     }
+  },
+  "about": {
+    "title": "关于项目",
+    "description": "是一个现代化开箱即用的中后台解决方案，采用 Vue 3、Vite、TailwindCSS 和 TypeScript 构建，提供清晰的项目结构、灵活的配置以及丰富的示例，适用于中大型后台系统开发。",
+    "basicInfo": "基本信息",
+    "version": "版本号",
+    "license": "开源许可协议",
+    "buildTime": "最后构建时间",
+    "homepage": "主页",
+    "document": "文档地址",
+    "preview": "预览地址",
+    "github": "Github",
+    "author": "作者",
+    "view": "点击查看",
+    "dependencies": "生产环境依赖",
+    "devDependencies": "开发环境依赖"
   },
   "profile": {
     "title": "个人中心",

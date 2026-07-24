@@ -3,8 +3,9 @@ import type { VbenFormProps } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { WorkScheduleApi } from '#/models/hr/work-schedule';
 
-import { markRaw } from 'vue';
+import { computed, markRaw } from 'vue';
 
+import { useAccess } from '@vben/access';
 import { Page, useVbenDrawer } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
 import { formatDate } from '@vben/utils';
@@ -17,12 +18,37 @@ import {
   createWorkScheduleApi,
   deleteWorkScheduleApi,
   getWorkScheduleListApi,
+  updateWorkScheduleApi,
 } from '#/api';
 import EmployeeSearchSelect from '#/components/EmployeeSearchSelect.vue';
+import { $t } from '#/locales';
 
 import WorkScheduleForm from './WorkScheduleForm.vue';
 
 const DEFAULT_PAGE_SIZE = 10;
+
+const WORK_SCHEDULE_PERMISSIONS = {
+  create: 'Hrms.WorkSchedule.Create',
+  delete: 'Hrms.WorkSchedule.Delete',
+  update: 'Hrms.WorkSchedule.Update',
+  view: 'Hrms.WorkSchedule',
+} as const;
+
+const { hasAccessByCodes } = useAccess();
+
+const canCreateWorkSchedule = computed(() =>
+  hasAccessByCodes([WORK_SCHEDULE_PERMISSIONS.create]),
+);
+const canDeleteWorkSchedule = computed(() =>
+  hasAccessByCodes([WORK_SCHEDULE_PERMISSIONS.delete]),
+);
+const canUpdateWorkSchedule = computed(() =>
+  hasAccessByCodes([WORK_SCHEDULE_PERMISSIONS.update]),
+);
+
+function showNoPermissionMessage() {
+  message.warning($t('page.common.noPermissionAction'));
+}
 
 function formatScheduleDate(value?: null | string) {
   return value ? formatDate(value, 'DD-MM-YYYY') : '-';
@@ -177,7 +203,7 @@ const gridOptions: VxeGridProps<WorkScheduleApi.WorkScheduleItem> = {
       fixed: 'right',
       slots: { default: 'actions' },
       title: 'Hành động',
-      width: 120,
+      width: 140,
     },
   ],
   keepSource: true,
@@ -222,11 +248,31 @@ const [Drawer, drawerApi] = useVbenDrawer({
 });
 
 function handleAdd() {
+  if (!canCreateWorkSchedule.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   drawerApi.setData({ record: null });
   drawerApi.open();
 }
 
+function handleEdit(row: WorkScheduleApi.WorkScheduleItem) {
+  if (!canUpdateWorkSchedule.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
+  drawerApi.setData({ record: row });
+  drawerApi.open();
+}
+
 async function handleDelete(row: WorkScheduleApi.WorkScheduleItem) {
+  if (!canDeleteWorkSchedule.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   if (!row.id) {
     return;
   }
@@ -240,13 +286,23 @@ async function handleFormSubmit(
   payload: Record<string, any>,
   original?: null | WorkScheduleApi.WorkScheduleItem,
 ) {
-  if (original?.id) {
-    message.warning('Không cho phép cập nhật lịch làm việc');
+  if (original?.id && !canUpdateWorkSchedule.value) {
+    showNoPermissionMessage();
     return;
   }
 
-  await createWorkScheduleApi(payload);
-  message.success('Tạo lịch làm việc thành công');
+  if (!original?.id && !canCreateWorkSchedule.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
+  if (original?.id) {
+    await updateWorkScheduleApi(original.id, payload);
+    message.success('Cập nhật lịch làm việc thành công');
+  } else {
+    await createWorkScheduleApi(payload);
+    message.success('Tạo lịch làm việc thành công');
+  }
 
   drawerApi.close();
   await gridApi.query();
@@ -257,7 +313,11 @@ async function handleFormSubmit(
   <Page>
     <Grid>
       <template #toolbar-actions>
-        <NButton type="primary" @click="handleAdd">
+        <NButton
+          type="primary"
+          :disabled="!canCreateWorkSchedule"
+          @click="handleAdd"
+        >
           <template #icon>
             <IconifyIcon icon="lucide:plus" />
           </template>
@@ -271,6 +331,24 @@ async function handleFormSubmit(
 
       <template #actions="{ row }">
         <NSpace justify="center" :size="4">
+          <NTooltip trigger="hover">
+            <template #trigger>
+              <NButton
+                circle
+                quaternary
+                size="small"
+                type="primary"
+                :disabled="!canUpdateWorkSchedule"
+                @click="handleEdit(row)"
+              >
+                <template #icon>
+                  <IconifyIcon class="size-4" icon="lucide:pencil" />
+                </template>
+              </NButton>
+            </template>
+            Sửa
+          </NTooltip>
+
           <NPopconfirm
             negative-text="Hủy"
             positive-text="Xóa"
@@ -279,7 +357,13 @@ async function handleFormSubmit(
             <template #trigger>
               <NTooltip trigger="hover">
                 <template #trigger>
-                  <NButton circle quaternary size="small" type="error">
+                  <NButton
+                    circle
+                    quaternary
+                    size="small"
+                    type="error"
+                    :disabled="!canDeleteWorkSchedule"
+                  >
                     <template #icon>
                       <IconifyIcon class="size-4" icon="lucide:trash-2" />
                     </template>

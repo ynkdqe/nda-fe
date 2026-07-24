@@ -7,6 +7,9 @@
     "forgetPassword": "Forget Password",
     "profile": "Profile"
   },
+  "common": {
+    "noPermissionAction": "You do not have permission to perform this action"
+  },
   "dashboard": {
     "title": "Dashboard",
     "analytics": "Analytics",
@@ -180,6 +183,7 @@
     "title": "Human Resources",
     "attendance": "Attendance",
     "employees": "Employees",
+    "organizationUnits": "Organization Units",
     "payroll": "Payroll",
     "contracts": "Contracts",
     "contractTypes": "Contract Types",
@@ -567,6 +571,12 @@
       "sensitive": "Sensitive",
       "encrypted": "Encrypted",
       "providers": "Providers",
+      "actions": "Actions",
+      "tenantDetail": "Tenant detail",
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "valuePlaceholder": "Enter setting value",
       "yes": "Yes",
       "no": "No"
     },
@@ -638,6 +648,22 @@
       "sampleDataOne": "Sample Data 1",
       "sampleDataTwo": "Sample Data 2"
     }
+  },
+  "about": {
+    "title": "About Project",
+    "description": "is a modern out-of-the-box admin solution built with Vue 3, Vite, TailwindCSS and TypeScript. It provides a clean structure, flexible configuration and rich examples for building medium and large admin systems.",
+    "basicInfo": "Basic Information",
+    "version": "Version",
+    "license": "Open Source License",
+    "buildTime": "Last Build Time",
+    "homepage": "Homepage",
+    "document": "Documentation",
+    "preview": "Preview",
+    "github": "Github",
+    "author": "Author",
+    "view": "View",
+    "dependencies": "Production Dependencies",
+    "devDependencies": "Development Dependencies"
   },
   "profile": {
     "title": "Profile",

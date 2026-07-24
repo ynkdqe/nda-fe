@@ -3,6 +3,9 @@ import type { VbenFormProps } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { ContractTypeApi } from '#/models/hr/contract-type';
 
+import { computed } from 'vue';
+
+import { useAccess } from '@vben/access';
 import { Page, useVbenDrawer, useVbenModal } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
 
@@ -18,11 +21,35 @@ import {
   updateContractTypeApi,
   updateContractTypeDurationsApi,
 } from '#/api';
+import { $t } from '#/locales';
 
 import ContractTypeForm from './ContractTypeForm.vue';
 import DurationsModal from './DurationsModal.vue';
 
 const DEFAULT_PAGE_SIZE = 10;
+
+const CONTRACT_TYPE_PERMISSIONS = {
+  create: 'Hrms.ContractType.Create',
+  delete: 'Hrms.ContractType.Delete',
+  update: 'Hrms.ContractType.Update',
+  view: 'Hrms.ContractType',
+} as const;
+
+const { hasAccessByCodes } = useAccess();
+
+const canCreateContractType = computed(() =>
+  hasAccessByCodes([CONTRACT_TYPE_PERMISSIONS.create]),
+);
+const canDeleteContractType = computed(() =>
+  hasAccessByCodes([CONTRACT_TYPE_PERMISSIONS.delete]),
+);
+const canUpdateContractType = computed(() =>
+  hasAccessByCodes([CONTRACT_TYPE_PERMISSIONS.update]),
+);
+
+function showNoPermissionMessage() {
+  message.warning($t('page.common.noPermissionAction'));
+}
 
 function numberFormatter(value?: null | number | string) {
   if (value === null || value === undefined || value === '') {
@@ -171,11 +198,21 @@ const [Modal, modalApi] = useVbenModal({
 });
 
 function handleAdd() {
+  if (!canCreateContractType.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   drawerApi.setData({ record: null });
   drawerApi.open();
 }
 
 async function handleEdit(row: ContractTypeApi.ContractTypeItem) {
+  if (!canUpdateContractType.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   const response = await getContractTypeByIdApi(row.id);
   if (!response.data) {
     message.error(response.message ?? 'Không tìm thấy loại hợp đồng');
@@ -187,11 +224,26 @@ async function handleEdit(row: ContractTypeApi.ContractTypeItem) {
 }
 
 function openDurationsModal(row: ContractTypeApi.ContractTypeItem) {
+  if (!canUpdateContractType.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   modalApi.setData({ record: row });
   modalApi.open();
 }
 
 async function handleFormSubmit(payload: Record<string, any>) {
+  if (payload?.id && !canUpdateContractType.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
+  if (!payload?.id && !canCreateContractType.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   if (payload?.id) {
     await updateContractTypeApi(payload.id, payload);
     message.success('Cập nhật loại hợp đồng thành công');
@@ -208,6 +260,11 @@ async function handleDurationSubmit(data: {
   contractTypeId: number | string;
   durations: ContractTypeApi.DurationItem[];
 }) {
+  if (!canUpdateContractType.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   await updateContractTypeDurationsApi(data.contractTypeId, data.durations);
   message.success('Lưu thời hạn hợp đồng thành công');
   modalApi.close();
@@ -215,6 +272,11 @@ async function handleDurationSubmit(data: {
 }
 
 async function onDelete(row: ContractTypeApi.ContractTypeItem) {
+  if (!canDeleteContractType.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   if (!row.id) {
     return;
   }
@@ -229,7 +291,11 @@ async function onDelete(row: ContractTypeApi.ContractTypeItem) {
   <Page>
     <Grid>
       <template #toolbar-actions>
-        <NButton type="primary" @click="handleAdd">
+        <NButton
+          type="primary"
+          :disabled="!canCreateContractType"
+          @click="handleAdd"
+        >
           <template #icon>
             <IconifyIcon icon="lucide:plus" />
           </template>
@@ -254,6 +320,7 @@ async function onDelete(row: ContractTypeApi.ContractTypeItem) {
                 quaternary
                 size="small"
                 type="primary"
+                :disabled="!canUpdateContractType"
                 @click="handleEdit(row)"
               >
                 <template #icon>
@@ -271,6 +338,7 @@ async function onDelete(row: ContractTypeApi.ContractTypeItem) {
                 quaternary
                 size="small"
                 type="info"
+                :disabled="!canUpdateContractType"
                 @click="openDurationsModal(row)"
               >
                 <template #icon>
@@ -289,7 +357,13 @@ async function onDelete(row: ContractTypeApi.ContractTypeItem) {
             <template #trigger>
               <NTooltip trigger="hover">
                 <template #trigger>
-                  <NButton circle quaternary size="small" type="error">
+                  <NButton
+                    circle
+                    quaternary
+                    size="small"
+                    type="error"
+                    :disabled="!canDeleteContractType"
+                  >
                     <template #icon>
                       <IconifyIcon class="size-4" icon="lucide:trash-2" />
                     </template>

@@ -3,8 +3,9 @@ import type { VbenFormProps } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { WorkShiftApi } from '#/models/hr/workshift';
 
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
+import { useAccess } from '@vben/access';
 import { Page, useVbenDrawer } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
 
@@ -19,10 +20,34 @@ import {
   getWorkShiftListApi,
   updateWorkShiftApi,
 } from '#/api';
+import { $t } from '#/locales';
 
 import WorkShiftForm from './WorkShiftForm.vue';
 
 const DEFAULT_PAGE_SIZE = 10;
+
+const WORK_SHIFT_PERMISSIONS = {
+  create: 'Hrms.Workshift.Create',
+  delete: 'Hrms.Workshift.Delete',
+  update: 'Hrms.Workshift.Update',
+  view: 'Hrms.Workshift',
+} as const;
+
+const { hasAccessByCodes } = useAccess();
+
+const canCreateWorkShift = computed(() =>
+  hasAccessByCodes([WORK_SHIFT_PERMISSIONS.create]),
+);
+const canDeleteWorkShift = computed(() =>
+  hasAccessByCodes([WORK_SHIFT_PERMISSIONS.delete]),
+);
+const canUpdateWorkShift = computed(() =>
+  hasAccessByCodes([WORK_SHIFT_PERMISSIONS.update]),
+);
+
+function showNoPermissionMessage() {
+  message.warning($t('page.common.noPermissionAction'));
+}
 
 const currentEditId = ref<null | number | string>(null);
 
@@ -159,12 +184,22 @@ const [Drawer, drawerApi] = useVbenDrawer({
 });
 
 function handleAdd() {
+  if (!canCreateWorkShift.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   currentEditId.value = null;
   drawerApi.setData({ record: null });
   drawerApi.open();
 }
 
 async function handleEdit(row: WorkShiftApi.WorkShiftItem) {
+  if (!canUpdateWorkShift.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   const response = await getWorkShiftByIdApi(row.id);
   if (!response.data) {
     message.error(response.message ?? 'Không tìm thấy ca làm việc');
@@ -177,6 +212,11 @@ async function handleEdit(row: WorkShiftApi.WorkShiftItem) {
 }
 
 async function handleDelete(row: WorkShiftApi.WorkShiftItem) {
+  if (!canDeleteWorkShift.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   if (!row.id) {
     return;
   }
@@ -187,6 +227,16 @@ async function handleDelete(row: WorkShiftApi.WorkShiftItem) {
 }
 
 async function handleFormSubmit(payload: Record<string, any>) {
+  if (currentEditId.value && !canUpdateWorkShift.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
+  if (!currentEditId.value && !canCreateWorkShift.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   if (currentEditId.value) {
     await updateWorkShiftApi(currentEditId.value, payload);
     message.success('Cập nhật ca làm việc thành công');
@@ -204,7 +254,11 @@ async function handleFormSubmit(payload: Record<string, any>) {
   <Page>
     <Grid>
       <template #toolbar-actions>
-        <NButton type="primary" @click="handleAdd">
+        <NButton
+          type="primary"
+          :disabled="!canCreateWorkShift"
+          @click="handleAdd"
+        >
           <template #icon>
             <IconifyIcon icon="lucide:plus" />
           </template>
@@ -233,6 +287,7 @@ async function handleFormSubmit(payload: Record<string, any>) {
                 quaternary
                 size="small"
                 type="primary"
+                :disabled="!canUpdateWorkShift"
                 @click="handleEdit(row)"
               >
                 <template #icon>
@@ -251,7 +306,13 @@ async function handleFormSubmit(payload: Record<string, any>) {
             <template #trigger>
               <NTooltip trigger="hover">
                 <template #trigger>
-                  <NButton circle quaternary size="small" type="error">
+                  <NButton
+                    circle
+                    quaternary
+                    size="small"
+                    type="error"
+                    :disabled="!canDeleteWorkShift"
+                  >
                     <template #icon>
                       <IconifyIcon class="size-4" icon="lucide:trash-2" />
                     </template>

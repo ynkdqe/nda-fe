@@ -26,6 +26,7 @@ import {
 import { $t } from '#/locales';
 import { DEFAULT_APP_LOGO, DEFAULT_APP_TITLE } from '#/preferences';
 import { useRealtimeStore } from '#/store/realtime';
+import { setFavicon } from '#/utils/favicon';
 
 export const useAuthStore = defineStore('auth', () => {
   const accessStore = useAccessStore();
@@ -150,15 +151,18 @@ export const useAuthStore = defineStore('auth', () => {
     const tenantName = tenant?.name?.trim();
     const tenantLogo = tenant?.profile?.logoUrl?.trim();
 
+    const logo = tenantLogo || DEFAULT_APP_LOGO;
+
     updatePreferences({
       app: {
         name: tenantName || DEFAULT_APP_TITLE,
       },
       logo: {
-        source: tenantLogo || DEFAULT_APP_LOGO,
-        sourceDark: tenantLogo || DEFAULT_APP_LOGO,
+        source: logo,
+        sourceDark: logo,
       },
     });
+    setFavicon(logo);
   }
 
   function resetTenantBranding() {
@@ -171,6 +175,7 @@ export const useAuthStore = defineStore('auth', () => {
         sourceDark: DEFAULT_APP_LOGO,
       },
     });
+    setFavicon(DEFAULT_APP_LOGO);
   }
 
   async function logout(redirect: boolean = true) {

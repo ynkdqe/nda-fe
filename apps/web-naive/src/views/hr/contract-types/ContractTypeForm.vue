@@ -10,6 +10,7 @@ import type {
 
 import { computed, nextTick, reactive, ref } from 'vue';
 
+import { useAccess } from '@vben/access';
 import { useVbenDrawer } from '@vben/common-ui';
 
 import {
@@ -19,13 +20,24 @@ import {
   NFormItem,
   NInput,
   NInputNumber,
+  NSpace,
   NSwitch,
 } from 'naive-ui';
+
+import { message } from '#/adapter/naive';
+import { $t } from '#/locales';
 
 const emit = defineEmits<{
   cancel: [];
   submit: [payload: UnknownRecord];
 }>();
+
+const CONTRACT_TYPE_PERMISSIONS = {
+  create: 'Hrms.ContractType.Create',
+  update: 'Hrms.ContractType.Update',
+} as const;
+
+const { hasAccessByCodes } = useAccess();
 
 const formRef = ref<FormInst | null>(null);
 
@@ -53,6 +65,15 @@ function resetForm(): ContractTypeFormModel {
 }
 
 const model = reactive<ContractTypeFormModel>(resetForm());
+const canCreateContractType = computed(() =>
+  hasAccessByCodes([CONTRACT_TYPE_PERMISSIONS.create]),
+);
+const canUpdateContractType = computed(() =>
+  hasAccessByCodes([CONTRACT_TYPE_PERMISSIONS.update]),
+);
+const canSubmit = computed(() =>
+  model.id ? canUpdateContractType.value : canCreateContractType.value,
+);
 
 const formRules: FormRules = {
   name: [
@@ -186,6 +207,11 @@ function removeDuration(index: number) {
 }
 
 async function handleSubmit() {
+  if (!canSubmit.value) {
+    message.warning($t('page.common.noPermissionAction'));
+    return;
+  }
+
   await formRef.value?.validate();
 
   const durations = model.contractDurations.map((duration) => ({
@@ -203,6 +229,7 @@ async function handleSubmit() {
 }
 
 const [Drawer, drawerApi] = useVbenDrawer({
+  showConfirmButton: false,
   onCancel() {
     emit('cancel');
     drawerApi.close();
@@ -437,5 +464,14 @@ const title = computed(() =>
         </div>
       </NFormItem>
     </NForm>
+
+    <template #footer>
+      <NSpace justify="end">
+        <NButton @click="drawerApi.close()">Hủy</NButton>
+        <NButton type="primary" :disabled="!canSubmit" @click="handleSubmit">
+          Lưu
+        </NButton>
+      </NSpace>
+    </template>
   </Drawer>
 </template>

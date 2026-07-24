@@ -19,5 +19,10 @@ export namespace SettingsApi {
     pageSize: number;
   }
 
+  export interface UpdateSettingPayload {
+    name: string;
+    value: null | string;
+  }
+
   export type SettingListResult = MResult<SettingItem[]>;
 }

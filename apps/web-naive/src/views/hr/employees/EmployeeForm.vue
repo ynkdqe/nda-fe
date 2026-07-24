@@ -10,6 +10,7 @@ import type {
 
 import { computed, nextTick, reactive, ref, watch } from 'vue';
 
+import { useAccess } from '@vben/access';
 import { useVbenDrawer } from '@vben/common-ui';
 import { $t } from '@vben/locales';
 
@@ -52,6 +53,13 @@ const emit = defineEmits<{
   submit: [data: EmployeeApi.EmployeeMutationPayload];
   'update:open': [value: boolean];
 }>();
+
+const EMPLOYEE_PERMISSIONS = {
+  create: 'Hrms.Employee.Create',
+  update: 'Hrms.Employee.Update',
+} as const;
+
+const { hasAccessByCodes } = useAccess();
 
 const formRef = ref<FormInst | null>(null);
 let bankItemSeed = 0;
@@ -147,6 +155,15 @@ function resetForm(): EmployeeFormData {
 const formData = reactive<EmployeeFormData>(resetForm());
 const selectedUser = ref<null | UserRecord>(null);
 const isEditMode = computed(() => !!formData.id);
+const canCreateEmployee = computed(() =>
+  hasAccessByCodes([EMPLOYEE_PERMISSIONS.create]),
+);
+const canUpdateEmployee = computed(() =>
+  hasAccessByCodes([EMPLOYEE_PERMISSIONS.update]),
+);
+const canSubmit = computed(() =>
+  isEditMode.value ? canUpdateEmployee.value : canCreateEmployee.value,
+);
 
 const departmentOptions = ref<SelectOption[]>([]);
 const departmentLoading = ref(false);
@@ -597,6 +614,11 @@ watch(
 );
 
 async function handleSubmit() {
+  if (!canSubmit.value) {
+    message.warning($t('page.common.noPermissionAction'));
+    return;
+  }
+
   try {
     await formRef.value?.validate();
   } catch {
@@ -971,7 +993,9 @@ defineExpose({
       <NSpace justify="end">
         <NButton @click="drawerApi.close()">Hủy</NButton>
         <NButton @click="handleReset">Đặt lại</NButton>
-        <NButton type="primary" @click="handleSubmit">Lưu</NButton>
+        <NButton type="primary" :disabled="!canSubmit" @click="handleSubmit">
+          Lưu
+        </NButton>
       </NSpace>
     </template>
   </Drawer>

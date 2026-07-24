@@ -8,21 +8,34 @@ import type {
 
 import { computed, reactive, ref } from 'vue';
 
+import { useAccess } from '@vben/access';
 import { useVbenDrawer } from '@vben/common-ui';
 
 import {
+  NButton,
   NForm,
   NFormItem,
   NInput,
   NInputNumber,
+  NSpace,
   NSwitch,
   NTimePicker,
 } from 'naive-ui';
+
+import { message } from '#/adapter/naive';
+import { $t } from '#/locales';
 
 const emit = defineEmits<{
   submit: [Record<string, any>];
   'update:open': [boolean];
 }>();
+
+const WORK_SHIFT_PERMISSIONS = {
+  create: 'Hrms.Workshift.Create',
+  update: 'Hrms.Workshift.Update',
+} as const;
+
+const { hasAccessByCodes } = useAccess();
 
 const formRef = ref<FormInst | null>(null);
 
@@ -49,6 +62,12 @@ function createInitialForm(): WorkShiftFormModel {
 }
 
 const form = reactive<WorkShiftFormModel>(createInitialForm());
+const canCreateWorkShift = computed(() =>
+  hasAccessByCodes([WORK_SHIFT_PERMISSIONS.create]),
+);
+const canUpdateWorkShift = computed(() =>
+  hasAccessByCodes([WORK_SHIFT_PERMISSIONS.update]),
+);
 
 const rules: FormRules = {
   code: [
@@ -196,12 +215,26 @@ function createPayload() {
   };
 }
 
+const canSubmit = computed(() => {
+  const data = drawerApi.getData<{
+    record: null | WorkShiftRecord;
+  }>();
+
+  return data.record ? canUpdateWorkShift.value : canCreateWorkShift.value;
+});
+
 async function handleSubmit() {
+  if (!canSubmit.value) {
+    message.warning($t('page.common.noPermissionAction'));
+    return;
+  }
+
   await formRef.value?.validate();
   emit('submit', createPayload());
 }
 
 const [Drawer, drawerApi] = useVbenDrawer({
+  showConfirmButton: false,
   onCancel() {
     emit('update:open', false);
     drawerApi.close();
@@ -411,6 +444,15 @@ defineExpose({
         </div>
       </NForm>
     </div>
+
+    <template #footer>
+      <NSpace justify="end">
+        <NButton @click="drawerApi.close()">Hủy</NButton>
+        <NButton type="primary" :disabled="!canSubmit" @click="handleSubmit">
+          Lưu
+        </NButton>
+      </NSpace>
+    </template>
   </Drawer>
 </template>
 

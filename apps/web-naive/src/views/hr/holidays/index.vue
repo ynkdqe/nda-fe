@@ -3,8 +3,9 @@ import type { VbenFormProps } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { HolidayApi, HolidayTypeOption } from '#/models/hr/holiday';
 
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
+import { useAccess } from '@vben/access';
 import { Page, useVbenDrawer } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
 import { $t } from '@vben/locales';
@@ -24,6 +25,25 @@ import {
 import HolidayForm from './HolidayForm.vue';
 
 const DEFAULT_PAGE_SIZE = 10;
+
+const HOLIDAY_PERMISSIONS = {
+  create: 'Hrms.Holiday.Create',
+  delete: 'Hrms.Holiday.Delete',
+  view: 'Hrms.Holiday',
+} as const;
+
+const { hasAccessByCodes } = useAccess();
+
+const canCreateHoliday = computed(() =>
+  hasAccessByCodes([HOLIDAY_PERMISSIONS.create]),
+);
+const canDeleteHoliday = computed(() =>
+  hasAccessByCodes([HOLIDAY_PERMISSIONS.delete]),
+);
+
+function showNoPermissionMessage() {
+  message.warning($t('page.common.noPermissionAction'));
+}
 
 const currentEditId = ref<null | string>(null);
 const holidayTypes = ref<HolidayTypeOption[]>([]);
@@ -214,12 +234,22 @@ const [Drawer, drawerApi] = useVbenDrawer({
 });
 
 function handleAdd() {
+  if (!canCreateHoliday.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   currentEditId.value = null;
   drawerApi.setData({ holidayTypes: holidayTypes.value, record: null });
   drawerApi.open();
 }
 
 async function handleFormSubmit(payload: Record<string, any>) {
+  if (!canCreateHoliday.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   if (currentEditId.value) {
     message.info('Chưa có API cập nhật ngày nghỉ');
   } else {
@@ -232,6 +262,11 @@ async function handleFormSubmit(payload: Record<string, any>) {
 }
 
 async function handleDelete(row: HolidayApi.HolidayItem) {
+  if (!canDeleteHoliday.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   if (!row.id) {
     return;
   }
@@ -248,7 +283,11 @@ onMounted(loadHolidayTypes);
   <Page>
     <Grid>
       <template #toolbar-actions>
-        <NButton type="primary" @click="handleAdd">
+        <NButton
+          type="primary"
+          :disabled="!canCreateHoliday"
+          @click="handleAdd"
+        >
           <template #icon>
             <IconifyIcon icon="lucide:plus" />
           </template>
@@ -282,7 +321,13 @@ onMounted(loadHolidayTypes);
             <template #trigger>
               <NTooltip trigger="hover">
                 <template #trigger>
-                  <NButton circle quaternary size="small" type="error">
+                  <NButton
+                    circle
+                    quaternary
+                    size="small"
+                    type="error"
+                    :disabled="!canDeleteHoliday"
+                  >
                     <template #icon>
                       <IconifyIcon class="size-4" icon="lucide:trash-2" />
                     </template>

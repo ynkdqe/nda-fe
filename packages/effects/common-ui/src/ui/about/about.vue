@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { AboutProps, DescriptionItem } from './about';
 
-import { h } from 'vue';
+import { computed, h } from 'vue';
 
 import {
   VBEN_DOC_URL,
@@ -19,10 +19,24 @@ defineOptions({
   name: 'AboutUI',
 });
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   description:
     '是一个现代化开箱即用的中后台解决方案，采用最新的技术栈，包括 Vue 3.0、Vite、TailwindCSS 和 TypeScript 等前沿技术，代码规范严谨，提供丰富的配置选项，旨在为中大型项目的开发提供现成的开箱即用解决方案及丰富的示例，同时，它也是学习和深入前端技术的一个极佳示例。',
-  name: 'Vben Admin',
+  labels: () => ({
+    author: '作者',
+    basicInfo: '基本信息',
+    buildTime: '最后构建时间',
+    dependencies: '生产环境依赖',
+    devDependencies: '开发环境依赖',
+    document: '文档地址',
+    github: 'Github',
+    homepage: '主页',
+    license: '开源许可协议',
+    preview: '预览地址',
+    version: '版本号',
+    view: '点击查看',
+  }),
+  name: 'NDA',
   title: '关于项目',
 });
 
@@ -62,43 +76,43 @@ const {
   // vite inject-metadata 插件注入的全局变量
 } = __VBEN_ADMIN_METADATA__ || {};
 
-const vbenDescriptionItems: DescriptionItem[] = [
+const vbenDescriptionItems = computed<DescriptionItem[]>(() => [
   {
     content: version,
-    title: '版本号',
+    title: props.labels.version,
   },
   {
     content: license,
-    title: '开源许可协议',
+    title: props.labels.license,
   },
   {
     content: buildTime,
-    title: '最后构建时间',
+    title: props.labels.buildTime,
   },
   {
-    content: renderLink(homepage, '点击查看'),
-    title: '主页',
+    content: renderLink(homepage, props.labels.view),
+    title: props.labels.homepage,
   },
   {
-    content: renderLink(VBEN_DOC_URL, '点击查看'),
-    title: '文档地址',
+    content: renderLink(VBEN_DOC_URL, props.labels.view),
+    title: props.labels.document,
   },
   {
-    content: renderLink(VBEN_PREVIEW_URL, '点击查看'),
-    title: '预览地址',
+    content: renderLink(VBEN_PREVIEW_URL, props.labels.view),
+    title: props.labels.preview,
   },
   {
-    content: renderLink(VBEN_GITHUB_URL, '点击查看'),
-    title: 'Github',
+    content: renderLink(VBEN_GITHUB_URL, props.labels.view),
+    title: props.labels.github,
   },
   {
     content: h('div', [
       renderLink(authorUrl, `${authorName}  `),
       renderLink(`mailto:${authorEmail}`, authorEmail),
     ]),
-    title: '作者',
+    title: props.labels.author,
   },
-];
+]);
 
 const dependenciesItems = Object.keys(dependencies).map((key) => ({
   content: dependencies[key],
@@ -123,7 +137,7 @@ const devDependenciesItems = Object.keys(devDependencies).map((key) => ({
     </template>
     <div class="card-box p-5">
       <div>
-        <h5 class="text-lg text-foreground">基本信息</h5>
+        <h5 class="text-lg text-foreground">{{ labels.basicInfo }}</h5>
       </div>
       <div class="mt-4">
         <dl class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -143,7 +157,7 @@ const devDependenciesItems = Object.keys(devDependencies).map((key) => ({
 
     <div class="card-box mt-6 p-5">
       <div>
-        <h5 class="text-lg text-foreground">生产环境依赖</h5>
+        <h5 class="text-lg text-foreground">{{ labels.dependencies }}</h5>
       </div>
       <div class="mt-4">
         <dl class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -162,7 +176,7 @@ const devDependenciesItems = Object.keys(devDependencies).map((key) => ({
     </div>
     <div class="card-box mt-6 p-5">
       <div>
-        <h5 class="text-lg text-foreground">开发环境依赖</h5>
+        <h5 class="text-lg text-foreground">{{ labels.devDependencies }}</h5>
       </div>
       <div class="mt-4">
         <dl class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4">

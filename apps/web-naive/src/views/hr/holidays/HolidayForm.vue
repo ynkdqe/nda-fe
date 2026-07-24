@@ -8,6 +8,7 @@ import type {
 
 import { computed, ref, watch } from 'vue';
 
+import { useAccess } from '@vben/access';
 import { useVbenDrawer } from '@vben/common-ui';
 import { $t } from '@vben/locales';
 import { formatDate } from '@vben/utils';
@@ -20,6 +21,7 @@ import {
   NRadioButton,
   NRadioGroup,
   NSelect,
+  NSpace,
   NSwitch,
   NTag,
 } from 'naive-ui';
@@ -29,6 +31,16 @@ import { message } from '#/adapter/naive';
 const emit = defineEmits<{
   submit: [Record<string, any>];
 }>();
+
+const HOLIDAY_PERMISSIONS = {
+  create: 'Hrms.Holiday.Create',
+} as const;
+
+const { hasAccessByCodes } = useAccess();
+
+const canCreateHoliday = computed(() =>
+  hasAccessByCodes([HOLIDAY_PERMISSIONS.create]),
+);
 
 const weekDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 
@@ -265,6 +277,11 @@ function removeDate(date: string) {
 }
 
 async function handleSubmit() {
+  if (!canCreateHoliday.value) {
+    message.warning($t('page.common.noPermissionAction'));
+    return;
+  }
+
   const name = form.value.name.trim();
   const description = form.value.description.trim();
 
@@ -300,6 +317,7 @@ watch(
 );
 
 const [Drawer, drawerApi] = useVbenDrawer({
+  showConfirmButton: false,
   onCancel() {
     drawerApi.close();
   },
@@ -457,6 +475,15 @@ defineExpose({
         </div>
       </NForm>
     </div>
+
+    <template #footer>
+      <NSpace justify="end">
+        <NButton @click="drawerApi.close()">Hủy</NButton>
+        <NButton type="primary" :disabled="!canCreateHoliday" @click="handleSubmit">
+          Lưu
+        </NButton>
+      </NSpace>
+    </template>
   </Drawer>
 </template>
 

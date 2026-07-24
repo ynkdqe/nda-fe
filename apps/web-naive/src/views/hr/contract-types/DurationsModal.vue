@@ -2,8 +2,9 @@
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { ContractTypeApi, DurationRow } from '#/models/hr/contract-type';
 
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
+import { useAccess } from '@vben/access';
 import { useVbenModal } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
 
@@ -11,6 +12,7 @@ import { NButton, NInput, NInputNumber, NSpace } from 'naive-ui';
 
 import { message } from '#/adapter/naive';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { $t } from '#/locales';
 
 const emit = defineEmits<{
   cancel: [];
@@ -22,9 +24,18 @@ const emit = defineEmits<{
   ];
 }>();
 
+const CONTRACT_TYPE_PERMISSIONS = {
+  update: 'Hrms.ContractType.Update',
+} as const;
+
+const { hasAccessByCodes } = useAccess();
+
 const durations = ref<DurationRow[]>([]);
 const loading = ref(false);
 const contractTypeId = ref<null | number | string>(null);
+const canUpdateContractType = computed(() =>
+  hasAccessByCodes([CONTRACT_TYPE_PERMISSIONS.update]),
+);
 
 function normalizeDuration(
   row: ContractTypeApi.DurationItem | DurationRow,
@@ -58,19 +69,38 @@ function syncGridData() {
   });
 }
 
+function showNoPermissionMessage() {
+  message.warning($t('page.common.noPermissionAction'));
+}
+
 function addRow() {
+  if (!canUpdateContractType.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   setupGridData();
   durations.value.push({ duration: 1, name: '' });
   syncGridData();
 }
 
 function removeRow(index: number) {
+  if (!canUpdateContractType.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   setupGridData();
   durations.value.splice(index, 1);
   syncGridData();
 }
 
 async function handleSubmit() {
+  if (!canUpdateContractType.value) {
+    showNoPermissionMessage();
+    return;
+  }
+
   if (!contractTypeId.value) {
     message.error('Không tìm thấy loại hợp đồng');
     return;
@@ -177,7 +207,12 @@ watch(
   <Modal>
     <Grid>
       <template #toolbar-actions>
-        <NButton size="small" type="primary" @click="addRow">
+        <NButton
+          size="small"
+          type="primary"
+          :disabled="!canUpdateContractType"
+          @click="addRow"
+        >
           <template #icon>
             <IconifyIcon icon="lucide:plus" />
           </template>
@@ -210,6 +245,7 @@ watch(
             quaternary
             size="small"
             type="error"
+            :disabled="!canUpdateContractType"
             @click="() => removeRow(rowIndex)"
           >
             <template #icon>
@@ -219,5 +255,19 @@ watch(
         </NSpace>
       </template>
     </Grid>
+
+    <template #footer>
+      <NSpace justify="end">
+        <NButton @click="close">Hủy</NButton>
+        <NButton
+          type="primary"
+          :disabled="!canUpdateContractType"
+          :loading="loading"
+          @click="handleSubmit"
+        >
+          Lưu
+        </NButton>
+      </NSpace>
+    </template>
   </Modal>
 </template>
