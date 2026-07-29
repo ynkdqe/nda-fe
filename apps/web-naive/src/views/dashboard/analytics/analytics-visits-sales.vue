@@ -31,7 +31,7 @@ onMounted(() => {
             value: 274,
           },
           { name: $t('page.dashboard.analyticsPage.sales.remote'), value: 400 },
-        ].toSorted((a, b) => {
+        ].sort((a, b) => {
           return a.value - b.value;
         }),
         name: $t('page.dashboard.analyticsPage.cards.salesRatio'),

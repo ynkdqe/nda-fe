@@ -158,7 +158,7 @@ function updateFormDates() {
     ...autoWeekendDates.value,
     ...manualDates.value,
   ]);
-  form.value.dates = [...combined].toSorted();
+  form.value.dates = [...combined].sort();
 }
 
 function computeAutoWeekends(month: number, year: number) {
@@ -302,7 +302,7 @@ async function handleSubmit() {
 
   emit('submit', {
     ...form.value,
-    dates: [...form.value.dates].toSorted(),
+    dates: [...form.value.dates].sort(),
     description,
     name,
   });

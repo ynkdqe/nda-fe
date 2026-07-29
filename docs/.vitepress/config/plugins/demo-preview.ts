@@ -83,7 +83,7 @@ export const demoPreviewPlugin = (md: MarkdownRenderer) => {
         return '';
       }
       const firstString = 'index.vue';
-      childFiles = childFiles.toSorted((a, b) => {
+      childFiles = [...childFiles].sort((a, b) => {
         if (a === firstString) return -1;
         if (b === firstString) return 1;
         return a.localeCompare(b, 'en', { sensitivity: 'base' });
