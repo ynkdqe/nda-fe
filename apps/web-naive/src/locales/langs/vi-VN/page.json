@@ -190,6 +190,8 @@
     "workShifts": "Ca làm việc",
     "workSchedules": "Lịch làm việc",
     "dayOffs": "Ngày nghỉ",
+    "requests": "Đơn từ",
+    "requestTypes": "Loại đơn từ",
     "dayOffPage": {
       "fields": {
         "isPaid": "Tính công"

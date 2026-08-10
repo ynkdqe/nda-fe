@@ -141,7 +141,7 @@ const statistics = computed<TimesheetStatisticItem[]>(() => {
     },
     {
       label: $t('page.hr.attendancePage.summary.overtime'),
-      trend: 'up',
+      trend: (dataExtend?.overtime ?? 0) > 0 ? 'up' : undefined,
       value: `${dataExtend?.overtime ?? 0}h`,
     },
     {

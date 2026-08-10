@@ -124,6 +124,26 @@ const routes: RouteRecordRaw[] = [
           keepAlive: true,
         },
       },
+      {
+        name: "HrRequests",
+        path: "/hr/requests",
+        component: () => import("#/views/hr/requests/index.vue"),
+        meta: {
+          icon: "lucide:file-pen-line",
+          title: $t("page.hr.requests"),
+          keepAlive: true,
+        },
+      },
+      {
+        name: "HrRequestTypes",
+        path: "/hr/request-types",
+        component: () => import("#/views/hr/requests/types.vue"),
+        meta: {
+          icon: "lucide:files",
+          title: $t("page.hr.requestTypes"),
+          keepAlive: true,
+        },
+      },
     ],
   },
 ];
