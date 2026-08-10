@@ -190,7 +190,9 @@ function filterRequests(requests: RequestItem[]) {
 }
 
 const filteredMyRequests = computed(() => filterRequests(myRequests));
-const filteredApprovalRequests = computed(() => filterRequests(approvalRequests));
+const filteredApprovalRequests = computed(() =>
+  filterRequests(approvalRequests),
+);
 
 const columns: DataTableColumns<RequestItem> = [
   {
