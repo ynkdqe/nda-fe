@@ -190,6 +190,8 @@
     "workShifts": "Work Shifts",
     "workSchedules": "Work Schedules",
     "dayOffs": "Days Off",
+    "requests": "Requests",
+    "requestTypes": "Request Types",
     "dayOffPage": {
       "fields": {
         "isPaid": "Paid"
