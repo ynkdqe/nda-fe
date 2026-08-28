@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { FormInst, FormRules } from 'naive-ui';
 
-import type { EmployeeRequestTypeApi } from '#/models/hr/employee-request-type';
+import type { EmployeeRequestTypeApi } from '#/models/employee-requests/employee-request-type';
 
 import { computed, nextTick, reactive, ref } from 'vue';
 

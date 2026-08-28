@@ -1,4 +1,4 @@
-import type { EmployeeRequestTypeApi } from '#/models/hr/employee-request-type';
+import type { EmployeeRequestTypeApi } from '#/models/employee-requests/employee-request-type';
 
 import { requestClient } from '#/api/request';
 

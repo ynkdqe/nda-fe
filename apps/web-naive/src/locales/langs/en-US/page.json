@@ -179,6 +179,14 @@
       }
     }
   },
+  "employeeRequest": {
+    "title": "Requests",
+    "requests": "Request List",
+    "configuration": "Request Configuration",
+    "types": "Request Types",
+    "reasons": "Reasons",
+    "policies": "Policies"
+  },
   "hr": {
     "title": "Human Resources",
     "attendance": "Attendance",

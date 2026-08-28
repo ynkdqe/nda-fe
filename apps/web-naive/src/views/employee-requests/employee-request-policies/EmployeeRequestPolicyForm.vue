@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import type { FormInst, FormRules } from 'naive-ui';
 
-import type { EmployeeRequestPolicyApi } from '#/models/hr/employee-request-policy';
-import type { EmployeeRequestReasonApi } from '#/models/hr/employee-request-reason';
-import type { EmployeeRequestTypeApi } from '#/models/hr/employee-request-type';
+import type { EmployeeRequestPolicyApi } from '#/models/employee-requests/employee-request-policy';
+import type { EmployeeRequestReasonApi } from '#/models/employee-requests/employee-request-reason';
+import type { EmployeeRequestTypeApi } from '#/models/employee-requests/employee-request-type';
 
 import { computed, nextTick, reactive, ref } from 'vue';
 
@@ -19,9 +19,9 @@ import {
   NSwitch,
 } from 'naive-ui';
 
-import EmployeeRequestPolicyUnitSelect from '../components/EmployeeRequestPolicyUnitSelect.vue';
-import EmployeeRequestReasonSelect from '../components/EmployeeRequestReasonSelect.vue';
-import EmployeeRequestTypeSelect from '../components/EmployeeRequestTypeSelect.vue';
+import EmployeeRequestPolicyUnitSelect from '../shared/EmployeeRequestPolicyUnitSelect.vue';
+import EmployeeRequestReasonSelect from '../shared/EmployeeRequestReasonSelect.vue';
+import EmployeeRequestTypeSelect from '../shared/EmployeeRequestTypeSelect.vue';
 const emit = defineEmits<{
   submit: [
     EmployeeRequestPolicyApi.CreateInput | EmployeeRequestPolicyApi.UpdateInput,

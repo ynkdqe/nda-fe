@@ -1,5 +1,6 @@
 export * from './analytic';
 export * from './core';
+export * from './employee-requests';
 export * from './hr';
 export * from './identity';
 export * from './location';

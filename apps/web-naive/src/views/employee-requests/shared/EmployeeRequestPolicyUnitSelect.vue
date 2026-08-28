@@ -3,7 +3,7 @@ import { computed } from 'vue';
 
 import { NSelect } from 'naive-ui';
 
-import { employeeRequestPolicyUnits } from '#/models/hr/employee-request-policy';
+import { employeeRequestPolicyUnits } from '#/models/employee-requests/employee-request-policy';
 
 const props = defineProps<{ value?: null | string }>();
 const emit = defineEmits<{ 'update:value': [null | string] }>();

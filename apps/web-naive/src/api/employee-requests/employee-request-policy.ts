@@ -1,4 +1,4 @@
-import type { EmployeeRequestPolicyApi } from '#/models/hr/employee-request-policy';
+import type { EmployeeRequestPolicyApi } from '#/models/employee-requests/employee-request-policy';
 
 import { requestClient } from '#/api/request';
 

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { EmployeeRequestReasonApi } from '#/models/hr/employee-request-reason';
+import type { EmployeeRequestReasonApi } from '#/models/employee-requests/employee-request-reason';
 
 import { computed, watch } from 'vue';
 

@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import type { VbenFormProps } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
-import type { EmployeeRequestPolicyApi } from '#/models/hr/employee-request-policy';
-import type { EmployeeRequestReasonApi } from '#/models/hr/employee-request-reason';
-import type { EmployeeRequestTypeApi } from '#/models/hr/employee-request-type';
+import type { EmployeeRequestPolicyApi } from '#/models/employee-requests/employee-request-policy';
+import type { EmployeeRequestReasonApi } from '#/models/employee-requests/employee-request-reason';
+import type { EmployeeRequestTypeApi } from '#/models/employee-requests/employee-request-type';
 
 import { computed, onMounted, ref } from 'vue';
 
@@ -26,7 +26,7 @@ import {
 } from '#/api';
 import { EMPLOYEE_REQUEST_PERMISSIONS } from '#/constants/employee-request';
 
-import PaidStatusBadge from '../components/PaidStatusBadge.vue';
+import PaidStatusBadge from '../shared/PaidStatusBadge.vue';
 import EmployeeRequestPolicyForm from './EmployeeRequestPolicyForm.vue';
 const { hasAccessByCodes } = useAccess();
 const canManage = computed(() =>

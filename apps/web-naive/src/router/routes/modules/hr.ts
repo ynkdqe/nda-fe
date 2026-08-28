@@ -1,6 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router';
 
-import { EMPLOYEE_REQUEST_PERMISSIONS } from '#/constants/employee-request';
 import { $t } from '#/locales';
 
 const hrPermissions = [
@@ -13,9 +12,6 @@ const hrPermissions = [
   'Hrms.Workshift',
   'Hrms.WorkSchedule',
   'Hrms.Holiday',
-  EMPLOYEE_REQUEST_PERMISSIONS.manageTypes,
-  EMPLOYEE_REQUEST_PERMISSIONS.manageReasons,
-  EMPLOYEE_REQUEST_PERMISSIONS.managePolicies,
 ];
 
 const routes: RouteRecordRaw[] = [
@@ -128,62 +124,7 @@ const routes: RouteRecordRaw[] = [
           keepAlive: true,
         },
       },
-      {
-        name: 'HrRequests',
-        path: '/hr/requests',
-        component: () => import('#/views/hr/requests/index.vue'),
-        meta: {
-          icon: 'lucide:file-pen-line',
-          title: $t('page.hr.requests'),
-          keepAlive: true,
-        },
-      },
-      {
-        name: 'HrEmployeeRequestConfiguration',
-        path: '/hr/employee-request-configuration',
-        meta: {
-          icon: 'lucide:settings-2',
-          title: $t('page.hr.requestSettings'),
-        },
-        children: [
-          {
-            name: 'HrEmployeeRequestTypes',
-            path: '/hr/employee-request-type',
-            component: () =>
-              import('#/views/hr/employee-requests/types/index.vue'),
-            meta: {
-              //authority: [EMPLOYEE_REQUEST_PERMISSIONS.manageTypes],
-              icon: 'lucide:files',
-              keepAlive: true,
-              title: $t('page.hr.requestTypes'),
-            },
-          },
-          {
-            name: 'HrEmployeeRequestReasons',
-            path: '/hr/employee-request-reason',
-            component: () =>
-              import('#/views/hr/employee-requests/reasons/index.vue'),
-            meta: {
-              //authority: [EMPLOYEE_REQUEST_PERMISSIONS.manageReasons],
-              icon: 'lucide:list-checks',
-              keepAlive: true,
-              title: $t('page.hr.leaveReasons'),
-            },
-          },
-          {
-            name: 'HrEmployeeRequestPolicies',
-            path: '/hr/employee-request-policy',
-            component: () =>
-              import('#/views/hr/employee-requests/policies/index.vue'),
-            meta: {
-              //authority: [EMPLOYEE_REQUEST_PERMISSIONS.managePolicies],
-              icon: 'lucide:shield-check',
-              keepAlive: true,
-              title: $t('page.hr.requestPolicies'),
-            },
-          },
-        ],
-      },
+
     ],
   },
 ];

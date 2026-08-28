@@ -179,6 +179,14 @@
       }
     }
   },
+  "employeeRequest": {
+    "title": "Đơn từ",
+    "requests": "Danh sách đơn từ",
+    "configuration": "Cấu hình đơn từ",
+    "types": "Loại đơn",
+    "reasons": "Lý do",
+    "policies": "Chính sách"
+  },
   "hr": {
     "title": "Nhân sự",
     "attendance": "Chấm công",

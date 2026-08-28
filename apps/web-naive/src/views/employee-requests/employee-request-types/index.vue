@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { VbenFormProps } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
-import type { EmployeeRequestTypeApi } from '#/models/hr/employee-request-type';
+import type { EmployeeRequestTypeApi } from '#/models/employee-requests/employee-request-type';
 
 import { ref } from 'vue';
 

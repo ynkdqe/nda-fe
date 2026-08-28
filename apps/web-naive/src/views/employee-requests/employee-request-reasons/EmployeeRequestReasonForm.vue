@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import type { FormInst, FormRules } from 'naive-ui';
 
-import type { EmployeeRequestReasonApi } from '#/models/hr/employee-request-reason';
-import type { EmployeeRequestTypeApi } from '#/models/hr/employee-request-type';
+import type { EmployeeRequestReasonApi } from '#/models/employee-requests/employee-request-reason';
+import type { EmployeeRequestTypeApi } from '#/models/employee-requests/employee-request-type';
 
 import { computed, nextTick, reactive, ref } from 'vue';
 
@@ -10,7 +10,7 @@ import { useVbenDrawer } from '@vben/common-ui';
 
 import { NButton, NForm, NFormItem, NInput, NSpace, NSwitch } from 'naive-ui';
 
-import EmployeeRequestTypeSelect from '../components/EmployeeRequestTypeSelect.vue';
+import EmployeeRequestTypeSelect from '../shared/EmployeeRequestTypeSelect.vue';
 
 const emit = defineEmits<{
   submit: [
