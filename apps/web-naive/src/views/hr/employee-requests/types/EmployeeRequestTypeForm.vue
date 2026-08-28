@@ -151,8 +151,8 @@ const title = computed(() => (model.id ? 'Sửa loại đơn' : 'Thêm loại đ
             placeholder="Ví dụ: lucide:calendar-off"
           >
             <template v-if="model.icon" #prefix>
-<IconifyIcon :icon="model.icon" />
-</template>
+              <IconifyIcon :icon="model.icon" />
+            </template>
           </NInput>
         </NFormItem>
         <NFormItem label="Thứ tự hiển thị" path="displayOrder" required>

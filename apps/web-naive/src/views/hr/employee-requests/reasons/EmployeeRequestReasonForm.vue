@@ -88,7 +88,7 @@ const title = computed(() => (model.id ? 'Sửa lý do' : 'Thêm lý do'));
 </script>
 <template>
   <Drawer :title="title" class="md:w-[640px]">
-<NForm
+    <NForm
       ref="formRef"
       :model="model"
       :rules="rules"
@@ -96,28 +96,29 @@ const title = computed(() => (model.id ? 'Sửa lý do' : 'Thêm lý do'));
       class="p-4 pb-20"
     >
       <NFormItem label="Loại đơn" path="employeeRequestTypeId" required>
-<EmployeeRequestTypeSelect
+        <EmployeeRequestTypeSelect
           v-model:value="model.employeeRequestTypeId"
           :options="types"
-      />
-</NFormItem>
+        />
+      </NFormItem>
       <NFormItem label="Tên lý do" path="name" required>
-<NInput v-model:value="model.name" :maxlength="100" show-count />
-</NFormItem>
+        <NInput v-model:value="model.name" :maxlength="100" show-count />
+      </NFormItem>
       <NFormItem label="Mô tả" path="description">
-<NInput
+        <NInput
           v-model:value="model.description"
           type="textarea"
           :maxlength="500"
           show-count
-      />
-</NFormItem>
+        />
+      </NFormItem>
       <NFormItem label="Đang hoạt động" path="isActive">
-<NSwitch v-model:value="model.isActive" />
-</NFormItem>
+        <NSwitch v-model:value="model.isActive" />
+      </NFormItem>
       <NSpace justify="end">
-<NButton @click="drawerApi.close()">Hủy</NButton><NButton type="primary" @click="submit">Lưu</NButton>
-</NSpace>
+        <NButton @click="drawerApi.close()">Hủy</NButton
+        ><NButton type="primary" @click="submit">Lưu</NButton>
+      </NSpace>
     </NForm>
-</Drawer>
+  </Drawer>
 </template>

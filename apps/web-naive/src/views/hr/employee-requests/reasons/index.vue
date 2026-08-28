@@ -180,71 +180,63 @@ onMounted(loadTypes);
 </script>
 <template>
   <Page>
-<Grid>
-<template #toolbar-actions>
-<NButton type="primary" @click="add">
-<template #icon><IconifyIcon icon="lucide:plus" /></template>Thêm
-          mới
-</NButton>
-</template><template #typeCell="{ row }">
-{{
-        row.employeeRequestType?.name ??
-        typeMap.get(row.employeeRequestTypeId)?.name ??
-        'Loại đơn đã bị xóa'
-      }}
-</template><template #statusCell="{ row }">
-<NTag :type="row.isActive ? 'success' : 'default'" size="small">
-{{
-          row.isActive ? 'Đang hoạt động' : 'Ngừng hoạt động'
-        }}
-</NTag>
-</template><template #actions="{ row }">
-<NSpace justify="center" :size="4">
-<NTooltip>
-<template #trigger>
-<NButton
+    <Grid>
+      <template #toolbar-actions>
+        <NButton type="primary" @click="add">
+          <template #icon><IconifyIcon icon="lucide:plus" /></template>Thêm mới
+        </NButton> </template
+      ><template #typeCell="{ row }">
+        {{
+          row.employeeRequestType?.name ??
+          typeMap.get(row.employeeRequestTypeId)?.name ??
+          'Loại đơn đã bị xóa'
+        }} </template
+      ><template #statusCell="{ row }">
+        <NTag :type="row.isActive ? 'success' : 'default'" size="small">
+          {{ row.isActive ? 'Đang hoạt động' : 'Ngừng hoạt động' }}
+        </NTag> </template
+      ><template #actions="{ row }">
+        <NSpace justify="center" :size="4">
+          <NTooltip>
+            <template #trigger>
+              <NButton
                 circle
                 quaternary
                 size="small"
                 type="primary"
                 @click="edit(row)"
-                >
-<template #icon>
-<IconifyIcon
-                    icon="lucide:pencil"
-/>
-</template>
-</NButton>
-</template>Sửa
-</NTooltip><NPopconfirm
+              >
+                <template #icon>
+                  <IconifyIcon icon="lucide:pencil" />
+                </template>
+              </NButton> </template
+            >Sửa </NTooltip
+          ><NPopconfirm
             negative-text="Hủy"
             positive-text="Xóa"
             @positive-click="() => remove(row)"
-            >
-<template #trigger>
-<NTooltip>
-<template #trigger>
-<NButton
+          >
+            <template #trigger>
+              <NTooltip>
+                <template #trigger>
+                  <NButton
                     circle
                     quaternary
                     size="small"
                     type="error"
                     :disabled="deletingId !== null"
                     :loading="deletingId === row.id"
-                    >
-<template #icon>
-<IconifyIcon
-                        icon="lucide:trash-2"
-/>
-</template>
-</NButton>
-</template>Xóa
-</NTooltip>
-</template>Bạn có chắc chắn muốn xóa lý do '{{ row.name }}'
-            không?
-</NPopconfirm>
-</NSpace>
-</template>
-</Grid><Drawer @submit="submit" />
-</Page>
+                  >
+                    <template #icon>
+                      <IconifyIcon icon="lucide:trash-2" />
+                    </template>
+                  </NButton> </template
+                >Xóa
+              </NTooltip> </template
+            >Bạn có chắc chắn muốn xóa lý do '{{ row.name }}' không?
+          </NPopconfirm>
+        </NSpace>
+      </template> </Grid
+    ><Drawer @submit="submit" />
+  </Page>
 </template>

@@ -224,79 +224,74 @@ onMounted(loadDependencies);
 </script>
 <template>
   <Page>
-<Grid>
-<template #toolbar-actions>
-<NButton type="primary" :disabled="!canManage" @click="add">
-<template #icon><IconifyIcon icon="lucide:plus" /></template>Thêm
-          mới
-</NButton>
-</template><template #typeCell="{ row }">
-{{
-        typeMap.get(row.employeeRequestTypeId)?.name ?? 'Loại đơn đã bị xóa'
-      }}
-</template><template #reasonCell="{ row }">
-{{
-        reasonMap.get(row.employeeRequestReasonId)?.name ?? 'Lý do đã bị xóa'
-      }}
-</template><template #paidCell="{ row }">
-<PaidStatusBadge :paid="row.paid" />
-</template><template #unitCell="{ row }">
-{{
-        row.unit === 'Day'
-          ? 'Ngày'
-          : row.unit === 'Hour'
-            ? 'Giờ'
-            : (row.unit ?? '-')
-      }}
-</template><template #actions="{ row }">
-<NSpace justify="center" :size="4">
-<NTooltip>
-<template #trigger>
-<NButton
+    <Grid>
+      <template #toolbar-actions>
+        <NButton type="primary" :disabled="!canManage" @click="add">
+          <template #icon><IconifyIcon icon="lucide:plus" /></template>Thêm mới
+        </NButton> </template
+      ><template #typeCell="{ row }">
+        {{
+          typeMap.get(row.employeeRequestTypeId)?.name ?? 'Loại đơn đã bị xóa'
+        }} </template
+      ><template #reasonCell="{ row }">
+        {{
+          reasonMap.get(row.employeeRequestReasonId)?.name ?? 'Lý do đã bị xóa'
+        }} </template
+      ><template #paidCell="{ row }">
+        <PaidStatusBadge :paid="row.paid" /> </template
+      ><template #unitCell="{ row }">
+        {{
+          row.unit === 'Day'
+            ? 'Ngày'
+            : row.unit === 'Hour'
+              ? 'Giờ'
+              : (row.unit ?? '-')
+        }} </template
+      ><template #actions="{ row }">
+        <NSpace justify="center" :size="4">
+          <NTooltip>
+            <template #trigger>
+              <NButton
                 circle
                 quaternary
                 size="small"
                 type="primary"
                 :disabled="!canManage"
                 @click="edit(row)"
-                >
-<template #icon>
-<IconifyIcon
-                    icon="lucide:pencil"
-/>
-</template>
-</NButton>
-</template>Sửa
-</NTooltip><NPopconfirm
+              >
+                <template #icon>
+                  <IconifyIcon icon="lucide:pencil" />
+                </template>
+              </NButton> </template
+            >Sửa </NTooltip
+          ><NPopconfirm
             negative-text="Hủy"
             positive-text="Xóa"
             @positive-click="() => remove(row)"
-            >
-<template #trigger>
-<NTooltip>
-<template #trigger>
-<NButton
+          >
+            <template #trigger>
+              <NTooltip>
+                <template #trigger>
+                  <NButton
                     circle
                     quaternary
                     size="small"
                     type="error"
                     :disabled="!canManage || deletingId !== null"
                     :loading="deletingId === row.id"
-                    >
-<template #icon>
-<IconifyIcon
-                        icon="lucide:trash-2"
-/>
-</template>
-</NButton>
-</template>Xóa
-</NTooltip>
-</template>Bạn có chắc chắn muốn xóa chính sách của lý do '{{
+                  >
+                    <template #icon>
+                      <IconifyIcon icon="lucide:trash-2" />
+                    </template>
+                  </NButton> </template
+                >Xóa
+              </NTooltip> </template
+            >Bạn có chắc chắn muốn xóa chính sách của lý do '{{
               reasonMap.get(row.employeeRequestReasonId)?.name ?? 'đã bị xóa'
             }}' không?
-</NPopconfirm>
-</NSpace>
-</template>
-</Grid><Drawer @submit="submit" />
-</Page>
+          </NPopconfirm>
+        </NSpace>
+      </template> </Grid
+    ><Drawer @submit="submit" />
+  </Page>
 </template>

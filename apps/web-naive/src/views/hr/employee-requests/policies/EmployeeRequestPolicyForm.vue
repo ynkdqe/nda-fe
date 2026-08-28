@@ -137,46 +137,47 @@ const title = computed(() => (model.id ? 'Sửa chính sách' : 'Thêm chính s�
 </script>
 <template>
   <Drawer :title="title" class="md:w-[640px]">
-<NForm
+    <NForm
       ref="formRef"
       :model="model"
       :rules="rules"
       label-placement="top"
       class="p-4 pb-20"
-      >
-<NFormItem label="Loại đơn" path="employeeRequestTypeId" required>
-<EmployeeRequestTypeSelect
+    >
+      <NFormItem label="Loại đơn" path="employeeRequestTypeId" required>
+        <EmployeeRequestTypeSelect
           v-model:value="model.employeeRequestTypeId"
           :options="types"
-/>
-</NFormItem><NFormItem label="Lý do" path="employeeRequestReasonId" required>
-<EmployeeRequestReasonSelect
+        /> </NFormItem
+      ><NFormItem label="Lý do" path="employeeRequestReasonId" required>
+        <EmployeeRequestReasonSelect
           v-model:value="model.employeeRequestReasonId"
           :employee-request-type-id="model.employeeRequestTypeId"
           :options="reasons"
-/>
-</NFormItem><NAlert v-if="duplicate" type="warning" class="mb-4">
-Đã tồn tại chính sách cho cặp loại đơn và lý do này. Backend sẽ quyết
+        /> </NFormItem
+      ><NAlert v-if="duplicate" type="warning" class="mb-4">
+        Đã tồn tại chính sách cho cặp loại đơn và lý do này. Backend sẽ quyết
         định có cho phép lưu hay không.
-</NAlert>
+      </NAlert>
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <NFormItem label="Hạn mức tối đa" path="maxTime" required>
-<NInputNumber
+          <NInputNumber
             v-model:value="model.maxTime"
             :min="0"
             :precision="2"
             :show-button="false"
             style="width: 100%"
-/>
-</NFormItem><NFormItem label="Đơn vị" path="unit" required>
-<EmployeeRequestPolicyUnitSelect v-model:value="model.unit" />
-</NFormItem>
+          /> </NFormItem
+        ><NFormItem label="Đơn vị" path="unit" required>
+          <EmployeeRequestPolicyUnitSelect v-model:value="model.unit" />
+        </NFormItem>
       </div>
       <NFormItem label="Tính lương" path="paid">
-<NSwitch v-model:value="model.paid" />
-</NFormItem><NSpace justify="end">
-<NButton @click="drawerApi.close()">Hủy</NButton><NButton type="primary" @click="submit">Lưu</NButton>
-</NSpace>
-</NForm>
-</Drawer>
+        <NSwitch v-model:value="model.paid" /> </NFormItem
+      ><NSpace justify="end">
+        <NButton @click="drawerApi.close()">Hủy</NButton
+        ><NButton type="primary" @click="submit">Lưu</NButton>
+      </NSpace>
+    </NForm>
+  </Drawer>
 </template>

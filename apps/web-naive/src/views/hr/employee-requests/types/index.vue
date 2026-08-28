@@ -22,7 +22,6 @@ import {
 
 import EmployeeRequestTypeForm from './EmployeeRequestTypeForm.vue';
 
-
 const deletingId = ref<null | number>(null);
 const maxDisplayOrder = ref(-1);
 
@@ -172,47 +171,43 @@ async function remove(row: EmployeeRequestTypeApi.Item) {
       <template #actions="{ row }">
         <NSpace justify="center" :size="4">
           <NTooltip trigger="hover">
-<template #trigger>
-<NButton
+            <template #trigger>
+              <NButton
                 circle
                 quaternary
                 size="small"
                 type="primary"
                 @click="edit(row)"
-                >
-<template #icon>
-<IconifyIcon
-                    icon="lucide:pencil"
-/>
-</template>
-</NButton>
-</template>Sửa
-</NTooltip>
+              >
+                <template #icon>
+                  <IconifyIcon icon="lucide:pencil" />
+                </template>
+              </NButton> </template
+            >Sửa
+          </NTooltip>
           <NPopconfirm
             negative-text="Hủy"
             positive-text="Xóa"
             @positive-click="() => remove(row)"
           >
             <template #trigger>
-<NTooltip trigger="hover">
-<template #trigger>
-<NButton
+              <NTooltip trigger="hover">
+                <template #trigger>
+                  <NButton
                     circle
                     quaternary
                     size="small"
                     type="error"
                     :disabled="deletingId !== null"
                     :loading="deletingId === row.id"
-                    >
-<template #icon>
-<IconifyIcon
-                        icon="lucide:trash-2"
-/>
-</template>
-</NButton>
-</template>Xóa
-</NTooltip>
-</template>
+                  >
+                    <template #icon>
+                      <IconifyIcon icon="lucide:trash-2" />
+                    </template>
+                  </NButton> </template
+                >Xóa
+              </NTooltip>
+            </template>
             Bạn có chắc chắn muốn xóa loại đơn '{{ row.name }}' không?
           </NPopconfirm>
         </NSpace>
