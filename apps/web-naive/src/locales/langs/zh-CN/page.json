@@ -192,6 +192,9 @@
     "dayOffs": "休假日",
     "requests": "申请单",
     "requestTypes": "申请单类型",
+    "leaveReasons": "休假原因",
+    "requestSettings": "申请单配置",
+    "requestPolicies": "政策",
     "dayOffPage": {
       "fields": {
         "isPaid": "带薪"

@@ -1,18 +1,25 @@
 import type { MResult } from '#/models/common';
 
-import type { SelectOption } from "naive-ui";
+import type { SelectOption } from 'naive-ui';
 
-export type { ContractTypeItem } from "#/models/hr/contract-type";
+export type { ContractTypeItem } from '#/models/hr/contract-type';
 
 export type Id = number | string;
 export type NullableNumber = null | number;
 export type NullableString = null | string;
 export type UnknownRecord = Record<string, unknown>;
 export type EmployeeSelectValue = Id;
-export type EmployeeModelValue = EmployeeSelectValue | EmployeeSelectValue[] | undefined;
-export type EmployeeUpdateValue = (Id | null | undefined)[] | Id | null | undefined;
+export type EmployeeModelValue =
+  | EmployeeSelectValue
+  | EmployeeSelectValue[]
+  | undefined;
+export type EmployeeUpdateValue =
+  | (Id | null | undefined)[]
+  | Id
+  | null
+  | undefined;
 
-export type ContractSelectOption = Omit<SelectOption, "label" | "value"> & {
+export type ContractSelectOption = Omit<SelectOption, 'label' | 'value'> & {
   label: string;
   value: Id;
 };
@@ -141,11 +148,11 @@ export interface ContractFormModel extends UnknownRecord {
 
 export type ContractBusinessCostValue = null | number | string | undefined;
 export type ContractBusinessCostField =
-  | "businessCalculateOccAccInsuranceFee"
-  | "businessHealthInsuranceFee"
-  | "businessSocialInsuranceFee"
-  | "businessUnemploymentInsuranceFee"
-  | "totalCost";
+  | 'businessCalculateOccAccInsuranceFee'
+  | 'businessHealthInsuranceFee'
+  | 'businessSocialInsuranceFee'
+  | 'businessUnemploymentInsuranceFee'
+  | 'totalCost';
 export type ContractBusinessCostsForm = Partial<
   Record<ContractBusinessCostField, ContractBusinessCostValue>
 > &
@@ -157,15 +164,15 @@ export interface ContractBusinessCostItem {
 
 export type ContractEmployeeCostValue = null | number | string | undefined;
 export type ContractEmployeeCostField =
-  | "employeeHealthInsuranceFee"
-  | "employeeSocialInsuranceFee"
-  | "employeeUnemploymentInsuranceFee"
-  | "employeeUnionFee"
-  | "insuranceSalary"
-  | "insuranceType"
-  | "insuranceValue"
-  | "tax"
-  | "taxFee";
+  | 'employeeHealthInsuranceFee'
+  | 'employeeSocialInsuranceFee'
+  | 'employeeUnemploymentInsuranceFee'
+  | 'employeeUnionFee'
+  | 'insuranceSalary'
+  | 'insuranceType'
+  | 'insuranceValue'
+  | 'tax'
+  | 'taxFee';
 export type ContractEmployeeCostsForm = Partial<
   Record<ContractEmployeeCostField, ContractEmployeeCostValue>
 > &
@@ -178,24 +185,30 @@ export interface ContractEmployeeFeeItem {
 
 export type ContractEmployeeInfoValue = null | number | string | undefined;
 export type ContractEmployeeInfoField =
-  | "birthDate"
-  | "email"
-  | "employeeId"
-  | "identification"
-  | "phone"
-  | "taxCode";
+  | 'birthDate'
+  | 'email'
+  | 'employeeId'
+  | 'identification'
+  | 'phone'
+  | 'taxCode';
 export type ContractEmployeeInfoForm = Partial<
   Record<ContractEmployeeInfoField, ContractEmployeeInfoValue>
 > &
   UnknownRecord;
 
 export type ContractSalaryValue = null | number | string | undefined;
-export type ContractSalaryField = "allowance" | "basicSalary" | "kpi" | "salaryGross";
-export type ContractSalaryForm = Partial<Record<ContractSalaryField, ContractSalaryValue>> &
+export type ContractSalaryField =
+  | 'allowance'
+  | 'basicSalary'
+  | 'kpi'
+  | 'salaryGross';
+export type ContractSalaryForm = Partial<
+  Record<ContractSalaryField, ContractSalaryValue>
+> &
   UnknownRecord;
 
 export type ContractStatusValue = null | number | string | undefined;
-export type ContractStatusField = "approver" | "checkers" | "notes" | "status";
+export type ContractStatusField = 'approver' | 'checkers' | 'notes' | 'status';
 export type ContractStatusApprovalForm = Partial<
   Record<ContractStatusField, ContractStatusValue | EmployeeSelectValue[]>
 > &

@@ -1,5 +1,5 @@
 import type { MResult } from '#/models/common';
-import type { HrId } from "#/models/hr/common";
+import type { HrId } from '#/models/hr/common';
 
 export namespace WorkShiftApi {
   export interface WorkShiftItem {

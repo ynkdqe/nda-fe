@@ -1,5 +1,5 @@
 import type { MResult } from '#/models/common';
-import type { HrId, IdLabelOption } from "#/models/hr/common";
+import type { HrId, IdLabelOption } from '#/models/hr/common';
 
 export namespace WorkScheduleApi {
   export interface WorkScheduleItem {

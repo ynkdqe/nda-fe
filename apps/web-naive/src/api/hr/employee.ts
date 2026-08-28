@@ -118,20 +118,30 @@ export namespace EmployeeApi {
 
 let bankListRequest: null | Promise<EmployeeApi.BankListResult> = null;
 
-export async function getEmployeeListApi(params: EmployeeApi.EmployeeListParams) {
-  return requestClient.get<EmployeeApi.EmployeeListResult>('/api/hrms/employee', {
-    params,
-    responseReturn: 'body',
-  });
+export async function getEmployeeListApi(
+  params: EmployeeApi.EmployeeListParams,
+) {
+  return requestClient.get<EmployeeApi.EmployeeListResult>(
+    '/api/hrms/employee',
+    {
+      params,
+      responseReturn: 'body',
+    },
+  );
 }
 
 export async function getEmployeeByIdApi(id: number | string) {
-  return requestClient.get<EmployeeApi.EmployeeDetailResult>(`/api/hrms/employee/${id}`, {
-    responseReturn: 'body',
-  });
+  return requestClient.get<EmployeeApi.EmployeeDetailResult>(
+    `/api/hrms/employee/${id}`,
+    {
+      responseReturn: 'body',
+    },
+  );
 }
 
-export async function createEmployeeApi(data: EmployeeApi.EmployeeMutationPayload) {
+export async function createEmployeeApi(
+  data: EmployeeApi.EmployeeMutationPayload,
+) {
   return requestClient.post('/api/hrms/employee', data, {
     responseReturn: 'body',
   });
@@ -147,19 +157,25 @@ export async function updateEmployeeApi(
 }
 
 export async function getEmployeeDepartmentOptionsApi() {
-  return requestClient.get<EmployeeApi.EmployeeOptionResult>('/api/identity/organization-unit', {
-    responseReturn: 'body',
-  });
+  return requestClient.get<EmployeeApi.EmployeeOptionResult>(
+    '/api/identity/organization-unit',
+    {
+      responseReturn: 'body',
+    },
+  );
 }
 
 export async function getEmployeePositionOptionsApi() {
-  return requestClient.get<EmployeeApi.EmployeeOptionResult>('/api/identity/roles', {
-    params: {
-      skipCount: 0,
-      maxResultCount: 100,
+  return requestClient.get<EmployeeApi.EmployeeOptionResult>(
+    '/api/identity/roles',
+    {
+      params: {
+        skipCount: 0,
+        maxResultCount: 100,
+      },
+      responseReturn: 'body',
     },
-    responseReturn: 'body',
-  });
+  );
 }
 
 export async function getEmployeeBankOptionsApi() {

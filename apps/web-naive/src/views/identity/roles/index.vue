@@ -119,7 +119,7 @@ const gridOptions: VxeGridProps<RoleItem> = {
   toolbarConfig: {
     custom: true,
     export: true,
-    // @ts-ignore
+    // @ts-expect-error
     search: true,
   },
 };

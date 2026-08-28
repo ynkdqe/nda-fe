@@ -192,6 +192,9 @@
     "dayOffs": "Days Off",
     "requests": "Requests",
     "requestTypes": "Request Types",
+    "leaveReasons": "Leave Reasons",
+    "requestSettings": "Request Settings",
+    "requestPolicies": "Policies",
     "dayOffPage": {
       "fields": {
         "isPaid": "Paid"

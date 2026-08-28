@@ -90,7 +90,9 @@ export namespace SmsNotificationApi {
   >;
 }
 
-export async function fetchNotificationList(params: SmsNotificationApi.NotificationListParams) {
+export async function fetchNotificationList(
+  params: SmsNotificationApi.NotificationListParams,
+) {
   return requestClient.get<
     SmsNotificationApi.NotificationListResult<SmsNotificationApi.NotificationUserItem>
   >('/api/sms/notification', {

@@ -1,6 +1,6 @@
-import type { SmsMessageApi } from "#/models/sms";
+import type { SmsMessageApi } from '#/models/sms';
 
-import { requestClient } from "#/api/request";
+import { requestClient } from '#/api/request';
 
 export async function fetchSmsProviderList(params: {
   current: number;
@@ -9,10 +9,10 @@ export async function fetchSmsProviderList(params: {
   status?: number | string;
 }) {
   return requestClient.get<SmsMessageApi.ListResult<SmsMessageApi.SmsProvider>>(
-    "/api/sms/provider",
+    '/api/sms/provider',
     {
       params,
-      responseReturn: "body",
+      responseReturn: 'body',
     },
   );
 }

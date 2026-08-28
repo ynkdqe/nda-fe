@@ -11,11 +11,7 @@ export interface MError<TData = unknown> {
   validationErrors?: null | MValidationError[];
 }
 
-export interface MResult<
-  TData,
-  TDataExtend = unknown,
-  TErrorData = unknown,
-> {
+export interface MResult<TData, TDataExtend = unknown, TErrorData = unknown> {
   current?: null | number;
   data?: null | TData;
   dataExtend?: null | TDataExtend;

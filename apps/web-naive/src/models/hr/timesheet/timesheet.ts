@@ -51,7 +51,12 @@ export namespace TimesheetApi {
   >;
 }
 
-export type TimesheetCalendarEntryType = 'absent' | 'holiday' | 'late' | 'missing' | 'work';
+export type TimesheetCalendarEntryType =
+  | 'absent'
+  | 'holiday'
+  | 'late'
+  | 'missing'
+  | 'work';
 export type TimesheetCalendarBadgeType =
   | 'danger'
   | 'default'
@@ -78,13 +83,19 @@ export interface TimesheetCalendarDay {
   date: string;
   entries: TimesheetCalendarEntry[];
   highlight?: {
-    type?: Extract<TimesheetCalendarBadgeType, 'danger' | 'primary' | 'success' | 'warning'>;
+    type?: Extract<
+      TimesheetCalendarBadgeType,
+      'danger' | 'primary' | 'success' | 'warning'
+    >;
     value: string;
   };
 }
 
 export interface TimesheetOverviewItem {
-  color?: Extract<TimesheetCalendarBadgeType, 'danger' | 'primary' | 'success' | 'warning'>;
+  color?: Extract<
+    TimesheetCalendarBadgeType,
+    'danger' | 'primary' | 'success' | 'warning'
+  >;
   label: string;
   total: number;
   unit?: string;

@@ -103,8 +103,7 @@ const coreRoutes: RouteRecordRaw[] = [
   {
     name: 'SsoCallback',
     path: '/signin-callback',
-    component: () =>
-      import('#/views/_core/authentication/sso-callback.vue'),
+    component: () => import('#/views/_core/authentication/sso-callback.vue'),
     meta: {
       hideInTab: true,
       title: 'SSO Callback',

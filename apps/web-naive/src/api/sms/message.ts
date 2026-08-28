@@ -1,16 +1,19 @@
-import type { SmsMessageApi } from "#/models/sms";
+import type { SmsMessageApi } from '#/models/sms';
 
-import { requestClient } from "#/api/request";
+import { requestClient } from '#/api/request';
 
 export async function fetchSmsMessageList(params: SmsMessageApi.ListParams) {
-  return requestClient.get<SmsMessageApi.ListResult<SmsMessageApi.SmsMessage>>("/api/sms/message", {
-    params,
-    responseReturn: "body",
-  });
+  return requestClient.get<SmsMessageApi.ListResult<SmsMessageApi.SmsMessage>>(
+    '/api/sms/message',
+    {
+      params,
+      responseReturn: 'body',
+    },
+  );
 }
 
 export async function sendSmsMessage(data: SmsMessageApi.SendSmsPayload) {
-  return requestClient.post("/api/sms/message", data, {
-    responseReturn: "body",
+  return requestClient.post('/api/sms/message', data, {
+    responseReturn: 'body',
   });
 }

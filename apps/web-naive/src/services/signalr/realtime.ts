@@ -74,7 +74,9 @@ function createConnection() {
       transport: HttpTransportType.WebSockets | HttpTransportType.LongPolling,
     })
     .withAutomaticReconnect(RECONNECT_DELAYS)
-    .configureLogging(import.meta.env.DEV ? LogLevel.Information : LogLevel.Warning)
+    .configureLogging(
+      import.meta.env.DEV ? LogLevel.Information : LogLevel.Warning,
+    )
     .build();
 
   hubConnection.on(CLIENT_EVENT_NAME, handleIncomingEvent);
@@ -116,7 +118,8 @@ function scheduleInitialRetry(attempt: number) {
     return;
   }
 
-  const delay = INITIAL_RETRY_DELAYS[Math.min(attempt, INITIAL_RETRY_DELAYS.length - 1)];
+  const delay =
+    INITIAL_RETRY_DELAYS[Math.min(attempt, INITIAL_RETRY_DELAYS.length - 1)];
   retryTimer = setTimeout(() => {
     retryTimer = null;
     void startConnection(attempt + 1);

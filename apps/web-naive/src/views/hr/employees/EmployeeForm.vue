@@ -40,12 +40,8 @@ import {
 } from '#/api';
 import UserSearchSelect from '#/components/UserSearchSelect.vue';
 import { toTimestamp } from '#/utils/date';
-import {
-  normalizeNumberValue,
-  normalizeSelectValue,
-  normalizeText,
-  type NullableSelectValue,
-} from '#/utils/normalize';
+import { normalizeNumberValue, normalizeSelectValue, normalizeText } from '#/utils/normalize';
+import type { NullableSelectValue } from '#/utils/normalize';
 
 type UserRecord = Record<string, unknown>;
 

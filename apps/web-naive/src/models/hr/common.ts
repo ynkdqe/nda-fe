@@ -1,5 +1,3 @@
-
-
 export type HrId = number | string;
 export type NullableHrId = HrId | null;
 export type NullableNumber = null | number;
@@ -28,4 +26,3 @@ export interface MErrorDetail {
 export interface MError {
   error?: MErrorDetail | null;
 }
-

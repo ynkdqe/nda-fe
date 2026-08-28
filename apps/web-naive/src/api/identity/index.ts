@@ -77,10 +77,13 @@ export namespace IdentityUserApi {
 }
 
 export async function getIdentityUsers(params: IdentityUserApi.UserListParams) {
-  return requestClient.get<IdentityUserApi.UserListResult>('/api/identity/users', {
-    params,
-    responseReturn: 'body',
-  });
+  return requestClient.get<IdentityUserApi.UserListResult>(
+    '/api/identity/users',
+    {
+      params,
+      responseReturn: 'body',
+    },
+  );
 }
 
 export async function getIdentityUserDetail(id: number | string) {
@@ -105,7 +108,9 @@ export async function updateIdentityUser(
   );
 }
 
-export async function setIdentityUserPassword(data: IdentityUserApi.SetPasswordPayload) {
+export async function setIdentityUserPassword(
+  data: IdentityUserApi.SetPasswordPayload,
+) {
   return requestClient.post<IdentityUserApi.SetPasswordResult>(
     '/api/identity/users/set-password',
     data,

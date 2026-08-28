@@ -1,8 +1,10 @@
 import type { MResult } from '#/models/common';
 
 export namespace AnalyticApi {
-
-  export type AnalyticDetailType = 'TotalBytes' | 'TotalRequests' | 'UniqueVisitors';
+  export type AnalyticDetailType =
+    | 'TotalBytes'
+    | 'TotalRequests'
+    | 'UniqueVisitors';
 
   export interface AnalyticDetail {
     total24h?: null | number;

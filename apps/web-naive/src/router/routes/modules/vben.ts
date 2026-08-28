@@ -1,10 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router';
 
-import {
-  VBEN_DOC_URL,
-  VBEN_GITHUB_URL,
-  VBEN_LOGO_URL,
-} from '@vben/constants';
+import { VBEN_DOC_URL, VBEN_GITHUB_URL, VBEN_LOGO_URL } from '@vben/constants';
 
 import { IFrameView } from '#/layouts';
 import { $t } from '#/locales';

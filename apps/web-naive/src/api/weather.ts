@@ -97,8 +97,8 @@ export async function getLocationByIp(
   }
 
   // Gọi API thông qua requestClient (tự động dùng Base API URL)
-  const response = await requestClient.get('/api/location',{
-    responseReturn: "body",
+  const response = await requestClient.get('/api/location', {
+    responseReturn: 'body',
   });
 
   // Bóc tách trường data từ BaseResponse của bạn

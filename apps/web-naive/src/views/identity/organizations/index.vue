@@ -154,7 +154,7 @@ const gridOptions: VxeGridProps<OrgRow> = {
   toolbarConfig: {
     custom: true,
     export: true,
-    // @ts-ignore
+    // @ts-expect-error
     search: true,
   },
 };

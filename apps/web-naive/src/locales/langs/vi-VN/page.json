@@ -192,6 +192,9 @@
     "dayOffs": "Ngày nghỉ",
     "requests": "Đơn từ",
     "requestTypes": "Loại đơn từ",
+    "leaveReasons": "Lý do nghỉ",
+    "requestSettings": "Cấu hình đơn từ",
+    "requestPolicies": "Chính sách",
     "dayOffPage": {
       "fields": {
         "isPaid": "Tính công"

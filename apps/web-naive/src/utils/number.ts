@@ -59,12 +59,12 @@ export interface EmployeeContractCostResult {
 }
 
 function toFiniteNumber(value: unknown, fallback = 0) {
-  if (typeof value === "number" && Number.isFinite(value)) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
     return value;
   }
 
-  if (typeof value === "string" && value.trim()) {
-    const numericValue = Number(value.replaceAll(",", ""));
+  if (typeof value === 'string' && value.trim()) {
+    const numericValue = Number(value.replaceAll(',', ''));
     return Number.isNaN(numericValue) ? fallback : numericValue;
   }
 
@@ -108,13 +108,22 @@ export function calculateEmployeeContractCosts({
   const hasSocialInsurance = Boolean(contractType.hasSocialInsurance);
 
   const employeeSocialInsuranceFee = hasSocialInsurance
-    ? calculatePercentFee(salaryBasic, contractType?.employeeSocialInsurancePercent)
+    ? calculatePercentFee(
+        salaryBasic,
+        contractType?.employeeSocialInsurancePercent,
+      )
     : 0;
   const employeeHealthInsuranceFee = hasSocialInsurance
-    ? calculatePercentFee(salaryBasic, contractType?.employeeHealthInsurancePercent)
+    ? calculatePercentFee(
+        salaryBasic,
+        contractType?.employeeHealthInsurancePercent,
+      )
     : 0;
   const employeeUnemploymentInsuranceFee = hasSocialInsurance
-    ? calculatePercentFee(salaryBasic, contractType?.employeeUnemployeeInsurancePercent)
+    ? calculatePercentFee(
+        salaryBasic,
+        contractType?.employeeUnemployeeInsurancePercent,
+      )
     : 0;
 
   const preTaxIncome = Math.floor(

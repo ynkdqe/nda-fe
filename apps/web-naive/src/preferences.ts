@@ -1,7 +1,6 @@
 import { defineOverridesPreferences } from '@vben/preferences';
 
-export const DEFAULT_APP_TITLE =
-  import.meta.env.VITE_APP_TITLE || 'Vben Admin';
+export const DEFAULT_APP_TITLE = import.meta.env.VITE_APP_TITLE || 'Vben Admin';
 export const DEFAULT_APP_LOGO =
   'https://objectstorage.ap-singapore-1.oraclecloud.com/n/axikfj1oi1jp/b/bucket-nda-prod/o/images/logov2-1784883753019.png';
 

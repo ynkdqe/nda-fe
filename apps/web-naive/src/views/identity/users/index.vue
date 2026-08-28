@@ -174,7 +174,7 @@ const gridOptions: VxeGridProps<IdentityUserApi.UserItem> = {
   toolbarConfig: {
     custom: true,
     export: true,
-    // @ts-ignore search is an extended Vben toolbar config option.
+    // @ts-expect-error search is an extended Vben toolbar config option.
     search: true,
   },
 };

@@ -34,7 +34,10 @@ function isConnectTokenRequest(url?: string) {
   return Boolean(url?.includes('/connect/token'));
 }
 
-function getResponseErrorMessage(responseData: unknown, fallbackMessage: string) {
+function getResponseErrorMessage(
+  responseData: unknown,
+  fallbackMessage: string,
+) {
   if (!responseData || typeof responseData !== 'object') {
     return fallbackMessage;
   }

@@ -1,77 +1,77 @@
-import type { RouteRecordRaw } from "vue-router";
+import type { RouteRecordRaw } from 'vue-router';
 
-import { $t } from "#/locales";
+import { $t } from '#/locales';
 
 const smsPermissions = [
-  "Sms.SmsMessage",
-  "Sms.SmsProvider",
-  "Sms.SmsTemplate",
-  "Sms.Notification",
+  'Sms.SmsMessage',
+  'Sms.SmsProvider',
+  'Sms.SmsTemplate',
+  'Sms.Notification',
 ];
 
 const routes: RouteRecordRaw[] = [
   {
     meta: {
       authority: smsPermissions,
-      icon: "lucide:message-square-text",
+      icon: 'lucide:message-square-text',
       order: 30,
-      title: $t("page.sms.title"),
+      title: $t('page.sms.title'),
     },
-    name: "SmsManagement",
-    path: "/sms",
+    name: 'SmsManagement',
+    path: '/sms',
     children: [
       {
-        name: "SmsMessages",
-        path: "/sms/messages",
-        component: () => import("#/views/sms/messages/index.vue"),
+        name: 'SmsMessages',
+        path: '/sms/messages',
+        component: () => import('#/views/sms/messages/index.vue'),
         meta: {
-          authority: ["Sms.SmsMessage"],
-          icon: "lucide:messages-square",
-          title: $t("page.sms.messages"),
+          authority: ['Sms.SmsMessage'],
+          icon: 'lucide:messages-square',
+          title: $t('page.sms.messages'),
           keepAlive: true,
         },
       },
       {
-        name: "SmsProviders",
-        path: "/sms/providers",
-        component: () => import("#/views/sms/providers/index.vue"),
+        name: 'SmsProviders',
+        path: '/sms/providers',
+        component: () => import('#/views/sms/providers/index.vue'),
         meta: {
-          authority: ["Sms.SmsProvider"],
-          icon: "lucide:radio-tower",
-          title: $t("page.sms.providers"),
+          authority: ['Sms.SmsProvider'],
+          icon: 'lucide:radio-tower',
+          title: $t('page.sms.providers'),
           keepAlive: true,
         },
       },
       {
-        name: "SmsTemplates",
-        path: "/sms/templates",
-        component: () => import("#/views/sms/templates/index.vue"),
+        name: 'SmsTemplates',
+        path: '/sms/templates',
+        component: () => import('#/views/sms/templates/index.vue'),
         meta: {
-          authority: ["Sms.SmsTemplate"],
-          icon: "lucide:file-text",
-          title: $t("page.sms.templates"),
+          authority: ['Sms.SmsTemplate'],
+          icon: 'lucide:file-text',
+          title: $t('page.sms.templates'),
           keepAlive: true,
         },
       },
       {
-        name: "SmsAdminNotifications",
-        path: "/sms/admin-notifications",
-        component: () => import("#/views/sms/admin-notifications/index.vue"),
+        name: 'SmsAdminNotifications',
+        path: '/sms/admin-notifications',
+        component: () => import('#/views/sms/admin-notifications/index.vue'),
         meta: {
-          authority: ["Sms.Notification"],
-          icon: "lucide:bell-ring",
-          title: $t("page.sms.adminNotifications"),
+          authority: ['Sms.Notification'],
+          icon: 'lucide:bell-ring',
+          title: $t('page.sms.adminNotifications'),
           keepAlive: true,
         },
       },
       {
-        name: "SmsUserNotifications",
-        path: "/sms/user-notifications",
-        component: () => import("#/views/sms/user-notifications/index.vue"),
+        name: 'SmsUserNotifications',
+        path: '/sms/user-notifications',
+        component: () => import('#/views/sms/user-notifications/index.vue'),
         meta: {
-          authority: ["Sms.Notification"],
-          icon: "lucide:bell",
-          title: $t("page.sms.personalNotifications"),
+          authority: ['Sms.Notification'],
+          icon: 'lucide:bell',
+          title: $t('page.sms.personalNotifications'),
           keepAlive: true,
         },
       },

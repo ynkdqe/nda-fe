@@ -179,7 +179,7 @@ const gridOptions: VxeGridProps<ContractTypeApi.ContractTypeItem> = {
   toolbarConfig: {
     custom: true,
     export: true,
-    // @ts-ignore search is an extended Vben toolbar config option.
+    // @ts-expect-error search is an extended Vben toolbar config option.
     search: true,
   },
 };
