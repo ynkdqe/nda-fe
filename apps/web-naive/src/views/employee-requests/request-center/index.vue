@@ -1,292 +1,614 @@
 <script lang="ts" setup>
-import type { DataTableColumns } from 'naive-ui';
-
 import type { VbenFormProps } from '#/adapter/form';
+import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { EmployeeApi } from '#/api/hr/employee';
+import type { EmployeeRequestApi } from '#/models/employee-requests/employee-request';
+import type { EmployeeRequestReasonApi } from '#/models/employee-requests/employee-request-reason';
+import type { EmployeeRequestTypeApi } from '#/models/employee-requests/employee-request-type';
 
-import { computed, h, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
-import { Page } from '@vben/common-ui';
+import { useAccess } from '@vben/access';
+import { Page, useVbenDrawer } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
 
-import { NButton, NCard, NDataTable, NTabPane, NTabs, NTag } from 'naive-ui';
+import {
+  NButton,
+  NInput,
+  NPopconfirm,
+  NSpace,
+  NTabPane,
+  NTabs,
+  NTooltip,
+} from 'naive-ui';
 
-import { useVbenForm } from '#/adapter/form';
 import { message } from '#/adapter/naive';
+import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import {
+  approveEmployeeRequestApi,
+  cancelEmployeeRequestApi,
+  createEmployeeRequestApi,
+  deleteEmployeeRequestApi,
+  getEmployeeListApi,
+  getEmployeeRequestByIdApi,
+  getEmployeeRequestListApi,
+  getEmployeeRequestReasonListApi,
+  getEmployeeRequestTypeListApi,
+  rejectEmployeeRequestApi,
+  updateEmployeeRequestApi,
+} from '#/api';
+import { EMPLOYEE_REQUEST_PERMISSIONS } from '#/constants/employee-request';
+import {
+  EmployeeRequestStatus,
+  employeeRequestStatusOptions,
+} from '#/models/employee-requests/employee-request';
+import { formatDateOnly, formatDateTime } from '#/utils/date';
 
-type RequestStatus = 'approved' | 'pending' | 'rejected';
+import EmployeeRequestStatusBadge from '../shared/EmployeeRequestStatusBadge.vue';
+import EmployeeRequestDetail from './EmployeeRequestDetail.vue';
+import EmployeeRequestForm from './EmployeeRequestForm.vue';
 
-type RequestItem = {
-  approver: string;
-  createdAt: string;
-  createdDate: string;
-  dateRange: string;
-  id: string;
-  reason: string;
-  status: RequestStatus;
-  type: string;
-};
+const { hasAccessByCodes } = useAccess();
 
-type RequestFilters = {
-  dateRange?: string[];
-  status?: RequestStatus;
-  type?: string;
-};
-
-const statusLabels: Record<RequestStatus, string> = {
-  approved: 'Đã phê duyệt',
-  pending: 'Chờ phê duyệt',
-  rejected: 'Từ chối',
-};
-
-const statusTypes: Record<RequestStatus, 'error' | 'success' | 'warning'> = {
-  approved: 'success',
-  pending: 'warning',
-  rejected: 'error',
-};
-
-const requestTypeOptions = [
-  { label: 'Đơn xin nghỉ phép', value: 'Đơn xin nghỉ phép' },
-  { label: 'Đơn xin làm việc tại nhà', value: 'Đơn xin làm việc tại nhà' },
-];
-
-const statusOptions = (Object.keys(statusLabels) as RequestStatus[]).map(
-  (value) => ({ label: statusLabels[value], value }),
+/**
+ * Backend dùng chính quyền Approve để quyết định người dùng thấy toàn bộ đơn
+ * hay chỉ đơn của mình, nên FE dùng lại đúng code đó cho các nút duyệt.
+ */
+const canApprove = computed(() =>
+  hasAccessByCodes([EMPLOYEE_REQUEST_PERMISSIONS.approve]),
+);
+const canReject = computed(() =>
+  hasAccessByCodes([EMPLOYEE_REQUEST_PERMISSIONS.reject]),
 );
 
-const myRequests: RequestItem[] = [
-  {
-    approver: 'Nguyễn Văn Bình',
-    createdAt: '08/08/2026 09:15',
-    createdDate: '2026-08-08',
-    dateRange: '15/08/2026',
-    id: 'DXN-20260808-001',
-    reason: 'Khám sức khỏe định kỳ',
-    status: 'pending',
-    type: 'Đơn xin nghỉ phép',
-  },
-  {
-    approver: 'Nguyễn Văn Bình',
-    createdAt: '01/08/2026 14:30',
-    createdDate: '2026-08-01',
-    dateRange: '04/08/2026 - 05/08/2026',
-    id: 'DXN-20260801-002',
-    reason: 'Giải quyết việc cá nhân',
-    status: 'approved',
-    type: 'Đơn xin làm việc tại nhà',
-  },
-  {
-    approver: 'Nguyễn Văn Bình',
-    createdAt: '28/07/2026 10:20',
-    createdDate: '2026-07-28',
-    dateRange: '30/07/2026',
-    id: 'DXN-20260728-003',
-    reason: 'Nghỉ việc riêng',
-    status: 'rejected',
-    type: 'Đơn xin nghỉ phép',
-  },
-];
+const types = ref<EmployeeRequestTypeApi.Item[]>([]);
+const reasons = ref<EmployeeRequestReasonApi.Item[]>([]);
+const employees = ref<EmployeeApi.EmployeeItem[]>([]);
+const processingId = ref<null | number>(null);
+const rejectReason = ref('');
 
-const approvalRequests: RequestItem[] = [
-  {
-    approver: 'Bạn',
-    createdAt: '08/08/2026 08:40',
-    createdDate: '2026-08-08',
-    dateRange: '12/08/2026',
-    id: 'DXN-20260808-004',
-    reason: 'Đưa con đi khám bệnh',
-    status: 'pending',
-    type: 'Đơn xin nghỉ phép',
-  },
-  {
-    approver: 'Bạn',
-    createdAt: '07/08/2026 16:10',
-    createdDate: '2026-08-07',
-    dateRange: '11/08/2026 - 12/08/2026',
-    id: 'DXN-20260807-005',
-    reason: 'Làm việc tại nhà để xử lý công việc gia đình',
-    status: 'pending',
-    type: 'Đơn xin làm việc tại nhà',
-  },
-];
+/**
+ * Tab `approval` là màn hình dành cho người duyệt: luôn ép trạng thái Chờ duyệt
+ * để chỉ còn các đơn cần xử lý. Backend đã tự giới hạn phạm vi dữ liệu theo quyền
+ * Approve (có quyền thì thấy toàn bộ đơn của tenant, không có thì chỉ thấy đơn của mình).
+ */
+type RequestTab = 'all' | 'approval';
 
-const filters = ref<RequestFilters>({});
+const activeTab = ref<RequestTab>('all');
+const isApprovalTab = computed(() => activeTab.value === 'approval');
 
-const filterOptions: VbenFormProps = {
-  actionWrapperClass: 'lg:col-span-1',
+const typeMap = computed(() => new Map(types.value.map((x) => [x.id, x])));
+const reasonMap = computed(() => new Map(reasons.value.map((x) => [x.id, x])));
+const employeeMap = computed(
+  () => new Map(employees.value.map((x) => [Number(x.id), x])),
+);
+
+async function loadDependencies() {
+  const [typeResponse, reasonResponse, employeeResponse] = await Promise.all([
+    getEmployeeRequestTypeListApi({ current: 1, pageSize: 100 }),
+    getEmployeeRequestReasonListApi({ current: 1, pageSize: 100 }),
+    getEmployeeListApi({ current: 1, pageSize: 100 }),
+  ]);
+
+  types.value = (typeResponse.data ?? [])
+    .filter((x) => !x.isDeleted)
+    .sort((a, b) => a.displayOrder - b.displayOrder || a.id - b.id);
+  reasons.value = (reasonResponse.data ?? []).filter((x) => !x.isDeleted);
+  employees.value = employeeResponse.data ?? [];
+}
+
+const formOptions: VbenFormProps = {
   collapsed: false,
-  commonConfig: {
-    componentProps: {
-      class: 'w-full',
-    },
-  },
-  layout: 'vertical',
+  showCollapseButton: false,
+  wrapperClass: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4',
   schema: [
     {
       component: 'Select',
-      componentProps: {
-        clearable: true,
-        options: requestTypeOptions,
-        placeholder: 'Chọn loại đơn',
-      },
       fieldName: 'type',
       label: 'Loại đơn',
+      componentProps: () => ({
+        clearable: true,
+        options: types.value.map((x) => ({ label: x.name, value: x.id })),
+      }),
     },
     {
       component: 'Select',
-      componentProps: {
-        clearable: true,
-        options: statusOptions,
-        placeholder: 'Chọn trạng thái',
-      },
       fieldName: 'status',
       label: 'Trạng thái',
+      // Tab duyệt đơn đã cố định trạng thái Chờ duyệt nên ẩn filter này để tránh hiểu nhầm.
+      dependencies: {
+        show: () => !isApprovalTab.value,
+        triggerFields: ['status'],
+      },
+      componentProps: {
+        clearable: true,
+        options: [...employeeRequestStatusOptions],
+      },
     },
     {
       component: 'DatePicker',
+      fieldName: 'dateRange',
+      label: 'Ngày tạo',
       componentProps: {
         clearable: true,
-        format: 'dd-MM-yyyy',
+        format: 'dd/MM/yyyy',
         type: 'daterange',
         valueFormat: 'yyyy-MM-dd',
       },
-      fieldName: 'dateRange',
-      label: 'Từ ngày - Đến ngày',
+    },
+    {
+      component: 'Input',
+      fieldName: 'keyword',
+      label: 'Từ khóa',
+      componentProps: { clearable: true, placeholder: 'Tìm theo mô tả' },
     },
   ],
-  resetButtonOptions: { content: 'Đặt lại' },
-  showCollapseButton: false,
-  submitButtonOptions: { content: 'Tìm kiếm' },
-  submitOnChange: false,
-  submitOnEnter: true,
-  wrapperClass: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4',
 };
 
-function applyFilters(values: RequestFilters) {
-  filters.value = {
-    dateRange: values.dateRange,
-    status: values.status,
-    type: values.type,
-  };
-}
+const gridOptions: VxeGridProps<EmployeeRequestApi.Item> = {
+  border: 'full',
+  columns: [
+    { align: 'center', title: 'STT', type: 'seq', width: 70 },
+    { field: 'id', title: 'Mã đơn', width: 90, slots: { default: 'codeCell' } },
+    {
+      field: 'employeeId',
+      title: 'Nhân viên',
+      minWidth: 180,
+      slots: { default: 'employeeCell' },
+    },
+    {
+      field: 'employeeRequestTypeId',
+      title: 'Loại đơn',
+      minWidth: 160,
+      slots: { default: 'typeCell' },
+    },
+    {
+      field: 'employeeRequestReasonId',
+      title: 'Lý do',
+      minWidth: 160,
+      slots: { default: 'reasonCell' },
+    },
+    {
+      field: 'periods',
+      title: 'Thời gian nghỉ',
+      minWidth: 200,
+      slots: { default: 'periodCell' },
+    },
+    { field: 'description', title: 'Mô tả', minWidth: 200 },
+    {
+      align: 'center',
+      field: 'status',
+      title: 'Trạng thái',
+      width: 130,
+      slots: { default: 'statusCell' },
+    },
+    {
+      field: 'creationTime',
+      title: 'Ngày tạo',
+      width: 160,
+      slots: { default: 'createdCell' },
+    },
+    {
+      align: 'center',
+      fixed: 'right',
+      title: 'Thao tác',
+      width: 170,
+      slots: { default: 'actions' },
+    },
+  ],
+  pagerConfig: { pageSize: 20, pageSizes: [10, 20, 50, 100] },
+  proxyConfig: {
+    ajax: {
+      query: async ({ page }: any, values: Record<string, any>) => {
+        const [startDate, endDate] = values?.dateRange ?? [];
+        // Tab duyệt đơn luôn ép trạng thái Chờ duyệt, bỏ qua filter trạng thái của người dùng.
+        const status = isApprovalTab.value
+          ? String(EmployeeRequestStatus.Pending)
+          : typeof values?.status === 'number'
+            ? String(values.status)
+            : undefined;
+        const params: EmployeeRequestApi.ListParams = {
+          current: page.currentPage,
+          pageSize: page.pageSize,
+          ...(typeof values?.type === 'number'
+            ? { type: String(values.type) }
+            : {}),
+          ...(status === undefined ? {} : { status }),
+          ...(startDate ? { startDate } : {}),
+          ...(endDate ? { endDate } : {}),
+          ...(values?.keyword ? { keyword: values.keyword } : {}),
+        };
 
-function filterRequests(requests: RequestItem[]) {
-  const [fromDate, toDate] = filters.value.dateRange ?? [];
-
-  return requests.filter((request) => {
-    if (filters.value.type && request.type !== filters.value.type) {
-      return false;
-    }
-
-    if (filters.value.status && request.status !== filters.value.status) {
-      return false;
-    }
-
-    if (fromDate && request.createdDate < fromDate) {
-      return false;
-    }
-
-    return !(toDate && request.createdDate > toDate);
-  });
-}
-
-const filteredMyRequests = computed(() => filterRequests(myRequests));
-const filteredApprovalRequests = computed(() =>
-  filterRequests(approvalRequests),
-);
-
-const columns: DataTableColumns<RequestItem> = [
-  {
-    key: 'id',
-    title: 'Mã đơn',
-    width: 160,
+        const response = await getEmployeeRequestListApi(params);
+        const items = (response.data ?? []).filter((x) => !x.isDeleted);
+        return { items, total: response.total ?? items.length };
+      },
+    },
   },
-  {
-    key: 'type',
-    title: 'Loại đơn',
-    width: 220,
-  },
-  {
-    key: 'dateRange',
-    title: 'Thời gian',
-    width: 210,
-  },
-  {
-    key: 'reason',
-    minWidth: 220,
-    title: 'Lý do',
-  },
-  {
-    key: 'approver',
-    title: 'Người phê duyệt',
-    width: 180,
-  },
-  {
-    key: 'createdAt',
-    title: 'Ngày tạo',
-    width: 170,
-  },
-  {
-    key: 'status',
-    render: (row) =>
-      h(
-        NTag,
-        { bordered: false, type: statusTypes[row.status] },
-        { default: () => statusLabels[row.status] },
-      ),
-    title: 'Trạng thái',
-    width: 150,
-  },
-];
+  round: true,
+  showOverflow: true,
+  stripe: true,
+  toolbarConfig: { custom: true, export: true, search: true } as any,
+};
 
-const [FilterForm] = useVbenForm({
-  ...filterOptions,
-  handleSubmit: applyFilters,
+const [Grid, gridApi] = useVbenVxeGrid<EmployeeRequestApi.Item>({
+  formOptions,
+  gridOptions,
+});
+const [FormDrawer, formDrawerApi] = useVbenDrawer({
+  connectedComponent: EmployeeRequestForm,
+});
+const [DetailDrawer, detailDrawerApi] = useVbenDrawer({
+  connectedComponent: EmployeeRequestDetail,
 });
 
-function openCreateRequest() {
-  message.info('Chức năng tạo đơn mới đang được phát triển');
+async function changeTab(value: RequestTab) {
+  activeTab.value = value;
+  await gridApi.query();
 }
+
+function employeeName(row: EmployeeRequestApi.Item) {
+  return (
+    row.employee?.name ??
+    employeeMap.value.get(row.employeeId)?.name ??
+    `#${row.employeeId}`
+  );
+}
+
+function periodSummary(row: EmployeeRequestApi.Item) {
+  const periods = row.periods ?? [];
+  if (periods.length === 0) {
+    return '-';
+  }
+
+  const first = periods[0];
+  if (!first) {
+    return '-';
+  }
+
+  const range =
+    first.fromDate === first.toDate
+      ? formatDateOnly(first.fromDate)
+      : `${formatDateOnly(first.fromDate)} - ${formatDateOnly(first.toDate)}`;
+
+  return periods.length > 1 ? `${range} (+${periods.length - 1})` : range;
+}
+
+function openCreate() {
+  formDrawerApi.setData({
+    employees: employees.value,
+    reasons: reasons.value,
+    record: null,
+    types: types.value,
+  });
+  formDrawerApi.open();
+}
+
+async function openEdit(row: EmployeeRequestApi.Item) {
+  // Lấy bản chi tiết để có Periods, vì API danh sách không trả kèm.
+  const response = await getEmployeeRequestByIdApi(row.id);
+  if (!response.data) {
+    message.error(response.message ?? 'Không tìm thấy đơn');
+    return;
+  }
+
+  formDrawerApi.setData({
+    employees: employees.value,
+    reasons: reasons.value,
+    record: response.data,
+    types: types.value,
+  });
+  formDrawerApi.open();
+}
+
+async function openDetail(row: EmployeeRequestApi.Item) {
+  const response = await getEmployeeRequestByIdApi(row.id);
+  if (!response.data) {
+    message.error(response.message ?? 'Không tìm thấy đơn');
+    return;
+  }
+
+  detailDrawerApi.setData({ record: response.data });
+  detailDrawerApi.open();
+}
+
+async function submit(
+  payload: EmployeeRequestApi.CreateInput | EmployeeRequestApi.UpdateInput,
+) {
+  formDrawerApi.setState({ confirmLoading: true });
+  try {
+    if ('id' in payload) {
+      await updateEmployeeRequestApi(payload.id, payload);
+      message.success('Cập nhật đơn thành công');
+    } else {
+      await createEmployeeRequestApi(payload);
+      message.success('Tạo đơn thành công');
+    }
+    formDrawerApi.close();
+    await gridApi.query();
+  } finally {
+    formDrawerApi.setState({ confirmLoading: false });
+  }
+}
+
+async function remove(row: EmployeeRequestApi.Item) {
+  if (processingId.value !== null) {
+    return;
+  }
+
+  processingId.value = row.id;
+  try {
+    await deleteEmployeeRequestApi(row.id);
+    message.success('Xóa đơn thành công');
+    await gridApi.query();
+  } finally {
+    processingId.value = null;
+  }
+}
+
+async function approve(row: EmployeeRequestApi.Item) {
+  if (processingId.value !== null) {
+    return;
+  }
+
+  processingId.value = row.id;
+  try {
+    await approveEmployeeRequestApi(row.id);
+    message.success('Duyệt đơn thành công');
+    await gridApi.query();
+  } finally {
+    processingId.value = null;
+  }
+}
+
+async function reject(row: EmployeeRequestApi.Item) {
+  if (processingId.value !== null) {
+    return;
+  }
+
+  processingId.value = row.id;
+  try {
+    await rejectEmployeeRequestApi(row.id, {
+      reason: rejectReason.value.trim() || null,
+    });
+    message.success('Từ chối đơn thành công');
+    rejectReason.value = '';
+    await gridApi.query();
+  } finally {
+    processingId.value = null;
+  }
+}
+
+async function cancel(row: EmployeeRequestApi.Item) {
+  if (processingId.value !== null) {
+    return;
+  }
+
+  processingId.value = row.id;
+  try {
+    await cancelEmployeeRequestApi(row.id);
+    message.success('Hủy đơn thành công');
+    await gridApi.query();
+  } finally {
+    processingId.value = null;
+  }
+}
+
+function isPending(row: EmployeeRequestApi.Item) {
+  return row.status === EmployeeRequestStatus.Pending;
+}
+
+onMounted(loadDependencies);
 </script>
 
 <template>
   <Page>
-    <div class="space-y-4">
-      <NCard :bordered="false">
-        <FilterForm />
-      </NCard>
+    <NTabs
+      v-if="canApprove"
+      class="mb-2"
+      type="line"
+      :value="activeTab"
+      @update:value="changeTab"
+    >
+      <NTabPane name="all" tab="Tất cả đơn từ" />
+      <NTabPane name="approval" tab="Đơn cần phê duyệt" />
+    </NTabs>
 
-      <NCard :bordered="false">
-        <div class="mb-4 flex items-center">
-          <NButton type="primary" @click="openCreateRequest">
-            <template #icon>
-              <IconifyIcon icon="lucide:plus" />
+    <Grid>
+      <template #toolbar-actions>
+        <NButton type="primary" @click="openCreate">
+          <template #icon><IconifyIcon icon="lucide:plus" /></template>
+          Tạo đơn mới
+        </NButton>
+      </template>
+
+      <template #codeCell="{ row }">#{{ row.id }}</template>
+
+      <template #employeeCell="{ row }">{{ employeeName(row) }}</template>
+
+      <template #typeCell="{ row }">
+        {{
+          row.employeeRequestType?.name ??
+          typeMap.get(row.employeeRequestTypeId)?.name ??
+          '-'
+        }}
+      </template>
+
+      <template #reasonCell="{ row }">
+        {{
+          row.employeeRequestReason?.name ??
+          reasonMap.get(row.employeeRequestReasonId)?.name ??
+          '-'
+        }}
+      </template>
+
+      <template #periodCell="{ row }">{{ periodSummary(row) }}</template>
+
+      <template #statusCell="{ row }">
+        <EmployeeRequestStatusBadge :status="row.status" />
+      </template>
+
+      <template #createdCell="{ row }">
+        {{ formatDateTime(row.creationTime) }}
+      </template>
+
+      <template #actions="{ row }">
+        <NSpace justify="center" :size="4">
+          <NTooltip>
+            <template #trigger>
+              <NButton
+                circle
+                quaternary
+                size="small"
+                type="info"
+                @click="openDetail(row)"
+              >
+                <template #icon><IconifyIcon icon="lucide:eye" /></template>
+              </NButton>
             </template>
-            Tạo đơn mới
-          </NButton>
-        </div>
+            Xem chi tiết
+          </NTooltip>
 
-        <NTabs default-value="my-requests" type="line" animated>
-          <NTabPane name="my-requests" tab="Đơn của tôi">
-            <NDataTable
-              :columns="columns"
-              :data="filteredMyRequests"
-              :pagination="false"
-              :scroll-x="1310"
-              class="mt-4"
-            />
-          </NTabPane>
+          <NTooltip v-if="isPending(row)">
+            <template #trigger>
+              <NButton
+                circle
+                :disabled="processingId !== null"
+                quaternary
+                size="small"
+                type="primary"
+                @click="openEdit(row)"
+              >
+                <template #icon><IconifyIcon icon="lucide:pencil" /></template>
+              </NButton>
+            </template>
+            Sửa đơn của tôi
+          </NTooltip>
 
-          <NTabPane name="approval-requests" tab="Đơn cần phê duyệt">
-            <NDataTable
-              :columns="columns"
-              :data="filteredApprovalRequests"
-              :pagination="false"
-              :scroll-x="1310"
-              class="mt-4"
-            />
-          </NTabPane>
-        </NTabs>
-      </NCard>
-    </div>
+          <NPopconfirm
+            v-if="isPending(row) && canApprove"
+            negative-text="Hủy"
+            positive-text="Duyệt"
+            @positive-click="() => approve(row)"
+          >
+            <template #trigger>
+              <NTooltip>
+                <template #trigger>
+                  <NButton
+                    circle
+                    :disabled="processingId !== null"
+                    :loading="processingId === row.id"
+                    quaternary
+                    size="small"
+                    type="success"
+                  >
+                    <template #icon>
+                      <IconifyIcon icon="lucide:check" />
+                    </template>
+                  </NButton>
+                </template>
+                Duyệt đơn
+              </NTooltip>
+            </template>
+            Bạn có chắc chắn muốn duyệt đơn #{{ row.id }} của
+            {{ employeeName(row) }} không?
+          </NPopconfirm>
+
+          <NPopconfirm
+            v-if="isPending(row) && canReject"
+            negative-text="Hủy"
+            positive-text="Từ chối"
+            @positive-click="() => reject(row)"
+          >
+            <template #trigger>
+              <NTooltip>
+                <template #trigger>
+                  <NButton
+                    circle
+                    :disabled="processingId !== null"
+                    :loading="processingId === row.id"
+                    quaternary
+                    size="small"
+                    type="error"
+                  >
+                    <template #icon><IconifyIcon icon="lucide:x" /></template>
+                  </NButton>
+                </template>
+                Từ chối đơn
+              </NTooltip>
+            </template>
+            <div class="w-64">
+              <div class="mb-2">Lý do từ chối đơn #{{ row.id }}:</div>
+              <NInput
+                v-model:value="rejectReason"
+                maxlength="500"
+                placeholder="Nhập lý do (không bắt buộc)"
+                type="textarea"
+              />
+            </div>
+          </NPopconfirm>
+
+          <NPopconfirm
+            v-if="isPending(row)"
+            negative-text="Không"
+            positive-text="Hủy đơn"
+            @positive-click="() => cancel(row)"
+          >
+            <template #trigger>
+              <NTooltip>
+                <template #trigger>
+                  <NButton
+                    circle
+                    :disabled="processingId !== null"
+                    :loading="processingId === row.id"
+                    quaternary
+                    size="small"
+                    type="warning"
+                  >
+                    <template #icon>
+                      <IconifyIcon icon="lucide:undo-2" />
+                    </template>
+                  </NButton>
+                </template>
+                Hủy đơn của tôi
+              </NTooltip>
+            </template>
+            Bạn có chắc chắn muốn hủy đơn #{{ row.id }} không? Chỉ người tạo đơn
+            mới hủy được.
+          </NPopconfirm>
+
+          <NPopconfirm
+            v-if="isPending(row)"
+            negative-text="Không"
+            positive-text="Xóa"
+            @positive-click="() => remove(row)"
+          >
+            <template #trigger>
+              <NTooltip>
+                <template #trigger>
+                  <NButton
+                    circle
+                    :disabled="processingId !== null"
+                    :loading="processingId === row.id"
+                    quaternary
+                    size="small"
+                    type="error"
+                  >
+                    <template #icon>
+                      <IconifyIcon icon="lucide:trash-2" />
+                    </template>
+                  </NButton>
+                </template>
+                Xóa đơn của tôi
+              </NTooltip>
+            </template>
+            Bạn có chắc chắn muốn xóa đơn #{{ row.id }} không?
+          </NPopconfirm>
+        </NSpace>
+      </template>
+    </Grid>
+
+    <FormDrawer @submit="submit" />
+    <DetailDrawer />
   </Page>
 </template>

@@ -7,10 +7,10 @@ import type { EmployeeRequestTypeApi } from '#/models/employee-requests/employee
  * Backend lưu giá trị số, không phải label.
  */
 export enum EmployeeRequestStatus {
-  Approved = 1,
-  Cancelled = 3,
   Pending = 0,
+  Approved = 1,
   Rejected = 2,
+  Cancelled = 3,
 }
 
 export namespace EmployeeRequestApi {
@@ -91,6 +91,17 @@ export namespace EmployeeRequestApi {
     description: string;
     employeeId: number;
     employeeRequestReasonId: number;
+    periods: PeriodInput[];
+  }
+
+  /**
+   * Maps EmployeeRequestUpdateDto. Backend cố ý KHÔNG nhận status/approveBy/rejectBy ở đây
+   * (duyệt/từ chối có endpoint và permission riêng), nên payload update không được gửi các field đó.
+   */
+  export interface UpdateInput {
+    description: string;
+    employeeRequestReasonId: number;
+    id: number;
     periods: PeriodInput[];
   }
 
