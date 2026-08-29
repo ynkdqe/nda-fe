@@ -124,6 +124,16 @@ const routes: RouteRecordRaw[] = [
           keepAlive: true,
         },
       },
+      {
+        name: 'HrTimesheetCutoffs',
+        path: '/hr/timesheet-cutoffs',
+        component: () => import('#/views/hr/timesheet-cutoffs/index.vue'),
+        meta: {
+          icon: 'lucide:calendar-check',
+          title: $t('page.hr.timesheetCutoffs'),
+          keepAlive: true,
+        },
+      },
 
     ],
   },

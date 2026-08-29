@@ -198,6 +198,7 @@
     "workShifts": "Ca làm việc",
     "workSchedules": "Lịch làm việc",
     "dayOffs": "Ngày nghỉ",
+    "timesheetCutoffs": "Ngày chốt công",
     "requests": "Đơn từ",
     "requestTypes": "Loại đơn từ",
     "leaveReasons": "Lý do nghỉ",

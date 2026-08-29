@@ -21,6 +21,9 @@ const tagType = computed<'default' | 'error' | 'success' | 'warning'>(() => {
     case EmployeeRequestStatus.Rejected: {
       return 'error';
     }
+    case EmployeeRequestStatus.Revoked: {
+      return 'error';
+    }
     default: {
       return 'warning';
     }

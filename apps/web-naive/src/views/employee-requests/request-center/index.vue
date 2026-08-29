@@ -35,6 +35,7 @@ import {
   getEmployeeRequestReasonListApi,
   getEmployeeRequestTypeListApi,
   rejectEmployeeRequestApi,
+  revokeEmployeeRequestApi,
   updateEmployeeRequestApi,
 } from '#/api';
 import { EMPLOYEE_REQUEST_PERMISSIONS } from '#/constants/employee-request';
@@ -59,6 +60,9 @@ const canApprove = computed(() =>
 );
 const canReject = computed(() =>
   hasAccessByCodes([EMPLOYEE_REQUEST_PERMISSIONS.reject]),
+);
+const canRevoke = computed(() =>
+  hasAccessByCodes([EMPLOYEE_REQUEST_PERMISSIONS.revoke]),
 );
 
 const types = ref<EmployeeRequestTypeApi.Item[]>([]);
@@ -394,8 +398,30 @@ async function cancel(row: EmployeeRequestApi.Item) {
   }
 }
 
+async function revoke(row: EmployeeRequestApi.Item) {
+  if (processingId.value !== null) {
+    return;
+  }
+
+  processingId.value = row.id;
+  try {
+    await revokeEmployeeRequestApi(row.id, {
+      reason: rejectReason.value.trim() || null,
+    });
+    message.success('Thu hồi đơn thành công');
+    rejectReason.value = '';
+    await gridApi.query();
+  } finally {
+    processingId.value = null;
+  }
+}
+
 function isPending(row: EmployeeRequestApi.Item) {
   return row.status === EmployeeRequestStatus.Pending;
+}
+
+function isApproved(row: EmployeeRequestApi.Item) {
+  return row.status === EmployeeRequestStatus.Approved;
 }
 
 onMounted(loadDependencies);
@@ -603,6 +629,44 @@ onMounted(loadDependencies);
               </NTooltip>
             </template>
             Bạn có chắc chắn muốn xóa đơn #{{ row.id }} không?
+          </NPopconfirm>
+
+          <NPopconfirm
+            v-if="isApproved(row) && canRevoke"
+            negative-text="Hủy"
+            positive-text="Thu hồi"
+            @positive-click="() => revoke(row)"
+          >
+            <template #trigger>
+              <NTooltip>
+                <template #trigger>
+                  <NButton
+                    circle
+                    :disabled="processingId !== null"
+                    :loading="processingId === row.id"
+                    quaternary
+                    size="small"
+                    type="warning"
+                  >
+                    <template #icon>
+                      <IconifyIcon icon="lucide:rotate-ccw" />
+                    </template>
+                  </NButton>
+                </template>
+                Thu hồi đơn đã duyệt
+              </NTooltip>
+            </template>
+            <div class="w-64">
+              <div class="mb-2">
+                Thu hồi đơn #{{ row.id }} và hoàn lại ngày phép. Lý do:
+              </div>
+              <NInput
+                v-model:value="rejectReason"
+                maxlength="500"
+                placeholder="Nhập lý do (không bắt buộc)"
+                type="textarea"
+              />
+            </div>
           </NPopconfirm>
         </NSpace>
       </template>

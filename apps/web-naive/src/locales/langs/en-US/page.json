@@ -198,6 +198,7 @@
     "workShifts": "Work Shifts",
     "workSchedules": "Work Schedules",
     "dayOffs": "Days Off",
+    "timesheetCutoffs": "Timesheet Cutoff Dates",
     "requests": "Requests",
     "requestTypes": "Request Types",
     "leaveReasons": "Leave Reasons",

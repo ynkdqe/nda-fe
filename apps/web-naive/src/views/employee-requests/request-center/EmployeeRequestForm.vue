@@ -319,7 +319,11 @@ const title = computed(() => (model.id ? 'Sửa đơn' : 'Tạo đơn mới'));
         :type="quotaExceeded ? 'error' : 'info'"
       >
         Hạn mức năm {{ quota.year }}: đã dùng {{ quota.usedTime }} / tối đa
-        {{ quota.maxTime }}, còn lại {{ quota.remaining }}.
+        {{ quota.maxTime + quota.carriedOverDays }}, còn lại
+        {{ quota.remaining }}.
+        <template v-if="quota.carriedOverDays > 0">
+          Đã gồm {{ quota.carriedOverDays }} ngày phép tồn năm trước.
+        </template>
         <template v-if="requestedDays > 0">
           Đơn này yêu cầu {{ requestedDays }} ngày.
         </template>

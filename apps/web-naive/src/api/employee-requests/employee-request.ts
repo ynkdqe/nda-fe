@@ -60,6 +60,17 @@ export function rejectEmployeeRequestApi(
   );
 }
 
+export function revokeEmployeeRequestApi(
+  id: number,
+  data: EmployeeRequestApi.RejectInput,
+) {
+  return requestClient.put<EmployeeRequestApi.MutationResult>(
+    `${PREFIX}/${id}/revoke`,
+    data,
+    { responseReturn: 'body' },
+  );
+}
+
 export function cancelEmployeeRequestApi(id: number) {
   return requestClient.put<EmployeeRequestApi.MutationResult>(
     `${PREFIX}/${id}/cancel`,

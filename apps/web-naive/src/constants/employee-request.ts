@@ -9,4 +9,5 @@ export const EMPLOYEE_REQUEST_PERMISSIONS = {
    */
   approve: 'Hrms.EmployeeRequest.Approve',
   reject: 'Hrms.EmployeeRequest.Reject',
+  revoke: 'Hrms.EmployeeRequest.Revoke',
 } as const;

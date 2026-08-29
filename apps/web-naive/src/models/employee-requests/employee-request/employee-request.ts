@@ -10,7 +10,10 @@ export enum EmployeeRequestStatus {
   Pending = 0,
   Approved = 1,
   Rejected = 2,
+  /** Nhân viên tự rút đơn khi còn chờ duyệt. */
   Cancelled = 3,
+  /** Quản lý/HR thu hồi đơn đã duyệt. */
+  Revoked = 4,
 }
 
 export namespace EmployeeRequestApi {
@@ -112,6 +115,8 @@ export namespace EmployeeRequestApi {
 
   // Maps EmployeeRequestQuotaDto.
   export interface Quota {
+    /** Phép tồn chuyển từ năm trước, đã được cộng vào remaining. */
+    carriedOverDays: number;
     maxTime: number;
     remaining: number;
     unit?: null | string;
@@ -139,6 +144,7 @@ export const employeeRequestStatusLabels: Record<
   [EmployeeRequestStatus.Cancelled]: 'Đã hủy',
   [EmployeeRequestStatus.Pending]: 'Chờ duyệt',
   [EmployeeRequestStatus.Rejected]: 'Từ chối',
+  [EmployeeRequestStatus.Revoked]: 'Đã thu hồi',
 };
 
 export const employeeRequestStatusOptions = [
@@ -146,4 +152,5 @@ export const employeeRequestStatusOptions = [
   { label: 'Đã duyệt', value: EmployeeRequestStatus.Approved },
   { label: 'Từ chối', value: EmployeeRequestStatus.Rejected },
   { label: 'Đã hủy', value: EmployeeRequestStatus.Cancelled },
+  { label: 'Đã thu hồi', value: EmployeeRequestStatus.Revoked },
 ] as const;
