@@ -89,10 +89,12 @@ export namespace EmployeeRequestApi {
     type?: string;
   }
 
-  // Maps EmployeeRequestCreateDto.
+  /**
+   * Maps EmployeeRequestCreateDto. Không có employeeId: backend luôn gắn đơn cho
+   * nhân viên ứng với tài khoản đang đăng nhập.
+   */
   export interface CreateInput {
     description: string;
-    employeeId: number;
     employeeRequestReasonId: number;
     periods: PeriodInput[];
   }
@@ -125,7 +127,8 @@ export namespace EmployeeRequestApi {
   }
 
   export interface QuotaParams {
-    employeeId: number;
+    /** Bỏ trống để hỏi hạn mức của chính người đang đăng nhập. */
+    employeeId?: number;
     employeeRequestReasonId: number;
     year?: number;
   }

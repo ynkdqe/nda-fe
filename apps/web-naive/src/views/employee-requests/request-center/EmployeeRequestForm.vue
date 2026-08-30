@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import type { FormInst, FormRules } from 'naive-ui';
 
-import type { EmployeeApi } from '#/api/hr/employee';
 import type { EmployeeRequestApi } from '#/models/employee-requests/employee-request';
 import type { EmployeeRequestPolicyApi } from '#/models/employee-requests/employee-request-policy';
 import type { EmployeeRequestReasonApi } from '#/models/employee-requests/employee-request-reason';
@@ -19,7 +18,6 @@ import {
   NForm,
   NFormItem,
   NInput,
-  NSelect,
   NSpace,
   NTag,
   NTimePicker,
@@ -47,7 +45,6 @@ const emit = defineEmits<{
 const formRef = ref<FormInst | null>(null);
 const types = ref<EmployeeRequestTypeApi.Item[]>([]);
 const reasons = ref<EmployeeRequestReasonApi.Item[]>([]);
-const employees = ref<EmployeeApi.EmployeeItem[]>([]);
 const policies = ref<EmployeeRequestPolicyApi.Item[]>([]);
 const quota = ref<EmployeeRequestApi.Quota | null>(null);
 const quotaLoading = ref(false);
@@ -67,21 +64,11 @@ function createPeriod(): PeriodFormItem {
 
 const model = reactive({
   description: '',
-  employeeId: null as null | number,
   employeeRequestReasonId: null as null | number,
   employeeRequestTypeId: null as null | number,
   id: undefined as number | undefined,
   periods: [createPeriod()] as PeriodFormItem[],
 });
-
-const employeeOptions = computed(() =>
-  employees.value.map((item) => ({
-    label: item.employeeCode
-      ? `${item.name ?? ''} (${item.employeeCode})`
-      : (item.name ?? String(item.id)),
-    value: Number(item.id),
-  })),
-);
 
 /** Tổng số ngày yêu cầu, tính giống backend: (toDate - fromDate) + 1 cho mỗi khoảng. */
 const requestedDays = computed(() => {
@@ -123,14 +110,14 @@ const quotaExceeded = computed(
 
 async function loadQuota() {
   quota.value = null;
-  if (model.employeeId === null || model.employeeRequestReasonId === null) {
+  if (model.employeeRequestReasonId === null) {
     return;
   }
 
   quotaLoading.value = true;
   try {
+    // Không truyền employeeId: backend lấy hạn mức của chính người đang đăng nhập.
     const response = await getEmployeeRequestQuotaApi({
-      employeeId: model.employeeId,
       employeeRequestReasonId: model.employeeRequestReasonId,
     });
     quota.value = response.data ?? null;
@@ -143,7 +130,7 @@ async function loadQuota() {
   }
 }
 
-watch(() => [model.employeeId, model.employeeRequestReasonId], loadQuota);
+watch(() => model.employeeRequestReasonId, loadQuota);
 
 function addPeriod() {
   model.periods.push(createPeriod());
@@ -157,12 +144,6 @@ function removePeriod(index: number) {
 }
 
 const rules: FormRules = {
-  employeeId: {
-    message: 'Vui lòng chọn nhân viên',
-    required: true,
-    trigger: 'change',
-    type: 'number',
-  },
   employeeRequestTypeId: {
     message: 'Vui lòng chọn loại đơn',
     required: true,
@@ -197,11 +178,7 @@ const periodError = computed(() => {
 async function submit() {
   await formRef.value?.validate();
 
-  if (
-    model.employeeId === null ||
-    model.employeeRequestReasonId === null ||
-    periodError.value
-  ) {
+  if (model.employeeRequestReasonId === null || periodError.value) {
     return;
   }
 
@@ -226,7 +203,6 @@ async function submit() {
     model.id === undefined
       ? {
           description: model.description.trim(),
-          employeeId: model.employeeId,
           employeeRequestReasonId: model.employeeRequestReasonId,
           periods,
         }
@@ -253,7 +229,6 @@ const [Drawer, drawerApi] = useVbenDrawer({
     }
 
     const data = drawerApi.getData<{
-      employees: EmployeeApi.EmployeeItem[];
       policies: EmployeeRequestPolicyApi.Item[];
       reasons: EmployeeRequestReasonApi.Item[];
       record?: EmployeeRequestApi.Item | null;
@@ -262,7 +237,6 @@ const [Drawer, drawerApi] = useVbenDrawer({
 
     types.value = data.types;
     reasons.value = data.reasons;
-    employees.value = data.employees;
     policies.value = data.policies ?? [];
 
     periodKey = 0;
@@ -282,7 +256,6 @@ const [Drawer, drawerApi] = useVbenDrawer({
 
     Object.assign(model, {
       description: record?.description ?? '',
-      employeeId: record?.employeeId ?? null,
       employeeRequestReasonId: record?.employeeRequestReasonId ?? null,
       employeeRequestTypeId: record?.employeeRequestTypeId ?? null,
       id: record?.id,
@@ -305,17 +278,6 @@ const title = computed(() => (model.id ? 'Sửa đơn' : 'Tạo đơn mới'));
       :model="model"
       :rules="rules"
     >
-      <NFormItem label="Nhân viên" path="employeeId" required>
-        <NSelect
-          v-model:value="model.employeeId"
-          clearable
-          :disabled="model.id !== undefined"
-          filterable
-          :options="employeeOptions"
-          placeholder="Chọn nhân viên"
-        />
-      </NFormItem>
-
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <NFormItem label="Loại đơn" path="employeeRequestTypeId" required>
           <EmployeeRequestTypeSelect
