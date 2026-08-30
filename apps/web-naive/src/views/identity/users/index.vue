@@ -1,9 +1,9 @@
 <script lang="ts" setup>
+import type { UserFormModel } from './UserForm.vue';
+
 import type { VbenFormProps } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { IdentityUserApi } from '#/api';
-
-import type { UserFormModel } from './UserForm.vue';
 
 import { ref } from 'vue';
 
@@ -11,13 +11,14 @@ import { Page, useVbenDrawer, useVbenModal } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
 import { formatDateTime } from '@vben/utils';
 
-import { NButton, NDropdown, NTag } from 'naive-ui';
+import { NButton, NDropdown, NPopconfirm, NTag } from 'naive-ui';
 
 import { message } from '#/adapter/naive';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import {
   getIdentityUserDetail,
   getIdentityUsers,
+  removeIdentityUserProfileCache,
   updateIdentityUser,
 } from '#/api';
 import Permission from '#/components/Permission.vue';
@@ -31,6 +32,7 @@ type DropdownKey =
   | 'lock'
   | 'loginAs'
   | 'permission'
+  | 'removeCache'
   | 'setPassword';
 type DropdownSelectKey = number | string;
 
@@ -45,6 +47,7 @@ const dropdownOptions: Array<{ key: DropdownKey; label: string }> = [
   { key: 'setPassword', label: 'Đặt mật khẩu' },
   { key: 'lock', label: 'Khóa' },
   { key: 'loginAs', label: 'Đăng nhập với user này' },
+  { key: 'removeCache', label: 'Xóa cache' },
   { key: 'delete', label: 'Xóa' },
 ];
 
@@ -192,6 +195,8 @@ const [PasswordModal, passwordModalApi] = useVbenModal({
   connectedComponent: SetPasswordModal,
 });
 
+/** Khóa thao tác khi đang xóa cache: 'all' cho toàn bộ, hoặc id của user đang xử lý. */
+const removingCacheId = ref<null | string>(null);
 const showPermission = ref(false);
 const permissionProviderName = ref('U');
 const permissionProviderKey = ref('');
@@ -229,6 +234,36 @@ function onDelete(row: IdentityUserApi.UserItem) {
   message.info(`Chưa có API xóa người dùng: ${row.userName ?? ''}`);
 }
 
+async function onRemoveCache(row: IdentityUserApi.UserItem) {
+  if (removingCacheId.value !== null) {
+    return;
+  }
+
+  removingCacheId.value = String(row.id);
+  try {
+    const response = await removeIdentityUserProfileCache(String(row.id));
+    message.success(
+      response.message ?? `Đã xóa cache của ${row.userName ?? 'người dùng'}`,
+    );
+  } finally {
+    removingCacheId.value = null;
+  }
+}
+
+async function onRemoveAllCache() {
+  if (removingCacheId.value !== null) {
+    return;
+  }
+
+  removingCacheId.value = 'all';
+  try {
+    const response = await removeIdentityUserProfileCache();
+    message.success(response.message ?? 'Đã xóa toàn bộ cache người dùng');
+  } finally {
+    removingCacheId.value = null;
+  }
+}
+
 function handleMenu(row: IdentityUserApi.UserItem, key: DropdownSelectKey) {
   const menuKey = String(key) as DropdownKey;
 
@@ -254,6 +289,10 @@ function handleMenu(row: IdentityUserApi.UserItem, key: DropdownSelectKey) {
       permissionProviderKey.value = String(row.id);
       permissionTitle.value = `Quyền của ${row.userName ?? ''}`;
       showPermission.value = true;
+      break;
+    }
+    case 'removeCache': {
+      void onRemoveCache(row);
       break;
     }
     case 'setPassword': {
@@ -309,6 +348,27 @@ async function onFormSubmit(formData: UserFormModel) {
           </template>
           Thêm mới
         </NButton>
+
+        <NPopconfirm
+          negative-text="Hủy"
+          positive-text="Xóa cache"
+          @positive-click="onRemoveAllCache"
+        >
+          <template #trigger>
+            <NButton
+              class="ml-2"
+              :disabled="removingCacheId !== null"
+              :loading="removingCacheId === 'all'"
+            >
+              <template #icon>
+                <IconifyIcon icon="lucide:eraser" />
+              </template>
+              Xóa toàn bộ cache
+            </NButton>
+          </template>
+          Xóa cache profile của tất cả người dùng trong đơn vị này? Lần đăng nhập
+          kế tiếp của họ sẽ đọc lại dữ liệu mới từ máy chủ.
+        </NPopconfirm>
       </template>
 
       <template #activeTag="{ row }">

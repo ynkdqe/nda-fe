@@ -74,6 +74,12 @@ export namespace IdentityUserApi {
     message?: null | string;
     success?: boolean;
   }
+
+  /** Maps MResult<dynamic> trả về từ UserAppService.RemoveProfileCacheAsync. */
+  export interface RemoveCacheResult {
+    message?: null | string;
+    success?: boolean;
+  }
 }
 
 export async function getIdentityUsers(params: IdentityUserApi.UserListParams) {
@@ -115,5 +121,19 @@ export async function setIdentityUserPassword(
     '/api/identity/users/set-password',
     data,
     { responseReturn: 'body' },
+  );
+}
+
+/**
+ * Xóa cache profile người dùng. Bỏ trống userId để xóa toàn bộ tenant hiện tại,
+ * truyền userId để chỉ xóa cache của một người.
+ */
+export async function removeIdentityUserProfileCache(userId?: string) {
+  return requestClient.delete<IdentityUserApi.RemoveCacheResult>(
+    '/api/identity/users/cache',
+    {
+      params: userId ? { userId } : {},
+      responseReturn: 'body',
+    },
   );
 }
