@@ -182,7 +182,6 @@
   "employeeRequest": {
     "title": "申请单",
     "requests": "申请单列表",
-    "configuration": "申请单配置",
     "types": "申请单类型",
     "reasons": "原因",
     "policies": "政策"
