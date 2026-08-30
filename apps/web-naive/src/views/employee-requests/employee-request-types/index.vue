@@ -206,8 +206,8 @@ async function remove(row: EmployeeRequestTypeApi.Item) {
                 <template #icon>
                   <IconifyIcon icon="lucide:pencil" />
                 </template>
-              </NButton>
-</template>Sửa
+              </NButton> </template
+            >Sửa
           </NTooltip>
           <NPopconfirm
             negative-text="Hủy"
@@ -228,8 +228,8 @@ async function remove(row: EmployeeRequestTypeApi.Item) {
                     <template #icon>
                       <IconifyIcon icon="lucide:trash-2" />
                     </template>
-                  </NButton>
-</template>Xóa
+                  </NButton> </template
+                >Xóa
               </NTooltip>
             </template>
             Bạn có chắc chắn muốn xóa loại đơn '{{ row.name }}' không?
