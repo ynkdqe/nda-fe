@@ -3,8 +3,9 @@ import type { VbenFormProps } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { EmployeeRequestTypeApi } from '#/models/employee-requests/employee-request-type';
 
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
+import { useAccess } from '@vben/access';
 import { Page, useVbenDrawer } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
 
@@ -19,8 +20,21 @@ import {
   getEmployeeRequestTypeListApi,
   updateEmployeeRequestTypeApi,
 } from '#/api';
+import { EMPLOYEE_REQUEST_PERMISSIONS } from '#/constants/employee-request';
 
 import EmployeeRequestTypeForm from './EmployeeRequestTypeForm.vue';
+
+const { hasAccessByCodes } = useAccess();
+// Tách theo từng thao tác để khớp với permission CRUD riêng biệt ở backend.
+const canCreate = computed(() =>
+  hasAccessByCodes([EMPLOYEE_REQUEST_PERMISSIONS.createTypes]),
+);
+const canUpdate = computed(() =>
+  hasAccessByCodes([EMPLOYEE_REQUEST_PERMISSIONS.updateTypes]),
+);
+const canDelete = computed(() =>
+  hasAccessByCodes([EMPLOYEE_REQUEST_PERMISSIONS.deleteTypes]),
+);
 
 const deletingId = ref<null | number>(null);
 const maxDisplayOrder = ref(-1);
@@ -104,7 +118,14 @@ const [Drawer, drawerApi] = useVbenDrawer({
   connectedComponent: EmployeeRequestTypeForm,
 });
 
+function permitted(allowed: boolean) {
+  if (allowed) return true;
+  message.warning('Bạn không có quyền thực hiện thao tác này');
+  return false;
+}
+
 function add() {
+  if (!permitted(canCreate.value)) return;
   drawerApi.setData({
     defaultDisplayOrder: maxDisplayOrder.value + 1,
     record: null,
@@ -113,6 +134,7 @@ function add() {
 }
 
 async function edit(row: EmployeeRequestTypeApi.Item) {
+  if (!permitted(canUpdate.value)) return;
   const response = await getEmployeeRequestTypeByIdApi(row.id);
   if (!response.data) {
     message.error(response.message ?? 'Không tìm thấy loại đơn');
@@ -127,6 +149,7 @@ async function submit(
     | EmployeeRequestTypeApi.CreateInput
     | EmployeeRequestTypeApi.UpdateInput,
 ) {
+  if (!permitted('id' in payload ? canUpdate.value : canCreate.value)) return;
   drawerApi.setState({ confirmLoading: true });
   try {
     if ('id' in payload) {
@@ -144,7 +167,7 @@ async function submit(
 }
 
 async function remove(row: EmployeeRequestTypeApi.Item) {
-  if (deletingId.value !== null) return;
+  if (!permitted(canDelete.value) || deletingId.value !== null) return;
   deletingId.value = row.id;
   try {
     await deleteEmployeeRequestTypeApi(row.id);
@@ -160,7 +183,7 @@ async function remove(row: EmployeeRequestTypeApi.Item) {
   <Page>
     <Grid>
       <template #toolbar-actions>
-        <NButton type="primary" @click="add">
+        <NButton type="primary" :disabled="!canCreate" @click="add">
           <template #icon><IconifyIcon icon="lucide:plus" /></template>Thêm mới
         </NButton>
       </template>
@@ -174,6 +197,7 @@ async function remove(row: EmployeeRequestTypeApi.Item) {
             <template #trigger>
               <NButton
                 circle
+                :disabled="!canUpdate"
                 quaternary
                 size="small"
                 type="primary"
@@ -182,8 +206,8 @@ async function remove(row: EmployeeRequestTypeApi.Item) {
                 <template #icon>
                   <IconifyIcon icon="lucide:pencil" />
                 </template>
-              </NButton> </template
-            >Sửa
+              </NButton>
+</template>Sửa
           </NTooltip>
           <NPopconfirm
             negative-text="Hủy"
@@ -198,14 +222,14 @@ async function remove(row: EmployeeRequestTypeApi.Item) {
                     quaternary
                     size="small"
                     type="error"
-                    :disabled="deletingId !== null"
+                    :disabled="!canDelete || deletingId !== null"
                     :loading="deletingId === row.id"
                   >
                     <template #icon>
                       <IconifyIcon icon="lucide:trash-2" />
                     </template>
-                  </NButton> </template
-                >Xóa
+                  </NButton>
+</template>Xóa
               </NTooltip>
             </template>
             Bạn có chắc chắn muốn xóa loại đơn '{{ row.name }}' không?

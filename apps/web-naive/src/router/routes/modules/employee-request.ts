@@ -1,5 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router';
 
+import { EMPLOYEE_REQUEST_PERMISSIONS } from '#/constants/employee-request';
 import { $t } from '#/locales';
 
 
@@ -37,7 +38,7 @@ const routes: RouteRecordRaw[] = [
             component: () =>
               import('#/views/employee-requests/employee-request-types/index.vue'),
             meta: {
-              // authority: [EMPLOYEE_REQUEST_PERMISSIONS.manageTypes],
+              authority: [EMPLOYEE_REQUEST_PERMISSIONS.viewTypes],
               icon: 'lucide:files',
               keepAlive: true,
               title: $t('page.employeeRequest.types'),
@@ -49,7 +50,7 @@ const routes: RouteRecordRaw[] = [
             component: () =>
               import('#/views/employee-requests/employee-request-reasons/index.vue'),
             meta: {
-              // authority: [EMPLOYEE_REQUEST_PERMISSIONS.manageReasons],
+              authority: [EMPLOYEE_REQUEST_PERMISSIONS.viewReasons],
               icon: 'lucide:list-checks',
               keepAlive: true,
               title: $t('page.employeeRequest.reasons'),
@@ -61,7 +62,7 @@ const routes: RouteRecordRaw[] = [
             component: () =>
               import('#/views/employee-requests/employee-request-policies/index.vue'),
             meta: {
-              // authority: [EMPLOYEE_REQUEST_PERMISSIONS.managePolicies],
+              authority: [EMPLOYEE_REQUEST_PERMISSIONS.viewPolicies],
               icon: 'lucide:shield-check',
               keepAlive: true,
               title: $t('page.employeeRequest.policies'),

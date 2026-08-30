@@ -29,8 +29,15 @@ import { EMPLOYEE_REQUEST_PERMISSIONS } from '#/constants/employee-request';
 import PaidStatusBadge from '../shared/PaidStatusBadge.vue';
 import EmployeeRequestPolicyForm from './EmployeeRequestPolicyForm.vue';
 const { hasAccessByCodes } = useAccess();
-const canManage = computed(() =>
-  hasAccessByCodes([EMPLOYEE_REQUEST_PERMISSIONS.managePolicies]),
+// Tách theo từng thao tác để khớp với permission CRUD riêng biệt ở backend.
+const canCreate = computed(() =>
+  hasAccessByCodes([EMPLOYEE_REQUEST_PERMISSIONS.createPolicies]),
+);
+const canUpdate = computed(() =>
+  hasAccessByCodes([EMPLOYEE_REQUEST_PERMISSIONS.updatePolicies]),
+);
+const canDelete = computed(() =>
+  hasAccessByCodes([EMPLOYEE_REQUEST_PERMISSIONS.deletePolicies]),
 );
 const deletingId = ref<null | number>(null);
 const types = ref<EmployeeRequestTypeApi.Item[]>([]);
@@ -160,8 +167,8 @@ const [Grid, gridApi] = useVbenVxeGrid<EmployeeRequestPolicyApi.Item>({
 const [Drawer, drawerApi] = useVbenDrawer({
   connectedComponent: EmployeeRequestPolicyForm,
 });
-function permitted() {
-  if (canManage.value) return true;
+function permitted(allowed: boolean) {
+  if (allowed) return true;
   message.warning('Bạn không có quyền thực hiện thao tác này');
   return false;
 }
@@ -174,12 +181,12 @@ function data(record: EmployeeRequestPolicyApi.Item | null) {
   };
 }
 function add() {
-  if (!permitted()) return;
+  if (!permitted(canCreate.value)) return;
   drawerApi.setData(data(null));
   drawerApi.open();
 }
 async function edit(row: EmployeeRequestPolicyApi.Item) {
-  if (!permitted()) return;
+  if (!permitted(canUpdate.value)) return;
   const r = await getEmployeeRequestPolicyByIdApi(row.id);
   if (!r.data) {
     message.error(r.message ?? 'Không tìm thấy chính sách');
@@ -193,7 +200,7 @@ async function submit(
     | EmployeeRequestPolicyApi.CreateInput
     | EmployeeRequestPolicyApi.UpdateInput,
 ) {
-  if (!permitted()) return;
+  if (!permitted('id' in p ? canUpdate.value : canCreate.value)) return;
   drawerApi.setState({ confirmLoading: true });
   try {
     if ('id' in p) {
@@ -210,7 +217,7 @@ async function submit(
   }
 }
 async function remove(row: EmployeeRequestPolicyApi.Item) {
-  if (!permitted() || deletingId.value !== null) return;
+  if (!permitted(canDelete.value) || deletingId.value !== null) return;
   deletingId.value = row.id;
   try {
     await deleteEmployeeRequestPolicyApi(row.id);
@@ -226,28 +233,28 @@ onMounted(loadDependencies);
   <Page>
     <Grid>
       <template #toolbar-actions>
-        <NButton type="primary" :disabled="!canManage" @click="add">
+        <NButton type="primary" :disabled="!canCreate" @click="add">
           <template #icon><IconifyIcon icon="lucide:plus" /></template>Thêm mới
-        </NButton> </template
-      ><template #typeCell="{ row }">
+        </NButton>
+</template><template #typeCell="{ row }">
         {{
           typeMap.get(row.employeeRequestTypeId)?.name ?? 'Loại đơn đã bị xóa'
-        }} </template
-      ><template #reasonCell="{ row }">
+        }}
+</template><template #reasonCell="{ row }">
         {{
           reasonMap.get(row.employeeRequestReasonId)?.name ?? 'Lý do đã bị xóa'
-        }} </template
-      ><template #paidCell="{ row }">
-        <PaidStatusBadge :paid="row.paid" /> </template
-      ><template #unitCell="{ row }">
+        }}
+</template><template #paidCell="{ row }">
+        <PaidStatusBadge :paid="row.paid" />
+</template><template #unitCell="{ row }">
         {{
           row.unit === 'Day'
             ? 'Ngày'
             : row.unit === 'Hour'
               ? 'Giờ'
               : (row.unit ?? '-')
-        }} </template
-      ><template #actions="{ row }">
+        }}
+</template><template #actions="{ row }">
         <NSpace justify="center" :size="4">
           <NTooltip>
             <template #trigger>
@@ -256,15 +263,15 @@ onMounted(loadDependencies);
                 quaternary
                 size="small"
                 type="primary"
-                :disabled="!canManage"
+                :disabled="!canUpdate"
                 @click="edit(row)"
               >
                 <template #icon>
                   <IconifyIcon icon="lucide:pencil" />
                 </template>
-              </NButton> </template
-            >Sửa </NTooltip
-          ><NPopconfirm
+              </NButton>
+</template>Sửa
+</NTooltip><NPopconfirm
             negative-text="Hủy"
             positive-text="Xóa"
             @positive-click="() => remove(row)"
@@ -277,21 +284,21 @@ onMounted(loadDependencies);
                     quaternary
                     size="small"
                     type="error"
-                    :disabled="!canManage || deletingId !== null"
+                    :disabled="!canDelete || deletingId !== null"
                     :loading="deletingId === row.id"
                   >
                     <template #icon>
                       <IconifyIcon icon="lucide:trash-2" />
                     </template>
-                  </NButton> </template
-                >Xóa
-              </NTooltip> </template
-            >Bạn có chắc chắn muốn xóa chính sách của lý do '{{
+                  </NButton>
+</template>Xóa
+              </NTooltip>
+</template>Bạn có chắc chắn muốn xóa chính sách của lý do '{{
               reasonMap.get(row.employeeRequestReasonId)?.name ?? 'đã bị xóa'
             }}' không?
           </NPopconfirm>
         </NSpace>
-      </template> </Grid
-    ><Drawer @submit="submit" />
+      </template>
+</Grid><Drawer @submit="submit" />
   </Page>
 </template>
