@@ -366,8 +366,8 @@ async function onFormSubmit(formData: UserFormModel) {
               Xóa toàn bộ cache
             </NButton>
           </template>
-          Xóa cache profile của tất cả người dùng trong đơn vị này? Lần đăng nhập
-          kế tiếp của họ sẽ đọc lại dữ liệu mới từ máy chủ.
+          Xóa cache profile của tất cả người dùng trong đơn vị này? Lần đăng
+          nhập kế tiếp của họ sẽ đọc lại dữ liệu mới từ máy chủ.
         </NPopconfirm>
       </template>
 
