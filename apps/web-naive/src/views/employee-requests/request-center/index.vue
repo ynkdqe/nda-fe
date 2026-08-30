@@ -3,6 +3,7 @@ import type { VbenFormProps } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { EmployeeApi } from '#/api/hr/employee';
 import type { EmployeeRequestApi } from '#/models/employee-requests/employee-request';
+import type { EmployeeRequestPolicyApi } from '#/models/employee-requests/employee-request-policy';
 import type { EmployeeRequestReasonApi } from '#/models/employee-requests/employee-request-reason';
 import type { EmployeeRequestTypeApi } from '#/models/employee-requests/employee-request-type';
 
@@ -32,6 +33,7 @@ import {
   getEmployeeListApi,
   getEmployeeRequestByIdApi,
   getEmployeeRequestListApi,
+  getEmployeeRequestPolicyListApi,
   getEmployeeRequestReasonListApi,
   getEmployeeRequestTypeListApi,
   rejectEmployeeRequestApi,
@@ -68,6 +70,8 @@ const canRevoke = computed(() =>
 const types = ref<EmployeeRequestTypeApi.Item[]>([]);
 const reasons = ref<EmployeeRequestReasonApi.Item[]>([]);
 const employees = ref<EmployeeApi.EmployeeItem[]>([]);
+// Dùng để tra "có tính lương hay không" theo lý do đã chọn khi tạo/sửa đơn.
+const policies = ref<EmployeeRequestPolicyApi.Item[]>([]);
 const processingId = ref<null | number>(null);
 const rejectReason = ref('');
 
@@ -88,17 +92,20 @@ const employeeMap = computed(
 );
 
 async function loadDependencies() {
-  const [typeResponse, reasonResponse, employeeResponse] = await Promise.all([
-    getEmployeeRequestTypeListApi({ current: 1, pageSize: 100 }),
-    getEmployeeRequestReasonListApi({ current: 1, pageSize: 100 }),
-    getEmployeeListApi({ current: 1, pageSize: 100 }),
-  ]);
+  const [typeResponse, reasonResponse, employeeResponse, policyResponse] =
+    await Promise.all([
+      getEmployeeRequestTypeListApi({ current: 1, pageSize: 100 }),
+      getEmployeeRequestReasonListApi({ current: 1, pageSize: 100 }),
+      getEmployeeListApi({ current: 1, pageSize: 100 }),
+      getEmployeeRequestPolicyListApi({ current: 1, pageSize: 100 }),
+    ]);
 
   types.value = (typeResponse.data ?? [])
     .filter((x) => !x.isDeleted)
     .sort((a, b) => a.displayOrder - b.displayOrder || a.id - b.id);
   reasons.value = (reasonResponse.data ?? []).filter((x) => !x.isDeleted);
   employees.value = employeeResponse.data ?? [];
+  policies.value = (policyResponse.data ?? []).filter((x) => !x.isDeleted);
 }
 
 const formOptions: VbenFormProps = {
@@ -208,9 +215,9 @@ const gridOptions: VxeGridProps<EmployeeRequestApi.Item> = {
         // Tab duyệt đơn luôn ép trạng thái Chờ duyệt, bỏ qua filter trạng thái của người dùng.
         const status = isApprovalTab.value
           ? String(EmployeeRequestStatus.Pending)
-          : typeof values?.status === 'number'
+          : (typeof values?.status === 'number'
             ? String(values.status)
-            : undefined;
+            : undefined);
         const params: EmployeeRequestApi.ListParams = {
           current: page.currentPage,
           pageSize: page.pageSize,
@@ -281,6 +288,7 @@ function periodSummary(row: EmployeeRequestApi.Item) {
 function openCreate() {
   formDrawerApi.setData({
     employees: employees.value,
+    policies: policies.value,
     reasons: reasons.value,
     record: null,
     types: types.value,
@@ -298,6 +306,7 @@ async function openEdit(row: EmployeeRequestApi.Item) {
 
   formDrawerApi.setData({
     employees: employees.value,
+    policies: policies.value,
     reasons: reasons.value,
     record: response.data,
     types: types.value,

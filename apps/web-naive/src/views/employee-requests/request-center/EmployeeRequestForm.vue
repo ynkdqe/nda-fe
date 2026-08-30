@@ -3,6 +3,7 @@ import type { FormInst, FormRules } from 'naive-ui';
 
 import type { EmployeeApi } from '#/api/hr/employee';
 import type { EmployeeRequestApi } from '#/models/employee-requests/employee-request';
+import type { EmployeeRequestPolicyApi } from '#/models/employee-requests/employee-request-policy';
 import type { EmployeeRequestReasonApi } from '#/models/employee-requests/employee-request-reason';
 import type { EmployeeRequestTypeApi } from '#/models/employee-requests/employee-request-type';
 
@@ -20,6 +21,7 @@ import {
   NInput,
   NSelect,
   NSpace,
+  NTag,
   NTimePicker,
 } from 'naive-ui';
 
@@ -28,6 +30,7 @@ import { toDateOnlyString, toTimeOnlyString } from '#/utils/date';
 
 import EmployeeRequestReasonSelect from '../shared/EmployeeRequestReasonSelect.vue';
 import EmployeeRequestTypeSelect from '../shared/EmployeeRequestTypeSelect.vue';
+import PaidStatusBadge from '../shared/PaidStatusBadge.vue';
 
 interface PeriodFormItem {
   fromDate: null | number;
@@ -45,6 +48,7 @@ const formRef = ref<FormInst | null>(null);
 const types = ref<EmployeeRequestTypeApi.Item[]>([]);
 const reasons = ref<EmployeeRequestReasonApi.Item[]>([]);
 const employees = ref<EmployeeApi.EmployeeItem[]>([]);
+const policies = ref<EmployeeRequestPolicyApi.Item[]>([]);
 const quota = ref<EmployeeRequestApi.Quota | null>(null);
 const quotaLoading = ref(false);
 
@@ -96,6 +100,19 @@ const requestedDays = computed(() => {
 
   return total;
 });
+
+/**
+ * Chính sách áp cho lý do đang chọn - quyết định ngày nghỉ có được tính lương hay không.
+ * Lý do chưa gắn chính sách sẽ không tra được, khi đó hiển thị là chưa cấu hình.
+ */
+const selectedPolicy = computed(() =>
+  model.employeeRequestReasonId === null
+    ? null
+    : (policies.value.find(
+        (policy) =>
+          policy.employeeRequestReasonId === model.employeeRequestReasonId,
+      ) ?? null),
+);
 
 const quotaExceeded = computed(
   () =>
@@ -237,6 +254,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
 
     const data = drawerApi.getData<{
       employees: EmployeeApi.EmployeeItem[];
+      policies: EmployeeRequestPolicyApi.Item[];
       reasons: EmployeeRequestReasonApi.Item[];
       record?: EmployeeRequestApi.Item | null;
       types: EmployeeRequestTypeApi.Item[];
@@ -245,6 +263,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
     types.value = data.types;
     reasons.value = data.reasons;
     employees.value = data.employees;
+    policies.value = data.policies ?? [];
 
     periodKey = 0;
     quota.value = null;
@@ -311,6 +330,21 @@ const title = computed(() => (model.id ? 'Sửa đơn' : 'Tạo đơn mới'));
             :options="reasons"
           />
         </NFormItem>
+      </div>
+
+      <div
+        v-if="model.employeeRequestReasonId !== null"
+        class="mb-4 flex flex-wrap items-center gap-2 text-sm"
+      >
+        <span class="text-gray-500">Ngày nghỉ theo lý do này:</span>
+        <PaidStatusBadge v-if="selectedPolicy" :paid="selectedPolicy.paid" />
+        <NTag v-else :bordered="false" size="small" type="warning">
+          Chưa cấu hình chính sách
+        </NTag>
+        <span v-if="selectedPolicy" class="text-gray-500">
+          hạn mức {{ selectedPolicy.maxTime }}
+          {{ selectedPolicy.unit === 'Hour' ? 'giờ' : 'ngày' }}/năm
+        </span>
       </div>
 
       <NAlert
