@@ -12,12 +12,15 @@ import { useVbenDrawer } from '@vben/common-ui';
 import {
   NAlert,
   NButton,
+  NDatePicker,
   NForm,
   NFormItem,
   NInputNumber,
   NSpace,
   NSwitch,
 } from 'naive-ui';
+
+import { toDateOnlyString, toTimestamp } from '#/utils/date';
 
 import EmployeeRequestPolicyUnitSelect from '../shared/EmployeeRequestPolicyUnitSelect.vue';
 import EmployeeRequestReasonSelect from '../shared/EmployeeRequestReasonSelect.vue';
@@ -34,9 +37,12 @@ const policies = ref<EmployeeRequestPolicyApi.Item[]>([]);
 const model = reactive({
   employeeRequestReasonId: null as null | number,
   employeeRequestTypeId: null as null | number,
+  // Date picker giữ timestamp, chỉ đổi sang chuỗi yyyy-MM-dd khi gửi lên backend.
+  fromDate: null as null | number,
   id: undefined as number | undefined,
   maxTime: null as null | number,
   paid: false,
+  toDate: null as null | number,
   unit: null as null | string,
 });
 const duplicate = computed(
@@ -90,12 +96,21 @@ const rules: FormRules = {
   ],
   unit: { required: true, message: 'Vui lòng chọn đơn vị', trigger: 'change' },
 };
+/** Cả hai mốc đều không bắt buộc, nhưng khi nhập đủ thì ngày kết thúc phải sau ngày bắt đầu. */
+const dateRangeError = computed(() =>
+  model.fromDate !== null &&
+  model.toDate !== null &&
+  model.toDate < model.fromDate
+    ? 'Ngày hết hiệu lực phải sau ngày bắt đầu hiệu lực'
+    : '',
+);
 async function submit() {
   await formRef.value?.validate();
   if (
     model.employeeRequestReasonId === null ||
     model.employeeRequestTypeId === null ||
-    model.maxTime === null
+    model.maxTime === null ||
+    dateRangeError.value
   ) {
     return;
   }
@@ -103,8 +118,10 @@ async function submit() {
   const base = {
     employeeRequestReasonId: model.employeeRequestReasonId,
     employeeRequestTypeId: model.employeeRequestTypeId,
+    fromDate: toDateOnlyString(model.fromDate),
     maxTime: model.maxTime,
     paid: model.paid,
+    toDate: toDateOnlyString(model.toDate),
     unit: model.unit,
   };
   emit('submit', model.id ? { ...base, id: model.id } : base);
@@ -125,9 +142,11 @@ const [Drawer, drawerApi] = useVbenDrawer({
     Object.assign(model, {
       employeeRequestReasonId: d.record?.employeeRequestReasonId ?? null,
       employeeRequestTypeId: d.record?.employeeRequestTypeId ?? null,
+      fromDate: toTimestamp(d.record?.fromDate),
       id: d.record?.id,
       maxTime: d.record?.maxTime ?? null,
       paid: d.record?.paid ?? false,
+      toDate: toTimestamp(d.record?.toDate),
       unit: d.record?.unit ?? null,
     });
     void nextTick(() => formRef.value?.restoreValidation());
@@ -148,14 +167,14 @@ const title = computed(() => (model.id ? 'Sửa chính sách' : 'Thêm chính s�
         <EmployeeRequestTypeSelect
           v-model:value="model.employeeRequestTypeId"
           :options="types"
-        /> </NFormItem
-      ><NFormItem label="Lý do" path="employeeRequestReasonId" required>
+        />
+</NFormItem><NFormItem label="Lý do" path="employeeRequestReasonId" required>
         <EmployeeRequestReasonSelect
           v-model:value="model.employeeRequestReasonId"
           :employee-request-type-id="model.employeeRequestTypeId"
           :options="reasons"
-        /> </NFormItem
-      ><NAlert v-if="duplicate" type="warning" class="mb-4">
+        />
+</NFormItem><NAlert v-if="duplicate" type="warning" class="mb-4">
         Đã tồn tại chính sách cho cặp loại đơn và lý do này. Backend sẽ quyết
         định có cho phép lưu hay không.
       </NAlert>
@@ -167,16 +186,39 @@ const title = computed(() => (model.id ? 'Sửa chính sách' : 'Thêm chính s�
             :precision="2"
             :show-button="false"
             style="width: 100%"
-          /> </NFormItem
-        ><NFormItem label="Đơn vị" path="unit" required>
+          />
+</NFormItem><NFormItem label="Đơn vị" path="unit" required>
           <EmployeeRequestPolicyUnitSelect v-model:value="model.unit" />
         </NFormItem>
       </div>
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <NFormItem label="Hiệu lực từ" path="fromDate">
+          <NDatePicker
+            v-model:value="model.fromDate"
+            class="w-full"
+            clearable
+            format="dd/MM/yyyy"
+            placeholder="Không giới hạn"
+            type="date"
+          />
+</NFormItem><NFormItem label="Hiệu lực đến" path="toDate">
+          <NDatePicker
+            v-model:value="model.toDate"
+            class="w-full"
+            clearable
+            format="dd/MM/yyyy"
+            placeholder="Không giới hạn"
+            type="date"
+          />
+        </NFormItem>
+      </div>
+      <NAlert v-if="dateRangeError" type="error" class="mb-4">
+        {{ dateRangeError }}
+      </NAlert>
       <NFormItem label="Tính lương" path="paid">
-        <NSwitch v-model:value="model.paid" /> </NFormItem
-      ><NSpace justify="end">
-        <NButton @click="drawerApi.close()">Hủy</NButton
-        ><NButton type="primary" @click="submit">Lưu</NButton>
+        <NSwitch v-model:value="model.paid" />
+</NFormItem><NSpace justify="end">
+        <NButton @click="drawerApi.close()">Hủy</NButton><NButton type="primary" @click="submit">Lưu</NButton>
       </NSpace>
     </NForm>
   </Drawer>

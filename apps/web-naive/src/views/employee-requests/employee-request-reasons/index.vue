@@ -95,6 +95,12 @@ const gridOptions: VxeGridProps<EmployeeRequestReasonApi.Item> = {
     { field: 'description', title: 'Mô tả', minWidth: 220 },
     {
       align: 'center',
+      field: 'display',
+      title: 'Thứ tự hiển thị',
+      width: 140,
+    },
+    {
+      align: 'center',
       field: 'isActive',
       title: 'Trạng thái',
       slots: { default: 'statusCell' },
@@ -130,6 +136,8 @@ const gridOptions: VxeGridProps<EmployeeRequestReasonApi.Item> = {
           );
         if (typeof v?.isActive === 'boolean')
           items = items.filter((x) => x.isActive === v.isActive);
+        // Sắp xếp theo thứ tự hiển thị để khớp với các dropdown chọn lý do.
+        items = [...items].sort((a, b) => a.display - b.display || a.id - b.id);
         return { items, total: r.total ?? items.length };
       },
     },
@@ -206,18 +214,18 @@ onMounted(loadTypes);
       <template #toolbar-actions>
         <NButton type="primary" :disabled="!canCreate" @click="add">
           <template #icon><IconifyIcon icon="lucide:plus" /></template>Thêm mới
-        </NButton> </template
-      ><template #typeCell="{ row }">
+        </NButton>
+</template><template #typeCell="{ row }">
         {{
           row.employeeRequestType?.name ??
           typeMap.get(row.employeeRequestTypeId)?.name ??
           'Loại đơn đã bị xóa'
-        }} </template
-      ><template #statusCell="{ row }">
+        }}
+</template><template #statusCell="{ row }">
         <NTag :type="row.isActive ? 'success' : 'default'" size="small">
           {{ row.isActive ? 'Đang hoạt động' : 'Ngừng hoạt động' }}
-        </NTag> </template
-      ><template #actions="{ row }">
+        </NTag>
+</template><template #actions="{ row }">
         <NSpace justify="center" :size="4">
           <NTooltip>
             <template #trigger>
@@ -232,9 +240,9 @@ onMounted(loadTypes);
                 <template #icon>
                   <IconifyIcon icon="lucide:pencil" />
                 </template>
-              </NButton> </template
-            >Sửa </NTooltip
-          ><NPopconfirm
+              </NButton>
+</template>Sửa
+</NTooltip><NPopconfirm
             negative-text="Hủy"
             positive-text="Xóa"
             @positive-click="() => remove(row)"
@@ -253,13 +261,13 @@ onMounted(loadTypes);
                     <template #icon>
                       <IconifyIcon icon="lucide:trash-2" />
                     </template>
-                  </NButton> </template
-                >Xóa
-              </NTooltip> </template
-            >Bạn có chắc chắn muốn xóa lý do '{{ row.name }}' không?
+                  </NButton>
+</template>Xóa
+              </NTooltip>
+</template>Bạn có chắc chắn muốn xóa lý do '{{ row.name }}' không?
           </NPopconfirm>
         </NSpace>
-      </template> </Grid
-    ><Drawer @submit="submit" />
+      </template>
+</Grid><Drawer @submit="submit" />
   </Page>
 </template>

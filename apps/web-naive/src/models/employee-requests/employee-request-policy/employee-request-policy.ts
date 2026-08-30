@@ -4,10 +4,14 @@ export namespace EmployeeRequestPolicyApi {
   export interface Item {
     employeeRequestReasonId: number;
     employeeRequestTypeId: number;
+    /** Ngày bắt đầu hiệu lực, dạng `yyyy-MM-dd`. Null nghĩa là không giới hạn đầu kỳ. */
+    fromDate?: null | string;
     id: number;
     isDeleted: boolean;
     maxTime: number;
     paid: boolean;
+    /** Ngày kết thúc hiệu lực, dạng `yyyy-MM-dd`. Null nghĩa là không giới hạn cuối kỳ. */
+    toDate?: null | string;
     unit?: null | string;
   }
 
@@ -22,8 +26,10 @@ export namespace EmployeeRequestPolicyApi {
   export interface CreateInput {
     employeeRequestReasonId: number;
     employeeRequestTypeId: number;
+    fromDate?: null | string;
     maxTime: number;
     paid: boolean;
+    toDate?: null | string;
     unit?: null | string;
   }
 

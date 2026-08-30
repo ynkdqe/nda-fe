@@ -8,7 +8,15 @@ import { computed, nextTick, reactive, ref } from 'vue';
 
 import { useVbenDrawer } from '@vben/common-ui';
 
-import { NButton, NForm, NFormItem, NInput, NSpace, NSwitch } from 'naive-ui';
+import {
+  NButton,
+  NForm,
+  NFormItem,
+  NInput,
+  NInputNumber,
+  NSpace,
+  NSwitch,
+} from 'naive-ui';
 
 import EmployeeRequestTypeSelect from '../shared/EmployeeRequestTypeSelect.vue';
 
@@ -21,6 +29,7 @@ const formRef = ref<FormInst | null>(null);
 const types = ref<EmployeeRequestTypeApi.Item[]>([]);
 const model = reactive({
   description: '',
+  display: 0,
   employeeRequestTypeId: null as null | number,
   id: undefined as number | undefined,
   isActive: true,
@@ -59,6 +68,7 @@ async function submit() {
 
   const base = {
     description: model.description.trim() || null,
+    display: model.display ?? 0,
     employeeRequestTypeId: model.employeeRequestTypeId,
     isActive: model.isActive,
     name: model.name.trim(),
@@ -76,6 +86,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
     types.value = data.types;
     Object.assign(model, {
       description: data.record?.description ?? '',
+      display: data.record?.display ?? 0,
       employeeRequestTypeId: data.record?.employeeRequestTypeId ?? null,
       id: data.record?.id,
       isActive: data.record?.isActive ?? true,
@@ -112,12 +123,20 @@ const title = computed(() => (model.id ? 'Sửa lý do' : 'Thêm lý do'));
           show-count
         />
       </NFormItem>
+      <NFormItem label="Thứ tự hiển thị" path="display">
+        <NInputNumber
+          v-model:value="model.display"
+          class="w-full"
+          :min="0"
+          :precision="0"
+          :show-button="false"
+        />
+      </NFormItem>
       <NFormItem label="Đang hoạt động" path="isActive">
         <NSwitch v-model:value="model.isActive" />
       </NFormItem>
       <NSpace justify="end">
-        <NButton @click="drawerApi.close()">Hủy</NButton
-        ><NButton type="primary" @click="submit">Lưu</NButton>
+        <NButton @click="drawerApi.close()">Hủy</NButton><NButton type="primary" @click="submit">Lưu</NButton>
       </NSpace>
     </NForm>
   </Drawer>

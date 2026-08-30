@@ -4,6 +4,8 @@ import type { EmployeeRequestTypeApi } from '#/models/employee-requests/employee
 export namespace EmployeeRequestReasonApi {
   export interface Item {
     description?: null | string;
+    /** Thứ tự hiển thị, tương ứng cột Display ở backend. */
+    display: number;
     employeeRequestType?: EmployeeRequestTypeApi.Item | null;
     employeeRequestTypeId: number;
     id: number;
@@ -22,6 +24,7 @@ export namespace EmployeeRequestReasonApi {
 
   export interface CreateInput {
     description?: null | string;
+    display: number;
     employeeRequestTypeId: number;
     isActive: boolean;
     name: string;

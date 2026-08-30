@@ -36,7 +36,9 @@ const filteredItems = computed(() =>
   ),
 );
 const selectOptions = computed(() =>
-  filteredItems.value.map((item) => ({ label: item.name, value: item.id })),
+  [...filteredItems.value]
+    .sort((a, b) => a.display - b.display || a.id - b.id)
+    .map((item) => ({ label: item.name, value: item.id })),
 );
 
 watch(
