@@ -3,8 +3,6 @@ import type { FormInst, FormRules } from 'naive-ui';
 
 import type { EmployeeRequestApi } from '#/models/employee-requests/employee-request';
 import type { EmployeeRequestPolicyApi } from '#/models/employee-requests/employee-request-policy';
-import type { EmployeeRequestReasonApi } from '#/models/employee-requests/employee-request-reason';
-import type { EmployeeRequestTypeApi } from '#/models/employee-requests/employee-request-type';
 
 import { computed, nextTick, reactive, ref, watch } from 'vue';
 
@@ -26,8 +24,6 @@ import {
 import { getEmployeeRequestQuotaApi } from '#/api';
 import { toDateOnlyString, toTimeOnlyString } from '#/utils/date';
 
-import EmployeeRequestReasonSelect from '../shared/EmployeeRequestReasonSelect.vue';
-import EmployeeRequestTypeSelect from '../shared/EmployeeRequestTypeSelect.vue';
 import PaidStatusBadge from '../shared/PaidStatusBadge.vue';
 
 interface PeriodFormItem {
@@ -43,8 +39,6 @@ const emit = defineEmits<{
 }>();
 
 const formRef = ref<FormInst | null>(null);
-const types = ref<EmployeeRequestTypeApi.Item[]>([]);
-const reasons = ref<EmployeeRequestReasonApi.Item[]>([]);
 const policies = ref<EmployeeRequestPolicyApi.Item[]>([]);
 const quota = ref<EmployeeRequestApi.Quota | null>(null);
 const quotaLoading = ref(false);
@@ -69,6 +63,68 @@ const model = reactive({
   id: undefined as number | undefined,
   periods: [createPeriod()] as PeriodFormItem[],
 });
+
+/**
+ * Loại đơn và lý do đều lấy từ danh sách chính sách còn hiệu lực, không lấy từ bảng gốc:
+ * cặp nào chưa có chính sách thì không tạo đơn được nên cũng không nên hiện ra để chọn.
+ * Lọc lý do theo loại đơn thực hiện ngay tại chỗ, không gọi lại API.
+ */
+const typeOptions = computed(() => {
+  const seen = new Map<number, { displayOrder: number; label: string }>();
+
+  for (const policy of policies.value) {
+    if (seen.has(policy.employeeRequestTypeId)) {
+      continue;
+    }
+    seen.set(policy.employeeRequestTypeId, {
+      displayOrder: policy.employeeRequestTypeDisplayOrder ?? 0,
+      label: policy.employeeRequestTypeName ?? `#${policy.employeeRequestTypeId}`,
+    });
+  }
+
+  return [...seen.entries()]
+    .sort((a, b) => a[1].displayOrder - b[1].displayOrder || a[0] - b[0])
+    .map(([value, item]) => ({ label: item.label, value }));
+});
+
+const reasonOptions = computed(() => {
+  if (model.employeeRequestTypeId === null) {
+    return [];
+  }
+
+  return policies.value
+    .filter(
+      (policy) =>
+        policy.employeeRequestTypeId === model.employeeRequestTypeId &&
+        policy.employeeRequestReasonIsActive !== false,
+    )
+    .sort(
+      (a, b) =>
+        (a.employeeRequestReasonDisplay ?? 0) -
+          (b.employeeRequestReasonDisplay ?? 0) ||
+        a.employeeRequestReasonId - b.employeeRequestReasonId,
+    )
+    .map((policy) => ({
+      label:
+        policy.employeeRequestReasonName ?? `#${policy.employeeRequestReasonId}`,
+      value: policy.employeeRequestReasonId,
+    }));
+});
+
+// Đổi loại đơn thì bỏ lý do cũ nếu nó không còn thuộc loại vừa chọn.
+watch(
+  () => model.employeeRequestTypeId,
+  () => {
+    if (
+      model.employeeRequestReasonId !== null &&
+      !reasonOptions.value.some(
+        (option) => option.value === model.employeeRequestReasonId,
+      )
+    ) {
+      model.employeeRequestReasonId = null;
+    }
+  },
+);
 
 /** Tổng số ngày yêu cầu, tính giống backend: (toDate - fromDate) + 1 cho mỗi khoảng. */
 const requestedDays = computed(() => {
@@ -230,13 +286,9 @@ const [Drawer, drawerApi] = useVbenDrawer({
 
     const data = drawerApi.getData<{
       policies: EmployeeRequestPolicyApi.Item[];
-      reasons: EmployeeRequestReasonApi.Item[];
       record?: EmployeeRequestApi.Item | null;
-      types: EmployeeRequestTypeApi.Item[];
     }>();
 
-    types.value = data.types;
-    reasons.value = data.reasons;
     policies.value = data.policies ?? [];
 
     periodKey = 0;
@@ -280,16 +332,26 @@ const title = computed(() => (model.id ? 'Sửa đơn' : 'Tạo đơn mới'));
     >
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <NFormItem label="Loại đơn" path="employeeRequestTypeId" required>
-          <EmployeeRequestTypeSelect
+          <NSelect
             v-model:value="model.employeeRequestTypeId"
-            :options="types"
+            clearable
+            filterable
+            :options="typeOptions"
+            placeholder="Chọn loại đơn"
           />
         </NFormItem>
         <NFormItem label="Lý do" path="employeeRequestReasonId" required>
-          <EmployeeRequestReasonSelect
+          <NSelect
             v-model:value="model.employeeRequestReasonId"
-            :employee-request-type-id="model.employeeRequestTypeId"
-            :options="reasons"
+            clearable
+            :disabled="model.employeeRequestTypeId === null"
+            filterable
+            :options="reasonOptions"
+            :placeholder="
+              model.employeeRequestTypeId === null
+                ? 'Chọn loại đơn trước'
+                : 'Chọn lý do'
+            "
           />
         </NFormItem>
       </div>
