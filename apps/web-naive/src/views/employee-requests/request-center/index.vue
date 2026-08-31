@@ -45,11 +45,7 @@ import {
   EmployeeRequestStatus,
   employeeRequestStatusOptions,
 } from '#/models/employee-requests/employee-request';
-import {
-  formatDateOnly,
-  formatDateTime,
-  toDateOnlyString,
-} from '#/utils/date';
+import { formatDateOnly, formatDateTime, toDateOnlyString } from '#/utils/date';
 
 import EmployeeRequestStatusBadge from '../shared/EmployeeRequestStatusBadge.vue';
 import EmployeeRequestDetail from './EmployeeRequestDetail.vue';
@@ -228,9 +224,9 @@ const gridOptions: VxeGridProps<EmployeeRequestApi.Item> = {
         // Tab duyệt đơn luôn ép trạng thái Chờ duyệt, bỏ qua filter trạng thái của người dùng.
         const status = isApprovalTab.value
           ? String(EmployeeRequestStatus.Pending)
-          : (typeof values?.status === 'number'
+          : typeof values?.status === 'number'
             ? String(values.status)
-            : undefined);
+            : undefined;
         const params: EmployeeRequestApi.ListParams = {
           current: page.currentPage,
           pageSize: page.pageSize,

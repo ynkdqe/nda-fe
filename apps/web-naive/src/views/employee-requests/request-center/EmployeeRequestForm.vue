@@ -78,7 +78,8 @@ const typeOptions = computed(() => {
     }
     seen.set(policy.employeeRequestTypeId, {
       displayOrder: policy.employeeRequestTypeDisplayOrder ?? 0,
-      label: policy.employeeRequestTypeName ?? `#${policy.employeeRequestTypeId}`,
+      label:
+        policy.employeeRequestTypeName ?? `#${policy.employeeRequestTypeId}`,
     });
   }
 
@@ -106,7 +107,8 @@ const reasonOptions = computed(() => {
     )
     .map((policy) => ({
       label:
-        policy.employeeRequestReasonName ?? `#${policy.employeeRequestReasonId}`,
+        policy.employeeRequestReasonName ??
+        `#${policy.employeeRequestReasonId}`,
       value: policy.employeeRequestReasonId,
     }));
 });
