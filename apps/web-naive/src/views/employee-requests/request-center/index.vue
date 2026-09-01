@@ -238,9 +238,9 @@ const gridOptions: VxeGridProps<EmployeeRequestApi.Item> = {
         // Tab duyệt đơn luôn ép trạng thái Chờ duyệt, bỏ qua filter trạng thái của người dùng.
         const status = isApprovalTab.value
           ? String(EmployeeRequestStatus.Pending)
-          : (typeof values?.status === 'number'
+          : typeof values?.status === 'number'
             ? String(values.status)
-            : undefined);
+            : undefined;
         const params: EmployeeRequestApi.ListParams = {
           current: page.currentPage,
           pageSize: page.pageSize,
@@ -310,7 +310,8 @@ function reasonName(row: EmployeeRequestApi.Item) {
     row.employeeRequestReason?.name ??
     reasonMap.value.get(row.employeeRequestReasonId)?.name ??
     policies.value.find(
-      (policy) => policy.employeeRequestReasonId === row.employeeRequestReasonId,
+      (policy) =>
+        policy.employeeRequestReasonId === row.employeeRequestReasonId,
     )?.employeeRequestReasonName ??
     '-'
   );
