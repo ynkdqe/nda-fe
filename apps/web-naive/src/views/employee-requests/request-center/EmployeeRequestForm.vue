@@ -16,6 +16,7 @@ import {
   NForm,
   NFormItem,
   NInput,
+  NSelect,
   NSpace,
   NTag,
   NTimePicker,
