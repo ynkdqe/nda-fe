@@ -92,24 +92,43 @@ const employeeMap = computed(
 );
 
 async function loadDependencies() {
-  // Form tạo đơn chỉ được chọn loại đơn/lý do có chính sách còn hiệu lực hôm nay,
-  // nên truyền cùng một ngày cho cả hai đầu khoảng.
+  // Chính sách còn hiệu lực hôm nay là nguồn dữ liệu cho dropdown của form tạo đơn.
   const today = toDateOnlyString(Date.now()) ?? undefined;
 
-  const [typeResponse, reasonResponse, employeeResponse, policyResponse] =
-    await Promise.all([
+  /**
+   * Dùng allSettled chứ không phải all: ba API danh mục bên dưới đòi quyền quản trị
+   * mà nhân viên thường không có, và Promise.all sẽ để một lời gọi 403 kéo sập cả hàm,
+   * khiến form mất sạch dropdown dù API options chạy bình thường.
+   */
+  const [typeResult, reasonResult, employeeResult, optionResult] =
+    await Promise.allSettled([
       getEmployeeRequestTypeListApi({ current: 1, pageSize: 100 }),
       getEmployeeRequestReasonListApi({ current: 1, pageSize: 100 }),
       getEmployeeListApi({ current: 1, pageSize: 100 }),
       getEmployeeRequestOptionsApi(today),
     ]);
 
-  types.value = (typeResponse.data ?? [])
-    .filter((x) => !x.isDeleted)
-    .sort((a, b) => a.displayOrder - b.displayOrder || a.id - b.id);
-  reasons.value = (reasonResponse.data ?? []).filter((x) => !x.isDeleted);
-  employees.value = employeeResponse.data ?? [];
-  policies.value = (policyResponse.data ?? []).filter((x) => !x.isDeleted);
+  types.value =
+    typeResult.status === 'fulfilled'
+      ? (typeResult.value.data ?? [])
+          .filter((x) => !x.isDeleted)
+          .sort((a, b) => a.displayOrder - b.displayOrder || a.id - b.id)
+      : [];
+
+  reasons.value =
+    reasonResult.status === 'fulfilled'
+      ? (reasonResult.value.data ?? []).filter((x) => !x.isDeleted)
+      : [];
+
+  employees.value =
+    employeeResult.status === 'fulfilled'
+      ? (employeeResult.value.data ?? [])
+      : [];
+
+  policies.value =
+    optionResult.status === 'fulfilled'
+      ? (optionResult.value.data ?? []).filter((x) => !x.isDeleted)
+      : [];
 }
 
 const formOptions: VbenFormProps = {
@@ -219,9 +238,9 @@ const gridOptions: VxeGridProps<EmployeeRequestApi.Item> = {
         // Tab duyệt đơn luôn ép trạng thái Chờ duyệt, bỏ qua filter trạng thái của người dùng.
         const status = isApprovalTab.value
           ? String(EmployeeRequestStatus.Pending)
-          : typeof values?.status === 'number'
+          : (typeof values?.status === 'number'
             ? String(values.status)
-            : undefined;
+            : undefined);
         const params: EmployeeRequestApi.ListParams = {
           current: page.currentPage,
           pageSize: page.pageSize,
@@ -267,6 +286,33 @@ function employeeName(row: EmployeeRequestApi.Item) {
     row.employee?.name ??
     employeeMap.value.get(row.employeeId)?.name ??
     `#${row.employeeId}`
+  );
+}
+
+/**
+ * Tên loại đơn và lý do lấy lần lượt từ navigation của đơn, danh mục đã tải,
+ * rồi mới tới danh sách chính sách. Bước cuối để nhân viên không có quyền đọc
+ * danh mục vẫn thấy tên thay vì dấu gạch.
+ */
+function typeName(row: EmployeeRequestApi.Item) {
+  return (
+    row.employeeRequestType?.name ??
+    typeMap.value.get(row.employeeRequestTypeId)?.name ??
+    policies.value.find(
+      (policy) => policy.employeeRequestTypeId === row.employeeRequestTypeId,
+    )?.employeeRequestTypeName ??
+    '-'
+  );
+}
+
+function reasonName(row: EmployeeRequestApi.Item) {
+  return (
+    row.employeeRequestReason?.name ??
+    reasonMap.value.get(row.employeeRequestReasonId)?.name ??
+    policies.value.find(
+      (policy) => policy.employeeRequestReasonId === row.employeeRequestReasonId,
+    )?.employeeRequestReasonName ??
+    '-'
   );
 }
 
@@ -459,21 +505,9 @@ onMounted(loadDependencies);
 
       <template #employeeCell="{ row }">{{ employeeName(row) }}</template>
 
-      <template #typeCell="{ row }">
-        {{
-          row.employeeRequestType?.name ??
-          typeMap.get(row.employeeRequestTypeId)?.name ??
-          '-'
-        }}
-      </template>
+      <template #typeCell="{ row }">{{ typeName(row) }}</template>
 
-      <template #reasonCell="{ row }">
-        {{
-          row.employeeRequestReason?.name ??
-          reasonMap.get(row.employeeRequestReasonId)?.name ??
-          '-'
-        }}
-      </template>
+      <template #reasonCell="{ row }">{{ reasonName(row) }}</template>
 
       <template #periodCell="{ row }">{{ periodSummary(row) }}</template>
 
