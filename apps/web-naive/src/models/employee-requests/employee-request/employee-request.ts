@@ -1,4 +1,5 @@
 import type { MResult } from '#/models/common';
+import type { EmployeeRequestPolicyApi } from '#/models/employee-requests/employee-request-policy';
 import type { EmployeeRequestReasonApi } from '#/models/employee-requests/employee-request-reason';
 import type { EmployeeRequestTypeApi } from '#/models/employee-requests/employee-request-type';
 
@@ -137,6 +138,8 @@ export namespace EmployeeRequestApi {
   export type DetailResult = MResult<Item>;
   export type MutationResult = MResult<Item>;
   export type QuotaResult = MResult<Quota>;
+  /** Options cho màn tạo đơn, trả về dưới dạng danh sách chính sách còn hiệu lực. */
+  export type OptionsResult = MResult<EmployeeRequestPolicyApi.Item[]>;
 }
 
 export const employeeRequestStatusLabels: Record<

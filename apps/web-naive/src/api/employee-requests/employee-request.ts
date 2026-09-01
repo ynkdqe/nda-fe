@@ -79,6 +79,21 @@ export function cancelEmployeeRequestApi(id: number) {
   );
 }
 
+/**
+ * Loại đơn và lý do khả dụng khi tạo đơn, dựng từ các chính sách còn hiệu lực.
+ * Dùng endpoint riêng thay vì API quản trị chính sách, vì API kia đòi quyền
+ * Hrms.EmployeeRequestPolicy mà nhân viên thường không có.
+ */
+export function getEmployeeRequestOptionsApi(effectiveDate?: string) {
+  return requestClient.get<EmployeeRequestApi.OptionsResult>(
+    `${PREFIX}/options`,
+    {
+      params: effectiveDate ? { effectiveDate } : {},
+      responseReturn: 'body',
+    },
+  );
+}
+
 export function getEmployeeRequestQuotaApi(
   params: EmployeeRequestApi.QuotaParams,
 ) {

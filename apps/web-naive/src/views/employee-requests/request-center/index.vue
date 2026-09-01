@@ -33,7 +33,7 @@ import {
   getEmployeeListApi,
   getEmployeeRequestByIdApi,
   getEmployeeRequestListApi,
-  getEmployeeRequestPolicyListApi,
+  getEmployeeRequestOptionsApi,
   getEmployeeRequestReasonListApi,
   getEmployeeRequestTypeListApi,
   rejectEmployeeRequestApi,
@@ -101,12 +101,7 @@ async function loadDependencies() {
       getEmployeeRequestTypeListApi({ current: 1, pageSize: 100 }),
       getEmployeeRequestReasonListApi({ current: 1, pageSize: 100 }),
       getEmployeeListApi({ current: 1, pageSize: 100 }),
-      getEmployeeRequestPolicyListApi({
-        current: 1,
-        endDate: today,
-        pageSize: 100,
-        startDate: today,
-      }),
+      getEmployeeRequestOptionsApi(today),
     ]);
 
   types.value = (typeResponse.data ?? [])
@@ -224,9 +219,9 @@ const gridOptions: VxeGridProps<EmployeeRequestApi.Item> = {
         // Tab duyệt đơn luôn ép trạng thái Chờ duyệt, bỏ qua filter trạng thái của người dùng.
         const status = isApprovalTab.value
           ? String(EmployeeRequestStatus.Pending)
-          : typeof values?.status === 'number'
+          : (typeof values?.status === 'number'
             ? String(values.status)
-            : undefined;
+            : undefined);
         const params: EmployeeRequestApi.ListParams = {
           current: page.currentPage,
           pageSize: page.pageSize,
