@@ -136,7 +136,8 @@ const title = computed(() => (model.id ? 'Sửa lý do' : 'Thêm lý do'));
         <NSwitch v-model:value="model.isActive" />
       </NFormItem>
       <NSpace justify="end">
-        <NButton @click="drawerApi.close()">Hủy</NButton><NButton type="primary" @click="submit">Lưu</NButton>
+        <NButton @click="drawerApi.close()">Hủy</NButton
+        ><NButton type="primary" @click="submit">Lưu</NButton>
       </NSpace>
     </NForm>
   </Drawer>

@@ -214,18 +214,18 @@ onMounted(loadTypes);
       <template #toolbar-actions>
         <NButton type="primary" :disabled="!canCreate" @click="add">
           <template #icon><IconifyIcon icon="lucide:plus" /></template>Thêm mới
-        </NButton>
-</template><template #typeCell="{ row }">
+        </NButton> </template
+      ><template #typeCell="{ row }">
         {{
           row.employeeRequestType?.name ??
           typeMap.get(row.employeeRequestTypeId)?.name ??
           'Loại đơn đã bị xóa'
-        }}
-</template><template #statusCell="{ row }">
+        }} </template
+      ><template #statusCell="{ row }">
         <NTag :type="row.isActive ? 'success' : 'default'" size="small">
           {{ row.isActive ? 'Đang hoạt động' : 'Ngừng hoạt động' }}
-        </NTag>
-</template><template #actions="{ row }">
+        </NTag> </template
+      ><template #actions="{ row }">
         <NSpace justify="center" :size="4">
           <NTooltip>
             <template #trigger>
@@ -240,9 +240,9 @@ onMounted(loadTypes);
                 <template #icon>
                   <IconifyIcon icon="lucide:pencil" />
                 </template>
-              </NButton>
-</template>Sửa
-</NTooltip><NPopconfirm
+              </NButton> </template
+            >Sửa </NTooltip
+          ><NPopconfirm
             negative-text="Hủy"
             positive-text="Xóa"
             @positive-click="() => remove(row)"
@@ -261,13 +261,13 @@ onMounted(loadTypes);
                     <template #icon>
                       <IconifyIcon icon="lucide:trash-2" />
                     </template>
-                  </NButton>
-</template>Xóa
-              </NTooltip>
-</template>Bạn có chắc chắn muốn xóa lý do '{{ row.name }}' không?
+                  </NButton> </template
+                >Xóa
+              </NTooltip> </template
+            >Bạn có chắc chắn muốn xóa lý do '{{ row.name }}' không?
           </NPopconfirm>
         </NSpace>
-      </template>
-</Grid><Drawer @submit="submit" />
+      </template> </Grid
+    ><Drawer @submit="submit" />
   </Page>
 </template>
