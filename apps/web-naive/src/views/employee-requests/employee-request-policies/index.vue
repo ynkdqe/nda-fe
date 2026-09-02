@@ -252,30 +252,30 @@ onMounted(loadDependencies);
       <template #toolbar-actions>
         <NButton type="primary" :disabled="!canCreate" @click="add">
           <template #icon><IconifyIcon icon="lucide:plus" /></template>Thêm mới
-        </NButton> </template
-      ><template #typeCell="{ row }">
+        </NButton>
+</template><template #typeCell="{ row }">
         {{
           typeMap.get(row.employeeRequestTypeId)?.name ?? 'Loại đơn đã bị xóa'
-        }} </template
-      ><template #reasonCell="{ row }">
+        }}
+</template><template #reasonCell="{ row }">
         {{
           reasonMap.get(row.employeeRequestReasonId)?.name ?? 'Lý do đã bị xóa'
-        }} </template
-      ><template #paidCell="{ row }">
-        <PaidStatusBadge :paid="row.paid" /> </template
-      ><template #unitCell="{ row }">
+        }}
+</template><template #paidCell="{ row }">
+        <PaidStatusBadge :paid="row.paid" />
+</template><template #unitCell="{ row }">
         {{
           row.unit === 'Day'
             ? 'Ngày'
             : row.unit === 'Hour'
               ? 'Giờ'
               : (row.unit ?? '-')
-        }} </template
-      ><template #fromDateCell="{ row }">
-        {{ formatDateOnly(row.fromDate) || '-' }} </template
-      ><template #toDateCell="{ row }">
-        {{ formatDateOnly(row.toDate) || '-' }} </template
-      ><template #actions="{ row }">
+        }}
+</template><template #fromDateCell="{ row }">
+        {{ formatDateOnly(row.fromDate) || '-' }}
+</template><template #toDateCell="{ row }">
+        {{ formatDateOnly(row.toDate) || '-' }}
+</template><template #actions="{ row }">
         <NSpace justify="center" :size="4">
           <NTooltip>
             <template #trigger>
@@ -290,9 +290,9 @@ onMounted(loadDependencies);
                 <template #icon>
                   <IconifyIcon icon="lucide:pencil" />
                 </template>
-              </NButton> </template
-            >Sửa </NTooltip
-          ><NPopconfirm
+              </NButton>
+</template>Sửa
+</NTooltip><NPopconfirm
             negative-text="Hủy"
             positive-text="Xóa"
             @positive-click="() => remove(row)"
@@ -311,15 +311,15 @@ onMounted(loadDependencies);
                     <template #icon>
                       <IconifyIcon icon="lucide:trash-2" />
                     </template>
-                  </NButton> </template
-                >Xóa
-              </NTooltip> </template
-            >Bạn có chắc chắn muốn xóa chính sách của lý do '{{
+                  </NButton>
+</template>Xóa
+              </NTooltip>
+</template>Bạn có chắc chắn muốn xóa chính sách của lý do '{{
               reasonMap.get(row.employeeRequestReasonId)?.name ?? 'đã bị xóa'
             }}' không?
           </NPopconfirm>
         </NSpace>
-      </template> </Grid
-    ><Drawer @submit="submit" />
+      </template>
+</Grid><Drawer @submit="submit" />
   </Page>
 </template>

@@ -127,6 +127,12 @@ export namespace EmployeeRequestApi {
     year: number;
   }
 
+  /** Maps EmployeeRequestBulkResultDto trả về từ approve-many. */
+  export interface BulkResult {
+    approvedIds: number[];
+    failed: Array<{ id: number; reason: string }>;
+  }
+
   export interface QuotaParams {
     /** Bỏ trống để hỏi hạn mức của chính người đang đăng nhập. */
     employeeId?: number;
@@ -138,6 +144,7 @@ export namespace EmployeeRequestApi {
   export type DetailResult = MResult<Item>;
   export type MutationResult = MResult<Item>;
   export type QuotaResult = MResult<Quota>;
+  export type BulkResultResponse = MResult<BulkResult>;
   /** Options cho màn tạo đơn, trả về dưới dạng danh sách chính sách còn hiệu lực. */
   export type OptionsResult = MResult<EmployeeRequestPolicyApi.Item[]>;
 }

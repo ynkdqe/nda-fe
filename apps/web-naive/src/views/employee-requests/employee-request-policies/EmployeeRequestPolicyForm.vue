@@ -167,14 +167,14 @@ const title = computed(() => (model.id ? 'Sửa chính sách' : 'Thêm chính s�
         <EmployeeRequestTypeSelect
           v-model:value="model.employeeRequestTypeId"
           :options="types"
-        /> </NFormItem
-      ><NFormItem label="Lý do" path="employeeRequestReasonId" required>
+        />
+</NFormItem><NFormItem label="Lý do" path="employeeRequestReasonId" required>
         <EmployeeRequestReasonSelect
           v-model:value="model.employeeRequestReasonId"
           :employee-request-type-id="model.employeeRequestTypeId"
           :options="reasons"
-        /> </NFormItem
-      ><NAlert v-if="duplicate" type="warning" class="mb-4">
+        />
+</NFormItem><NAlert v-if="duplicate" type="warning" class="mb-4">
         Đã tồn tại chính sách cho cặp loại đơn và lý do này. Backend sẽ quyết
         định có cho phép lưu hay không.
       </NAlert>
@@ -186,8 +186,8 @@ const title = computed(() => (model.id ? 'Sửa chính sách' : 'Thêm chính s�
             :precision="2"
             :show-button="false"
             style="width: 100%"
-          /> </NFormItem
-        ><NFormItem label="Đơn vị" path="unit" required>
+          />
+</NFormItem><NFormItem label="Đơn vị" path="unit" required>
           <EmployeeRequestPolicyUnitSelect v-model:value="model.unit" />
         </NFormItem>
       </div>
@@ -200,8 +200,8 @@ const title = computed(() => (model.id ? 'Sửa chính sách' : 'Thêm chính s�
             format="dd/MM/yyyy"
             placeholder="Không giới hạn"
             type="date"
-          /> </NFormItem
-        ><NFormItem label="Hiệu lực đến" path="toDate">
+          />
+</NFormItem><NFormItem label="Hiệu lực đến" path="toDate">
           <NDatePicker
             v-model:value="model.toDate"
             class="w-full"
@@ -216,10 +216,9 @@ const title = computed(() => (model.id ? 'Sửa chính sách' : 'Thêm chính s�
         {{ dateRangeError }}
       </NAlert>
       <NFormItem label="Tính lương" path="paid">
-        <NSwitch v-model:value="model.paid" /> </NFormItem
-      ><NSpace justify="end">
-        <NButton @click="drawerApi.close()">Hủy</NButton
-        ><NButton type="primary" @click="submit">Lưu</NButton>
+        <NSwitch v-model:value="model.paid" />
+</NFormItem><NSpace justify="end">
+        <NButton @click="drawerApi.close()">Hủy</NButton><NButton type="primary" @click="submit">Lưu</NButton>
       </NSpace>
     </NForm>
   </Drawer>

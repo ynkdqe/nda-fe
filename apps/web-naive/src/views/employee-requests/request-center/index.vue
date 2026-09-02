@@ -15,18 +15,19 @@ import { IconifyIcon } from '@vben/icons';
 
 import {
   NButton,
+  NDropdown,
   NInput,
-  NPopconfirm,
+  NModal,
   NSpace,
   NTabPane,
   NTabs,
-  NTooltip,
 } from 'naive-ui';
 
-import { message } from '#/adapter/naive';
+import { dialog, message } from '#/adapter/naive';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import {
   approveEmployeeRequestApi,
+  approveManyEmployeeRequestsApi,
   cancelEmployeeRequestApi,
   createEmployeeRequestApi,
   deleteEmployeeRequestApi,
@@ -182,6 +183,13 @@ const formOptions: VbenFormProps = {
 const gridOptions: VxeGridProps<EmployeeRequestApi.Item> = {
   border: 'full',
   columns: [
+    // Cột tick chỉ có nghĩa ở tab duyệt, nơi mọi đơn đều đang chờ duyệt.
+    {
+      type: 'checkbox',
+      width: 50,
+      visible: false,
+      field: 'bulkSelect',
+    },
     { align: 'center', title: 'STT', type: 'seq', width: 70 },
     { field: 'id', title: 'Mã đơn', width: 90, slots: { default: 'codeCell' } },
     {
@@ -238,9 +246,9 @@ const gridOptions: VxeGridProps<EmployeeRequestApi.Item> = {
         // Tab duyệt đơn luôn ép trạng thái Chờ duyệt, bỏ qua filter trạng thái của người dùng.
         const status = isApprovalTab.value
           ? String(EmployeeRequestStatus.Pending)
-          : typeof values?.status === 'number'
+          : (typeof values?.status === 'number'
             ? String(values.status)
-            : undefined;
+            : undefined);
         const params: EmployeeRequestApi.ListParams = {
           current: page.currentPage,
           pageSize: page.pageSize,
@@ -278,6 +286,15 @@ const [DetailDrawer, detailDrawerApi] = useVbenDrawer({
 
 async function changeTab(value: RequestTab) {
   activeTab.value = value;
+  // Cột tick chỉ hiện ở tab duyệt; đổi tab thì bỏ luôn lựa chọn cũ để tránh duyệt nhầm.
+  gridApi.grid?.clearCheckboxRow?.();
+  await gridApi.setGridOptions({
+    columns: gridOptions.columns?.map((column: any) =>
+      column.field === 'bulkSelect'
+        ? { ...column, visible: isApprovalTab.value }
+        : column,
+    ),
+  });
   await gridApi.query();
 }
 
@@ -419,24 +436,6 @@ async function approve(row: EmployeeRequestApi.Item) {
   }
 }
 
-async function reject(row: EmployeeRequestApi.Item) {
-  if (processingId.value !== null) {
-    return;
-  }
-
-  processingId.value = row.id;
-  try {
-    await rejectEmployeeRequestApi(row.id, {
-      reason: rejectReason.value.trim() || null,
-    });
-    message.success('Từ chối đơn thành công');
-    rejectReason.value = '';
-    await gridApi.query();
-  } finally {
-    processingId.value = null;
-  }
-}
-
 async function cancel(row: EmployeeRequestApi.Item) {
   if (processingId.value !== null) {
     return;
@@ -452,22 +451,94 @@ async function cancel(row: EmployeeRequestApi.Item) {
   }
 }
 
-async function revoke(row: EmployeeRequestApi.Item) {
-  if (processingId.value !== null) {
+/**
+ * Từ chối và thu hồi đều cần lý do nên dùng chung một hộp thoại nhập liệu,
+ * mở từ menu thao tác thay vì popconfirm gắn sẵn trên từng nút như trước.
+ */
+const reasonDialogOpen = ref(false);
+const reasonDialogAction = ref<'reject' | 'revoke'>('reject');
+const reasonDialogRow = ref<EmployeeRequestApi.Item | null>(null);
+
+const reasonDialogTitle = computed(() =>
+  reasonDialogAction.value === 'reject' ? 'Từ chối đơn' : 'Thu hồi đơn',
+);
+
+function openReasonDialog(
+  row: EmployeeRequestApi.Item,
+  action: 'reject' | 'revoke',
+) {
+  reasonDialogRow.value = row;
+  reasonDialogAction.value = action;
+  rejectReason.value = '';
+  reasonDialogOpen.value = true;
+}
+
+async function confirmReasonDialog() {
+  const row = reasonDialogRow.value;
+  if (row === null || processingId.value !== null) {
     return;
   }
 
   processingId.value = row.id;
   try {
-    await revokeEmployeeRequestApi(row.id, {
-      reason: rejectReason.value.trim() || null,
-    });
-    message.success('Thu hồi đơn thành công');
+    const payload = { reason: rejectReason.value.trim() || null };
+    if (reasonDialogAction.value === 'reject') {
+      await rejectEmployeeRequestApi(row.id, payload);
+      message.success('Từ chối đơn thành công');
+    } else {
+      await revokeEmployeeRequestApi(row.id, payload);
+      message.success('Thu hồi đơn thành công');
+    }
+    reasonDialogOpen.value = false;
     rejectReason.value = '';
     await gridApi.query();
   } finally {
     processingId.value = null;
   }
+}
+
+/**
+ * Duyệt hàng loạt các đơn đang được tick trong lưới. Backend xử lý từng đơn độc lập
+ * nên đơn không hợp lệ chỉ bị bỏ qua, không làm hỏng cả lượt duyệt.
+ */
+const bulkApproving = ref(false);
+
+async function approveSelected() {
+  const rows = gridApi.grid?.getCheckboxRecords?.() ?? [];
+  const ids = rows.filter((row) => isPending(row)).map((row) => row.id);
+
+  if (ids.length === 0) {
+    message.warning('Chưa chọn đơn nào đang chờ duyệt');
+    return;
+  }
+
+  dialog.warning({
+    content: `Duyệt ${ids.length} đơn đã chọn?`,
+    negativeText: 'Hủy',
+    positiveText: 'Duyệt tất cả',
+    title: 'Xác nhận duyệt hàng loạt',
+    onPositiveClick: async () => {
+      bulkApproving.value = true;
+      try {
+        const response = await approveManyEmployeeRequestsApi(ids);
+        const failed = response.data?.failed ?? [];
+        if (failed.length > 0) {
+          // Nêu rõ đơn nào bị bỏ qua để người duyệt còn xử lý tiếp.
+          message.warning(
+            `${response.message ?? ''} Bỏ qua: ${failed
+              .map((item) => `#${item.id} (${item.reason})`)
+              .join(', ')}`,
+          );
+        } else {
+          message.success(response.message ?? `Đã duyệt ${ids.length} đơn`);
+        }
+        gridApi.grid?.clearCheckboxRow?.();
+        await gridApi.query();
+      } finally {
+        bulkApproving.value = false;
+      }
+    },
+  });
 }
 
 function isPending(row: EmployeeRequestApi.Item) {
@@ -476,6 +547,95 @@ function isPending(row: EmployeeRequestApi.Item) {
 
 function isApproved(row: EmployeeRequestApi.Item) {
   return row.status === EmployeeRequestStatus.Approved;
+}
+
+type ActionKey =
+  | 'approve'
+  | 'cancel'
+  | 'delete'
+  | 'detail'
+  | 'edit'
+  | 'reject'
+  | 'revoke';
+
+/** Menu thao tác dựng theo trạng thái đơn và quyền của người dùng. */
+function actionOptions(row: EmployeeRequestApi.Item) {
+  const options: Array<{ key: ActionKey; label: string }> = [
+    { key: 'detail', label: 'Xem chi tiết' },
+  ];
+
+  if (isPending(row)) {
+    options.push({ key: 'edit', label: 'Sửa đơn' });
+
+    if (canApprove.value) {
+      options.push({ key: 'approve', label: 'Duyệt đơn' });
+    }
+    if (canReject.value) {
+      options.push({ key: 'reject', label: 'Từ chối đơn' });
+    }
+
+    options.push(
+      { key: 'cancel', label: 'Hủy đơn của tôi' },
+      { key: 'delete', label: 'Xóa đơn' },
+    );
+  }
+
+  if (isApproved(row) && canRevoke.value) {
+    options.push({ key: 'revoke', label: 'Thu hồi đơn' });
+  }
+
+  return options;
+}
+
+function handleAction(row: EmployeeRequestApi.Item, key: number | string) {
+  switch (key as ActionKey) {
+    case 'approve': {
+      dialog.warning({
+        content: `Duyệt đơn #${row.id} của ${employeeName(row)}?`,
+        negativeText: 'Hủy',
+        onPositiveClick: () => void approve(row),
+        positiveText: 'Duyệt',
+        title: 'Xác nhận duyệt đơn',
+      });
+      break;
+    }
+    case 'cancel': {
+      dialog.warning({
+        content: `Hủy đơn #${row.id}? Chỉ người tạo đơn mới hủy được.`,
+        negativeText: 'Không',
+        onPositiveClick: () => void cancel(row),
+        positiveText: 'Hủy đơn',
+        title: 'Xác nhận hủy đơn',
+      });
+      break;
+    }
+    case 'delete': {
+      dialog.error({
+        content: `Xóa đơn #${row.id}?`,
+        negativeText: 'Không',
+        onPositiveClick: () => void remove(row),
+        positiveText: 'Xóa',
+        title: 'Xác nhận xóa đơn',
+      });
+      break;
+    }
+    case 'detail': {
+      void openDetail(row);
+      break;
+    }
+    case 'edit': {
+      void openEdit(row);
+      break;
+    }
+    case 'reject': {
+      openReasonDialog(row, 'reject');
+      break;
+    }
+    case 'revoke': {
+      openReasonDialog(row, 'revoke');
+      break;
+    }
+  }
 }
 
 onMounted(loadDependencies);
@@ -500,6 +660,19 @@ onMounted(loadDependencies);
           <template #icon><IconifyIcon icon="lucide:plus" /></template>
           Tạo đơn mới
         </NButton>
+
+        <NButton
+          v-if="isApprovalTab && canApprove"
+          class="ml-2"
+          :loading="bulkApproving"
+          type="success"
+          @click="approveSelected"
+        >
+          <template #icon>
+            <IconifyIcon icon="lucide:check-check" />
+          </template>
+          Duyệt các đơn đã chọn
+        </NButton>
       </template>
 
       <template #codeCell="{ row }">#{{ row.id }}</template>
@@ -521,200 +694,55 @@ onMounted(loadDependencies);
       </template>
 
       <template #actions="{ row }">
-        <NSpace justify="center" :size="4">
-          <NTooltip>
-            <template #trigger>
-              <NButton
-                circle
-                quaternary
-                size="small"
-                type="info"
-                @click="openDetail(row)"
-              >
-                <template #icon><IconifyIcon icon="lucide:eye" /></template>
-              </NButton>
-            </template>
-            Xem chi tiết
-          </NTooltip>
-
-          <NTooltip v-if="isPending(row)">
-            <template #trigger>
-              <NButton
-                circle
-                :disabled="processingId !== null"
-                quaternary
-                size="small"
-                type="primary"
-                @click="openEdit(row)"
-              >
-                <template #icon><IconifyIcon icon="lucide:pencil" /></template>
-              </NButton>
-            </template>
-            Sửa đơn của tôi
-          </NTooltip>
-
-          <NPopconfirm
-            v-if="isPending(row) && canApprove"
-            negative-text="Hủy"
-            positive-text="Duyệt"
-            @positive-click="() => approve(row)"
+        <NDropdown
+          :options="actionOptions(row)"
+          trigger="click"
+          @select="(key) => handleAction(row, key)"
+        >
+          <NButton
+            circle
+            :disabled="processingId !== null"
+            :loading="processingId === row.id"
+            quaternary
+            size="small"
           >
-            <template #trigger>
-              <NTooltip>
-                <template #trigger>
-                  <NButton
-                    circle
-                    :disabled="processingId !== null"
-                    :loading="processingId === row.id"
-                    quaternary
-                    size="small"
-                    type="success"
-                  >
-                    <template #icon>
-                      <IconifyIcon icon="lucide:check" />
-                    </template>
-                  </NButton>
-                </template>
-                Duyệt đơn
-              </NTooltip>
+            <template #icon>
+              <IconifyIcon class="size-4" icon="lucide:ellipsis-vertical" />
             </template>
-            Bạn có chắc chắn muốn duyệt đơn #{{ row.id }} của
-            {{ employeeName(row) }} không?
-          </NPopconfirm>
-
-          <NPopconfirm
-            v-if="isPending(row) && canReject"
-            negative-text="Hủy"
-            positive-text="Từ chối"
-            @positive-click="() => reject(row)"
-          >
-            <template #trigger>
-              <NTooltip>
-                <template #trigger>
-                  <NButton
-                    circle
-                    :disabled="processingId !== null"
-                    :loading="processingId === row.id"
-                    quaternary
-                    size="small"
-                    type="error"
-                  >
-                    <template #icon><IconifyIcon icon="lucide:x" /></template>
-                  </NButton>
-                </template>
-                Từ chối đơn
-              </NTooltip>
-            </template>
-            <div class="w-64">
-              <div class="mb-2">Lý do từ chối đơn #{{ row.id }}:</div>
-              <NInput
-                v-model:value="rejectReason"
-                maxlength="500"
-                placeholder="Nhập lý do (không bắt buộc)"
-                type="textarea"
-              />
-            </div>
-          </NPopconfirm>
-
-          <NPopconfirm
-            v-if="isPending(row)"
-            negative-text="Không"
-            positive-text="Hủy đơn"
-            @positive-click="() => cancel(row)"
-          >
-            <template #trigger>
-              <NTooltip>
-                <template #trigger>
-                  <NButton
-                    circle
-                    :disabled="processingId !== null"
-                    :loading="processingId === row.id"
-                    quaternary
-                    size="small"
-                    type="warning"
-                  >
-                    <template #icon>
-                      <IconifyIcon icon="lucide:undo-2" />
-                    </template>
-                  </NButton>
-                </template>
-                Hủy đơn của tôi
-              </NTooltip>
-            </template>
-            Bạn có chắc chắn muốn hủy đơn #{{ row.id }} không? Chỉ người tạo đơn
-            mới hủy được.
-          </NPopconfirm>
-
-          <NPopconfirm
-            v-if="isPending(row)"
-            negative-text="Không"
-            positive-text="Xóa"
-            @positive-click="() => remove(row)"
-          >
-            <template #trigger>
-              <NTooltip>
-                <template #trigger>
-                  <NButton
-                    circle
-                    :disabled="processingId !== null"
-                    :loading="processingId === row.id"
-                    quaternary
-                    size="small"
-                    type="error"
-                  >
-                    <template #icon>
-                      <IconifyIcon icon="lucide:trash-2" />
-                    </template>
-                  </NButton>
-                </template>
-                Xóa đơn của tôi
-              </NTooltip>
-            </template>
-            Bạn có chắc chắn muốn xóa đơn #{{ row.id }} không?
-          </NPopconfirm>
-
-          <NPopconfirm
-            v-if="isApproved(row) && canRevoke"
-            negative-text="Hủy"
-            positive-text="Thu hồi"
-            @positive-click="() => revoke(row)"
-          >
-            <template #trigger>
-              <NTooltip>
-                <template #trigger>
-                  <NButton
-                    circle
-                    :disabled="processingId !== null"
-                    :loading="processingId === row.id"
-                    quaternary
-                    size="small"
-                    type="warning"
-                  >
-                    <template #icon>
-                      <IconifyIcon icon="lucide:rotate-ccw" />
-                    </template>
-                  </NButton>
-                </template>
-                Thu hồi đơn đã duyệt
-              </NTooltip>
-            </template>
-            <div class="w-64">
-              <div class="mb-2">
-                Thu hồi đơn #{{ row.id }} và hoàn lại ngày phép. Lý do:
-              </div>
-              <NInput
-                v-model:value="rejectReason"
-                maxlength="500"
-                placeholder="Nhập lý do (không bắt buộc)"
-                type="textarea"
-              />
-            </div>
-          </NPopconfirm>
-        </NSpace>
+          </NButton>
+        </NDropdown>
       </template>
     </Grid>
 
     <FormDrawer @submit="submit" />
     <DetailDrawer />
+
+    <NModal
+      v-model:show="reasonDialogOpen"
+      :mask-closable="false"
+      preset="dialog"
+      :title="reasonDialogTitle"
+    >
+      <NInput
+        v-model:value="rejectReason"
+        :autosize="{ maxRows: 5, minRows: 3 }"
+        maxlength="500"
+        placeholder="Nhập lý do (không bắt buộc)"
+        show-count
+        type="textarea"
+      />
+      <template #action>
+        <NSpace justify="end">
+          <NButton @click="reasonDialogOpen = false">Hủy</NButton>
+          <NButton
+            :loading="processingId !== null"
+            type="primary"
+            @click="confirmReasonDialog"
+          >
+            Xác nhận
+          </NButton>
+        </NSpace>
+      </template>
+    </NModal>
   </Page>
 </template>

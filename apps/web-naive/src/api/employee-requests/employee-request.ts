@@ -49,6 +49,15 @@ export function approveEmployeeRequestApi(id: number) {
   );
 }
 
+/** Duyệt nhiều đơn cùng lúc; backend bỏ qua đơn không hợp lệ và trả về lý do từng đơn. */
+export function approveManyEmployeeRequestsApi(ids: number[]) {
+  return requestClient.put<EmployeeRequestApi.BulkResultResponse>(
+    `${PREFIX}/approve-many`,
+    ids,
+    { responseReturn: 'body' },
+  );
+}
+
 export function rejectEmployeeRequestApi(
   id: number,
   data: EmployeeRequestApi.RejectInput,
