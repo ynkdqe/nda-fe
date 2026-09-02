@@ -13,6 +13,7 @@ import {
   NAlert,
   NButton,
   NDatePicker,
+  NDivider,
   NForm,
   NFormItem,
   NInputNumber,
@@ -40,8 +41,11 @@ const model = reactive({
   // Date picker giữ timestamp, chỉ đổi sang chuỗi yyyy-MM-dd khi gửi lên backend.
   fromDate: null as null | number,
   id: undefined as number | undefined,
+  maxCarryOverDays: 0,
   maxTime: null as null | number,
   paid: false,
+  prorateOnJoin: false,
+  seniorityBonusEnabled: false,
   toDate: null as null | number,
   unit: null as null | string,
 });
@@ -119,8 +123,11 @@ async function submit() {
     employeeRequestReasonId: model.employeeRequestReasonId,
     employeeRequestTypeId: model.employeeRequestTypeId,
     fromDate: toDateOnlyString(model.fromDate),
+    maxCarryOverDays: model.maxCarryOverDays,
     maxTime: model.maxTime,
     paid: model.paid,
+    prorateOnJoin: model.prorateOnJoin,
+    seniorityBonusEnabled: model.seniorityBonusEnabled,
     toDate: toDateOnlyString(model.toDate),
     unit: model.unit,
   };
@@ -144,8 +151,11 @@ const [Drawer, drawerApi] = useVbenDrawer({
       employeeRequestTypeId: d.record?.employeeRequestTypeId ?? null,
       fromDate: toTimestamp(d.record?.fromDate),
       id: d.record?.id,
+      maxCarryOverDays: d.record?.maxCarryOverDays ?? 0,
       maxTime: d.record?.maxTime ?? null,
       paid: d.record?.paid ?? false,
+      prorateOnJoin: d.record?.prorateOnJoin ?? false,
+      seniorityBonusEnabled: d.record?.seniorityBonusEnabled ?? false,
       toDate: toTimestamp(d.record?.toDate),
       unit: d.record?.unit ?? null,
     });
@@ -216,7 +226,37 @@ const title = computed(() => (model.id ? 'Sửa chính sách' : 'Thêm chính s�
         {{ dateRangeError }}
       </NAlert>
       <NFormItem label="Tính lương" path="paid">
-        <NSwitch v-model:value="model.paid" /> </NFormItem
+        <NSwitch v-model:value="model.paid" />
+      </NFormItem>
+      <NDivider title-placement="left">Quyền lợi phép</NDivider>
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <NFormItem
+          label="Chuyển tồn tối đa sang năm sau"
+          path="maxCarryOverDays"
+        >
+          <NInputNumber
+            v-model:value="model.maxCarryOverDays"
+            :min="0"
+            :precision="1"
+            :show-button="false"
+            placeholder="0 = không cho chuyển"
+            style="width: 100%"
+          /> </NFormItem
+        ><NFormItem label="Cộng phép thâm niên" path="seniorityBonusEnabled">
+          <NSwitch v-model:value="model.seniorityBonusEnabled" />
+          <span class="text-muted-foreground ml-3 text-xs"
+            >+1 ngày mỗi 5 năm làm việc</span
+          >
+        </NFormItem>
+      </div>
+      <NFormItem
+        label="Chia theo tháng khi vào làm giữa năm"
+        path="prorateOnJoin"
+      >
+        <NSwitch v-model:value="model.prorateOnJoin" />
+        <span class="text-muted-foreground ml-3 text-xs"
+          >Vào làm tháng 7 chỉ được 6/12 hạn mức</span
+        > </NFormItem
       ><NSpace justify="end">
         <NButton @click="drawerApi.close()">Hủy</NButton
         ><NButton type="primary" @click="submit">Lưu</NButton>

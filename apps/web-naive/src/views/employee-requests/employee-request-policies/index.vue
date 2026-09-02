@@ -11,7 +11,7 @@ import { useAccess } from '@vben/access';
 import { Page, useVbenDrawer } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
 
-import { NButton, NPopconfirm, NSpace, NTooltip } from 'naive-ui';
+import { NButton, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui';
 
 import { message } from '#/adapter/naive';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
@@ -120,6 +120,26 @@ const gridOptions: VxeGridProps<EmployeeRequestPolicyApi.Item> = {
       title: 'Đơn vị',
       slots: { default: 'unitCell' },
       width: 110,
+    },
+    {
+      align: 'right',
+      field: 'maxCarryOverDays',
+      title: 'Chuyển tồn tối đa',
+      width: 150,
+    },
+    {
+      align: 'center',
+      field: 'seniorityBonusEnabled',
+      title: 'Phép thâm niên',
+      slots: { default: 'seniorityCell' },
+      width: 130,
+    },
+    {
+      align: 'center',
+      field: 'prorateOnJoin',
+      title: 'Chia theo tháng',
+      slots: { default: 'prorateCell' },
+      width: 130,
     },
     {
       align: 'center',
@@ -271,6 +291,22 @@ onMounted(loadDependencies);
               ? 'Giờ'
               : (row.unit ?? '-')
         }} </template
+      ><template #seniorityCell="{ row }">
+        <NTag
+          :bordered="false"
+          size="small"
+          :type="row.seniorityBonusEnabled ? 'success' : 'default'"
+        >
+          {{ row.seniorityBonusEnabled ? 'Có' : 'Không' }}
+        </NTag> </template
+      ><template #prorateCell="{ row }">
+        <NTag
+          :bordered="false"
+          size="small"
+          :type="row.prorateOnJoin ? 'success' : 'default'"
+        >
+          {{ row.prorateOnJoin ? 'Có' : 'Không' }}
+        </NTag> </template
       ><template #fromDateCell="{ row }">
         {{ formatDateOnly(row.fromDate) || '-' }} </template
       ><template #toDateCell="{ row }">

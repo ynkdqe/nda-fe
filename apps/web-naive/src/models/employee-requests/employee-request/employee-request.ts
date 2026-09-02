@@ -118,10 +118,17 @@ export namespace EmployeeRequestApi {
 
   // Maps EmployeeRequestQuotaDto.
   export interface Quota {
-    /** Phép tồn chuyển từ năm trước, đã được cộng vào remaining. */
+    /** Điều chỉnh thủ công của HR, có thể âm. */
+    adjustmentDays: number;
+    /** Hạn mức cơ bản theo chính sách, đã chia tỷ lệ nếu vào làm giữa năm. */
+    baseDays: number;
+    /** Phép tồn chuyển từ năm trước. */
     carriedOverDays: number;
+    /** Tổng hạn mức khả dụng, đã cộng đủ các nguồn còn lại. */
     maxTime: number;
     remaining: number;
+    /** Ngày cộng thêm theo thâm niên. */
+    seniorityDays: number;
     unit?: null | string;
     usedTime: number;
     year: number;

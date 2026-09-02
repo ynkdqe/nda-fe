@@ -167,6 +167,26 @@ const quotaExceeded = computed(
     requestedDays.value > quota.value.remaining,
 );
 
+/**
+ * Tách tổng hạn mức thành từng nguồn để người xin nghỉ hiểu vì sao con số của mình
+ * khác mức chuẩn của chính sách. Bỏ qua nguồn bằng 0 cho đỡ rối.
+ */
+const quotaBreakdown = computed(() => {
+  const q = quota.value;
+  if (!q) return [];
+  const parts: string[] = [];
+  if (q.baseDays > 0) parts.push(`${q.baseDays} ngày phép chuẩn`);
+  if (q.seniorityDays > 0) parts.push(`${q.seniorityDays} ngày thâm niên`);
+  if (q.carriedOverDays > 0)
+    parts.push(`${q.carriedOverDays} ngày tồn năm trước`);
+  if (q.adjustmentDays !== 0)
+    parts.push(
+      `${q.adjustmentDays > 0 ? '+' : ''}${q.adjustmentDays} ngày điều chỉnh`,
+    );
+  // Một nguồn duy nhất thì dòng chi tiết chỉ lặp lại tổng số, không có giá trị gì thêm.
+  return parts.length > 1 ? parts : [];
+});
+
 async function loadQuota() {
   quota.value = null;
   if (model.employeeRequestReasonId === null) {
@@ -380,14 +400,13 @@ const title = computed(() => (model.id ? 'Sửa đơn' : 'Tạo đơn mới'));
         :type="quotaExceeded ? 'error' : 'info'"
       >
         Hạn mức năm {{ quota.year }}: đã dùng {{ quota.usedTime }} / tối đa
-        {{ quota.maxTime + quota.carriedOverDays }}, còn lại
-        {{ quota.remaining }}.
-        <template v-if="quota.carriedOverDays > 0">
-          Đã gồm {{ quota.carriedOverDays }} ngày phép tồn năm trước.
-        </template>
+        {{ quota.maxTime }}, còn lại {{ quota.remaining }}.
         <template v-if="requestedDays > 0">
           Đơn này yêu cầu {{ requestedDays }} ngày.
         </template>
+        <div v-if="quotaBreakdown.length > 0" class="mt-1 text-xs opacity-80">
+          Gồm: {{ quotaBreakdown.join(' + ') }}.
+        </div>
       </NAlert>
 
       <NFormItem label="Mô tả" path="description">

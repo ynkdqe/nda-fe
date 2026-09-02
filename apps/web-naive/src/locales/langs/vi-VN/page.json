@@ -182,6 +182,7 @@
   "employeeRequest": {
     "title": "Đơn từ",
     "requests": "Danh sách đơn từ",
+    "quotas": "Quyền lợi phép",
     "types": "Loại đơn",
     "reasons": "Lý do",
     "policies": "Chính sách"

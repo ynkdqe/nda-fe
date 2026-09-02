@@ -25,6 +25,18 @@ const routes: RouteRecordRaw[] = [
         },
       },
       {
+        name: 'EmployeeRequestQuotas',
+        path: '/employee-requests/quotas',
+        component: () =>
+          import('#/views/employee-requests/employee-request-quotas/index.vue'),
+        meta: {
+          authority: [EMPLOYEE_REQUEST_PERMISSIONS.viewQuotas],
+          icon: 'lucide:calendar-check',
+          keepAlive: true,
+          title: $t('page.employeeRequest.quotas'),
+        },
+      },
+      {
         name: 'EmployeeRequestTypes',
         path: '/employee-requests/types',
         component: () =>

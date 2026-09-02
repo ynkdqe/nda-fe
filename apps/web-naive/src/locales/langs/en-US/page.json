@@ -182,6 +182,7 @@
   "employeeRequest": {
     "title": "Requests",
     "requests": "Request List",
+    "quotas": "Leave Entitlement",
     "types": "Request Types",
     "reasons": "Reasons",
     "policies": "Policies"

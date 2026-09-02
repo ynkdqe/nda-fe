@@ -14,8 +14,14 @@ export namespace EmployeeRequestPolicyApi {
     fromDate?: null | string;
     id: number;
     isDeleted: boolean;
+    /** Số ngày tồn tối đa được chuyển sang năm sau. 0 nghĩa là không cho chuyển. */
+    maxCarryOverDays: number;
     maxTime: number;
     paid: boolean;
+    /** Chia hạn mức theo số tháng làm việc cho người vào làm giữa năm. */
+    prorateOnJoin: boolean;
+    /** Cộng thêm ngày phép theo thâm niên (Điều 114 BLLĐ: +1 ngày mỗi 5 năm). */
+    seniorityBonusEnabled: boolean;
     /** Ngày kết thúc hiệu lực, dạng `yyyy-MM-dd`. Null nghĩa là không giới hạn cuối kỳ. */
     toDate?: null | string;
     unit?: null | string;
@@ -36,8 +42,11 @@ export namespace EmployeeRequestPolicyApi {
     employeeRequestReasonId: number;
     employeeRequestTypeId: number;
     fromDate?: null | string;
+    maxCarryOverDays: number;
     maxTime: number;
     paid: boolean;
+    prorateOnJoin: boolean;
+    seniorityBonusEnabled: boolean;
     toDate?: null | string;
     unit?: null | string;
   }

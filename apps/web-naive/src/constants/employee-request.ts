@@ -9,6 +9,11 @@ export const EMPLOYEE_REQUEST_PERMISSIONS = {
   reject: 'Hrms.EmployeeRequest.Reject',
   revoke: 'Hrms.EmployeeRequest.Revoke',
 
+  // Hrms.EmployeeRequestQuota - quyền lợi phép theo năm
+  viewQuotas: 'Hrms.EmployeeRequestQuota',
+  updateQuotas: 'Hrms.EmployeeRequestQuota.Update',
+  generateQuotas: 'Hrms.EmployeeRequestQuota.Generate',
+
   // Hrms.EmployeeRequestType - cấu hình loại đơn
   viewTypes: 'Hrms.EmployeeRequestType',
   createTypes: 'Hrms.EmployeeRequestType.Create',
