@@ -1,30 +1,56 @@
 import type { MResult } from '#/models/common';
+import type {
+  EmployeeRequestDuration,
+  EmployeeRequestEffect,
+} from '#/models/employee-requests/employee-request';
 
 export namespace EmployeeRequestPolicyApi {
   export interface Item {
-    /** Các field phẳng dưới đây chỉ có khi API list nạp kèm loại đơn và lý do. */
-    employeeRequestReasonDisplay?: null | number;
-    employeeRequestReasonId: number;
-    employeeRequestReasonIsActive?: boolean | null;
-    employeeRequestReasonName?: null | string;
-    employeeRequestTypeDisplayOrder?: null | number;
-    employeeRequestTypeId: number;
-    employeeRequestTypeName?: null | string;
-    /** Ngày bắt đầu hiệu lực, dạng `yyyy-MM-dd`. Null nghĩa là không giới hạn đầu kỳ. */
-    fromDate?: null | string;
     id: number;
-    isDeleted: boolean;
-    /** Số ngày tồn tối đa được chuyển sang năm sau. 0 nghĩa là không cho chuyển. */
-    maxCarryOverDays: number;
-    maxTime: number;
+    employeeRequestTypeId: number;
+    employeeRequestReasonId: number;
     paid: boolean;
-    /** Chia hạn mức theo số tháng làm việc cho người vào làm giữa năm. */
-    prorateOnJoin: boolean;
-    /** Cộng thêm ngày phép theo thâm niên (Điều 114 BLLĐ: +1 ngày mỗi 5 năm). */
-    seniorityBonusEnabled: boolean;
-    /** Ngày kết thúc hiệu lực, dạng `yyyy-MM-dd`. Null nghĩa là không giới hạn cuối kỳ. */
-    toDate?: null | string;
+    /** Đơn làm gì khi được duyệt. */
+    effectKind: EmployeeRequestEffect;
+    /** Form tạo đơn hỏi gì về thời gian. */
+    durationInput: EmployeeRequestDuration;
+
+    /** null = không giới hạn hạn mức, khác hẳn với 0. */
+    maxTime?: null | number;
     unit?: null | string;
+    maxCarryOverDays: number;
+    seniorityBonusEnabled: boolean;
+    prorateOnJoin: boolean;
+
+    /** Ca làm việc thay thế, chỉ dùng cho effectKind = WorkArrangement. */
+    overrideWorkshiftId?: null | number;
+    /** Độ dài chế độ tính bằng tháng; null = tự nhập ngày kết thúc. */
+    durationMonths?: null | number;
+
+    overtimeRate?: null | number;
+    maxOvertimeHoursPerMonth?: null | number;
+    maxOvertimeHoursPerYear?: null | number;
+
+    minNoticeDays: number;
+    maxBackdateDays: number;
+    requireDocument: boolean;
+    maxDaysPerRequest?: null | number;
+
+    minSeniorityMonths?: null | number;
+    /** Maps GenderEnum: 0 nam, 1 nữ, 2 khác. null = mọi giới. */
+    requiredGender?: null | number;
+
+    fromDate?: null | string;
+    toDate?: null | string;
+    isDeleted: boolean;
+
+    /** Các field phẳng dưới đây chỉ có khi API list nạp kèm loại đơn và lý do. */
+    employeeRequestTypeName?: null | string;
+    employeeRequestTypeDisplayOrder?: null | number;
+    employeeRequestReasonName?: null | string;
+    employeeRequestReasonDisplay?: null | number;
+    employeeRequestReasonIsActive?: boolean | null;
+    overrideWorkshiftName?: null | string;
   }
 
   export interface ListParams {
@@ -39,16 +65,41 @@ export namespace EmployeeRequestPolicyApi {
   }
 
   export interface CreateInput {
-    employeeRequestReasonId: number;
     employeeRequestTypeId: number;
-    fromDate?: null | string;
-    maxCarryOverDays: number;
-    maxTime: number;
+    employeeRequestReasonId: number;
     paid: boolean;
-    prorateOnJoin: boolean;
-    seniorityBonusEnabled: boolean;
-    toDate?: null | string;
+    /** Đơn làm gì khi được duyệt. */
+    effectKind: EmployeeRequestEffect;
+    /** Form tạo đơn hỏi gì về thời gian. */
+    durationInput: EmployeeRequestDuration;
+
+    /** null = không giới hạn hạn mức, khác hẳn với 0. */
+    maxTime?: null | number;
     unit?: null | string;
+    maxCarryOverDays: number;
+    seniorityBonusEnabled: boolean;
+    prorateOnJoin: boolean;
+
+    /** Ca làm việc thay thế, chỉ dùng cho effectKind = WorkArrangement. */
+    overrideWorkshiftId?: null | number;
+    /** Độ dài chế độ tính bằng tháng; null = tự nhập ngày kết thúc. */
+    durationMonths?: null | number;
+
+    overtimeRate?: null | number;
+    maxOvertimeHoursPerMonth?: null | number;
+    maxOvertimeHoursPerYear?: null | number;
+
+    minNoticeDays: number;
+    maxBackdateDays: number;
+    requireDocument: boolean;
+    maxDaysPerRequest?: null | number;
+
+    minSeniorityMonths?: null | number;
+    /** Maps GenderEnum: 0 nam, 1 nữ, 2 khác. null = mọi giới. */
+    requiredGender?: null | number;
+
+    fromDate?: null | string;
+    toDate?: null | string;
   }
 
   export interface UpdateInput extends CreateInput {

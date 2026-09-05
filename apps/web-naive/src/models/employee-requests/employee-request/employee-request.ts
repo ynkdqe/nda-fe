@@ -17,15 +17,81 @@ export enum EmployeeRequestStatus {
   Revoked = 4,
 }
 
+/**
+ * Maps NDA.Enums.EmployeeRequestEffectEnum — đơn LÀM GÌ khi được duyệt.
+ * Quyết định backend chạy nhánh xử lý nào và form ẩn/hiện phần nào.
+ */
+export enum EmployeeRequestEffect {
+  /** Nghỉ và trừ vào hạn mức phép. */
+  LeaveWithQuota = 0,
+  /** Nghỉ nhưng không trừ hạn mức (nghỉ không lương, ốm BHXH, thai sản). */
+  LeaveNoQuota = 1,
+  /** Vẫn đi làm, chỉ đổi ca trong một khoảng (sau thai sản, làm từ xa, công tác). */
+  WorkArrangement = 2,
+  /** Bổ sung hoặc sửa dữ liệu chấm công đã có. */
+  TimesheetAdjustment = 3,
+  /** Đăng ký làm thêm giờ. */
+  Overtime = 4,
+  /** Thủ tục hành chính, không đụng chấm công hay hạn mức. */
+  Administrative = 5,
+}
+
+/** Maps NDA.Enums.EmployeeRequestDurationEnum — form hỏi gì về thời gian. */
+export enum EmployeeRequestDuration {
+  None = 0,
+  SingleDate = 1,
+  DateRange = 2,
+  DateRangeWithPart = 3,
+  DateTimeRange = 4,
+}
+
+/** Maps NDA.Enums.DayPartEnum. */
+export enum DayPart {
+  FullDay = 0,
+  Morning = 1,
+  Afternoon = 2,
+  Custom = 3,
+}
+
+export const employeeRequestEffectLabels: Record<EmployeeRequestEffect, string> =
+  {
+    [EmployeeRequestEffect.Administrative]: 'Thủ tục hành chính',
+    [EmployeeRequestEffect.LeaveNoQuota]: 'Nghỉ không trừ phép',
+    [EmployeeRequestEffect.LeaveWithQuota]: 'Nghỉ trừ phép',
+    [EmployeeRequestEffect.Overtime]: 'Đăng ký làm thêm giờ',
+    [EmployeeRequestEffect.TimesheetAdjustment]: 'Sửa chấm công',
+    [EmployeeRequestEffect.WorkArrangement]: 'Chế độ làm việc',
+  };
+
+export const employeeRequestDurationLabels: Record<
+  EmployeeRequestDuration,
+  string
+> = {
+  [EmployeeRequestDuration.DateRange]: 'Khoảng ngày',
+  [EmployeeRequestDuration.DateRangeWithPart]: 'Khoảng ngày + buổi',
+  [EmployeeRequestDuration.DateTimeRange]: 'Khoảng ngày + giờ',
+  [EmployeeRequestDuration.None]: 'Không cần thời gian',
+  [EmployeeRequestDuration.SingleDate]: 'Một ngày',
+};
+
+export const dayPartLabels: Record<DayPart, string> = {
+  [DayPart.Afternoon]: 'Buổi chiều',
+  [DayPart.Custom]: 'Theo giờ',
+  [DayPart.FullDay]: 'Cả ngày',
+  [DayPart.Morning]: 'Buổi sáng',
+};
+
 export namespace EmployeeRequestApi {
   // Maps EmployeeRequestPeriodDto.
   export interface Period {
+    dayPart: DayPart;
     employeeRequestId: number;
     fromDate: string;
-    fromTime: string;
+    /** Chỉ có giá trị khi dayPart = Custom. */
+    fromTime?: null | string;
     id: number;
     toDate: string;
-    toTime: string;
+    toTime?: null | string;
   }
 
   // Maps EmployeeRequestDocumentDto.
@@ -39,10 +105,12 @@ export namespace EmployeeRequestApi {
 
   // Maps EmployeeRequestPeriodCreateDto.
   export interface PeriodInput {
+    dayPart: DayPart;
     fromDate: string;
-    fromTime: string;
+    /** Chỉ gửi khi dayPart = Custom. */
+    fromTime?: null | string;
     toDate: string;
-    toTime: string;
+    toTime?: null | string;
   }
 
   // Maps EmployeeDto nested trong EmployeeRequestDto.

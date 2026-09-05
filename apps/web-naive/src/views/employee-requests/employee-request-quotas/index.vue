@@ -21,6 +21,7 @@ import {
   updateEmployeeRequestQuotaApi,
 } from '#/api';
 import { EMPLOYEE_REQUEST_PERMISSIONS } from '#/constants/employee-request';
+import { EmployeeRequestEffect } from '#/models/employee-requests/employee-request';
 
 import EmployeeRequestQuotaForm from './EmployeeRequestQuotaForm.vue';
 import EmployeeRequestQuotaGenerateForm from './EmployeeRequestQuotaGenerateForm.vue';
@@ -33,13 +34,18 @@ const canGenerate = computed(() =>
 );
 const currentYear = new Date().getFullYear();
 const policies = ref<EmployeeRequestPolicyApi.Item[]>([]);
-/** Chỉ những chính sách có hạn mức mới cần cấp quyền lợi theo năm. */
+/** Chỉ chính sách nghỉ trừ phép và có hạn mức mới cần cấp quyền lợi theo năm. */
 async function loadPolicies() {
   const r = await getEmployeeRequestPolicyListApi({
     current: 1,
     pageSize: 100,
   });
-  policies.value = (r.data ?? []).filter((x) => !x.isDeleted && x.maxTime > 0);
+  policies.value = (r.data ?? []).filter(
+    (x) =>
+      !x.isDeleted &&
+      x.effectKind === EmployeeRequestEffect.LeaveWithQuota &&
+      (x.maxTime ?? 0) > 0,
+  );
 }
 const formOptions: VbenFormProps = {
   collapsed: false,

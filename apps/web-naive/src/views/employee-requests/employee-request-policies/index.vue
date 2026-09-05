@@ -25,6 +25,10 @@ import {
   updateEmployeeRequestPolicyApi,
 } from '#/api';
 import { EMPLOYEE_REQUEST_PERMISSIONS } from '#/constants/employee-request';
+import {
+  employeeRequestDurationLabels,
+  employeeRequestEffectLabels,
+} from '#/models/employee-requests/employee-request';
 import { formatDateOnly } from '#/utils/date';
 
 import PaidStatusBadge from '../shared/PaidStatusBadge.vue';
@@ -108,12 +112,32 @@ const gridOptions: VxeGridProps<EmployeeRequestPolicyApi.Item> = {
     },
     {
       align: 'center',
+      field: 'effectKind',
+      title: 'Khi duyệt',
+      slots: { default: 'effectCell' },
+      width: 160,
+    },
+    {
+      align: 'center',
+      field: 'durationInput',
+      title: 'Dạng thời gian',
+      slots: { default: 'durationCell' },
+      width: 150,
+    },
+    {
+      align: 'center',
       field: 'paid',
       title: 'Tính lương',
       slots: { default: 'paidCell' },
       width: 150,
     },
-    { align: 'right', field: 'maxTime', title: 'Hạn mức tối đa', width: 150 },
+    {
+      align: 'right',
+      field: 'maxTime',
+      title: 'Hạn mức tối đa',
+      slots: { default: 'maxTimeCell' },
+      width: 150,
+    },
     {
       align: 'center',
       field: 'unit',
@@ -281,6 +305,17 @@ onMounted(loadDependencies);
         {{
           reasonMap.get(row.employeeRequestReasonId)?.name ?? 'Lý do đã bị xóa'
         }} </template
+      ><template #effectCell="{ row }">
+        <NTag :bordered="false" size="small">{{
+          employeeRequestEffectLabels[row.effectKind] ?? '-'
+        }}</NTag> </template
+      ><template #durationCell="{ row }">
+        {{ employeeRequestDurationLabels[row.durationInput] ?? '-' }} </template
+      ><template #maxTimeCell="{ row }">
+        <span v-if="row.maxTime === null" class="text-muted-foreground"
+          >Không giới hạn</span
+        >
+        <span v-else class="tabular-nums">{{ row.maxTime }}</span> </template
       ><template #paidCell="{ row }">
         <PaidStatusBadge :paid="row.paid" /> </template
       ><template #unitCell="{ row }">

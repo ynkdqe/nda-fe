@@ -23,17 +23,27 @@ import {
 } from 'naive-ui';
 
 import { getEmployeeRequestQuotaApi } from '#/api';
+import {
+  DayPart,
+  dayPartLabels,
+  EmployeeRequestDuration,
+  EmployeeRequestEffect,
+} from '#/models/employee-requests/employee-request';
 import { toDateOnlyString, toTimeOnlyString } from '#/utils/date';
 
 import PaidStatusBadge from '../shared/PaidStatusBadge.vue';
 
 interface PeriodFormItem {
+  dayPart: DayPart;
   fromDate: null | number;
   fromTime: null | number;
   key: number;
   toDate: null | number;
   toTime: null | number;
 }
+
+/** Số giờ một ngày công chuẩn, khớp LeaveDurationHelper.StandardWorkHoursPerDay ở backend. */
+const STANDARD_WORK_HOURS = 8;
 
 const emit = defineEmits<{
   submit: [EmployeeRequestApi.CreateInput | EmployeeRequestApi.UpdateInput];
@@ -49,6 +59,7 @@ let periodKey = 0;
 function createPeriod(): PeriodFormItem {
   periodKey += 1;
   return {
+    dayPart: DayPart.FullDay,
     fromDate: null,
     fromTime: null,
     key: periodKey,
@@ -129,27 +140,9 @@ watch(
   },
 );
 
-/** Tổng số ngày yêu cầu, tính giống backend: (toDate - fromDate) + 1 cho mỗi khoảng. */
-const requestedDays = computed(() => {
-  let total = 0;
-
-  for (const period of model.periods) {
-    if (period.fromDate === null || period.toDate === null) {
-      continue;
-    }
-
-    const from = new Date(period.fromDate).setHours(0, 0, 0, 0);
-    const to = new Date(period.toDate).setHours(0, 0, 0, 0);
-    const days = Math.round((to - from) / 86_400_000) + 1;
-    total += Math.max(days, 0);
-  }
-
-  return total;
-});
-
 /**
- * Chính sách áp cho lý do đang chọn - quyết định ngày nghỉ có được tính lương hay không.
- * Lý do chưa gắn chính sách sẽ không tra được, khi đó hiển thị là chưa cấu hình.
+ * Chính sách áp cho lý do đang chọn. Đây là nguồn quyết định form hỏi gì và
+ * hiển thị gì — không có nó thì chỉ hiện dạng mặc định.
  */
 const selectedPolicy = computed(() =>
   model.employeeRequestReasonId === null
@@ -159,6 +152,77 @@ const selectedPolicy = computed(() =>
           policy.employeeRequestReasonId === model.employeeRequestReasonId,
       ) ?? null),
 );
+
+const durationInput = computed(
+  () =>
+    selectedPolicy.value?.durationInput ??
+    EmployeeRequestDuration.DateRangeWithPart,
+);
+const effectKind = computed(
+  () =>
+    selectedPolicy.value?.effectKind ?? EmployeeRequestEffect.LeaveWithQuota,
+);
+
+const needsPeriods = computed(
+  () => durationInput.value !== EmployeeRequestDuration.None,
+);
+const isSingleDate = computed(
+  () => durationInput.value === EmployeeRequestDuration.SingleDate,
+);
+const showDayPart = computed(
+  () => durationInput.value === EmployeeRequestDuration.DateRangeWithPart,
+);
+const showTime = computed(
+  () => durationInput.value === EmployeeRequestDuration.DateTimeRange,
+);
+/** Đơn một ngày chỉ có đúng một khoảng, không cho thêm bớt. */
+const allowMultiplePeriods = computed(
+  () => needsPeriods.value && !isSingleDate.value,
+);
+/** Chỉ đơn trừ phép mới có hạn mức để hiển thị. */
+const showQuotaBox = computed(
+  () => effectKind.value === EmployeeRequestEffect.LeaveWithQuota,
+);
+
+const dayPartOptions = [
+  { label: dayPartLabels[DayPart.FullDay], value: DayPart.FullDay },
+  { label: dayPartLabels[DayPart.Morning], value: DayPart.Morning },
+  { label: dayPartLabels[DayPart.Afternoon], value: DayPart.Afternoon },
+];
+
+/**
+ * Tổng số ngày yêu cầu, tính xấp xỉ giống backend nhưng chưa trừ ngày lễ
+ * (frontend không có lịch nghỉ). Con số cuối cùng vẫn do backend chốt.
+ */
+const requestedDays = computed(() => {
+  let total = 0;
+
+  for (const period of model.periods) {
+    if (period.fromDate === null || period.toDate === null) {
+      continue;
+    }
+
+    if (period.dayPart === DayPart.Custom) {
+      if (period.fromTime === null || period.toTime === null) {
+        continue;
+      }
+      const hours = (period.toTime - period.fromTime) / 3_600_000;
+      total += Math.max(hours, 0) / STANDARD_WORK_HOURS;
+      continue;
+    }
+
+    const from = new Date(period.fromDate).setHours(0, 0, 0, 0);
+    const to = new Date(period.toDate).setHours(0, 0, 0, 0);
+    const days = Math.max(Math.round((to - from) / 86_400_000) + 1, 0);
+
+    total +=
+      period.dayPart === DayPart.FullDay || days === 0
+        ? days
+        : Math.max(days - 0.5, 0.5);
+  }
+
+  return Math.round(total * 100) / 100;
+});
 
 const quotaExceeded = computed(
   () =>
@@ -187,9 +251,61 @@ const quotaBreakdown = computed(() => {
   return parts.length > 1 ? parts : [];
 });
 
+/** Mô tả bằng lời điều gì sẽ xảy ra khi đơn được duyệt, để người nộp biết trước. */
+const effectHint = computed(() => {
+  const policy = selectedPolicy.value;
+  if (!policy) return '';
+
+  switch (policy.effectKind) {
+    case EmployeeRequestEffect.Administrative: {
+      return 'Thủ tục hành chính, không ảnh hưởng tới bảng công hay ngày phép.';
+    }
+    case EmployeeRequestEffect.LeaveNoQuota: {
+      return 'Thời gian nghỉ này không trừ vào ngày phép của bạn.';
+    }
+    case EmployeeRequestEffect.Overtime: {
+      return policy.overtimeRate
+        ? `Giờ làm thêm được tính hệ số ${policy.overtimeRate}.`
+        : 'Đăng ký làm thêm giờ.';
+    }
+    case EmployeeRequestEffect.TimesheetAdjustment: {
+      return 'Đơn này dùng để bổ sung hoặc sửa dữ liệu chấm công.';
+    }
+    case EmployeeRequestEffect.WorkArrangement: {
+      return policy.durationMonths
+        ? `Khi được duyệt, ca làm việc của bạn sẽ đổi trong ${policy.durationMonths} tháng kể từ ngày bắt đầu.`
+        : 'Khi được duyệt, ca làm việc của bạn sẽ đổi trong khoảng thời gian đã chọn.';
+    }
+    default: {
+      return '';
+    }
+  }
+});
+
+/** Các quy tắc nộp đơn của chính sách, hiện trước để người nộp không bị backend từ chối. */
+const submissionHints = computed(() => {
+  const policy = selectedPolicy.value;
+  if (!policy) return [];
+
+  const hints: string[] = [];
+  if (policy.minNoticeDays > 0) {
+    hints.push(`phải báo trước ${policy.minNoticeDays} ngày`);
+  }
+  if (policy.maxBackdateDays > 0) {
+    hints.push(`được nộp lùi tối đa ${policy.maxBackdateDays} ngày`);
+  }
+  if (policy.maxDaysPerRequest) {
+    hints.push(`tối đa ${policy.maxDaysPerRequest} ngày mỗi đơn`);
+  }
+  if (policy.requireDocument) {
+    hints.push('bắt buộc đính kèm tài liệu trước khi được duyệt');
+  }
+  return hints;
+});
+
 async function loadQuota() {
   quota.value = null;
-  if (model.employeeRequestReasonId === null) {
+  if (model.employeeRequestReasonId === null || !showQuotaBox.value) {
     return;
   }
 
@@ -211,8 +327,46 @@ async function loadQuota() {
 
 watch(() => model.employeeRequestReasonId, loadQuota);
 
+/**
+ * Đổi lý do có thể đổi luôn dạng thời gian, nên phải chuẩn hoá lại các khoảng đang nhập
+ * về đúng dạng mới — nếu không, dữ liệu thừa từ dạng cũ sẽ bị backend từ chối.
+ */
+watch(durationInput, (value) => {
+  if (value === EmployeeRequestDuration.SingleDate) {
+    model.periods = model.periods.slice(0, 1);
+  }
+
+  for (const period of model.periods) {
+    switch (value) {
+      case EmployeeRequestDuration.DateTimeRange: {
+        period.dayPart = DayPart.Custom;
+        break;
+      }
+      case EmployeeRequestDuration.DateRangeWithPart: {
+        if (period.dayPart === DayPart.Custom) {
+          period.dayPart = DayPart.FullDay;
+        }
+        break;
+      }
+      default: {
+        period.dayPart = DayPart.FullDay;
+        period.fromTime = null;
+        period.toTime = null;
+      }
+    }
+
+    if (value === EmployeeRequestDuration.SingleDate) {
+      period.toDate = period.fromDate;
+    }
+  }
+});
+
 function addPeriod() {
-  model.periods.push(createPeriod());
+  const period = createPeriod();
+  if (durationInput.value === EmployeeRequestDuration.DateTimeRange) {
+    period.dayPart = DayPart.Custom;
+  }
+  model.periods.push(period);
 }
 
 function removePeriod(index: number) {
@@ -220,6 +374,14 @@ function removePeriod(index: number) {
     return;
   }
   model.periods.splice(index, 1);
+}
+
+/** Đơn một ngày: ngày kết thúc luôn bám theo ngày bắt đầu, người dùng không phải nhập hai lần. */
+function onFromDateChange(period: PeriodFormItem, value: null | number) {
+  period.fromDate = value;
+  if (isSingleDate.value) {
+    period.toDate = value;
+  }
 }
 
 const rules: FormRules = {
@@ -243,12 +405,26 @@ const rules: FormRules = {
 };
 
 const periodError = computed(() => {
+  if (!needsPeriods.value) {
+    return '';
+  }
+
   for (const [index, period] of model.periods.entries()) {
+    const label = `Khoảng thời gian ${index + 1}`;
+
     if (period.fromDate === null || period.toDate === null) {
-      return `Khoảng thời gian ${index + 1}: vui lòng chọn đủ ngày bắt đầu và kết thúc`;
+      return `${label}: vui lòng chọn đủ ngày bắt đầu và kết thúc`;
     }
     if (period.toDate < period.fromDate) {
-      return `Khoảng thời gian ${index + 1}: ngày kết thúc phải sau ngày bắt đầu`;
+      return `${label}: ngày kết thúc phải sau ngày bắt đầu`;
+    }
+    if (period.dayPart === DayPart.Custom) {
+      if (period.fromTime === null || period.toTime === null) {
+        return `${label}: vui lòng nhập giờ bắt đầu và giờ kết thúc`;
+      }
+      if (period.toTime <= period.fromTime) {
+        return `${label}: giờ kết thúc phải sau giờ bắt đầu`;
+      }
     }
   }
   return '';
@@ -262,19 +438,26 @@ async function submit() {
   }
 
   const periods: EmployeeRequestApi.PeriodInput[] = [];
-  for (const period of model.periods) {
-    const fromDate = toDateOnlyString(period.fromDate);
-    const toDate = toDateOnlyString(period.toDate);
-    if (!fromDate || !toDate) {
-      return;
-    }
 
-    periods.push({
-      fromDate,
-      fromTime: toTimeOnlyString(period.fromTime) ?? '00:00:00',
-      toDate,
-      toTime: toTimeOnlyString(period.toTime) ?? '23:59:00',
-    });
+  if (needsPeriods.value) {
+    for (const period of model.periods) {
+      const fromDate = toDateOnlyString(period.fromDate);
+      const toDate = toDateOnlyString(period.toDate);
+      if (!fromDate || !toDate) {
+        return;
+      }
+
+      // Giờ chỉ gửi khi thực sự nghỉ theo giờ; các dạng khác gửi null để backend
+      // không phải đoán giá trị nào là thật.
+      const custom = period.dayPart === DayPart.Custom;
+      periods.push({
+        dayPart: period.dayPart,
+        fromDate,
+        fromTime: custom ? toTimeOnlyString(period.fromTime) : null,
+        toDate,
+        toTime: custom ? toTimeOnlyString(period.toTime) : null,
+      });
+    }
   }
 
   emit(
@@ -295,8 +478,9 @@ async function submit() {
 }
 
 /** Chuyển `yyyy-MM-dd` / `HH:mm:ss` từ backend về timestamp cho date/time picker. */
-function toPickerValue(date: string, time: string) {
-  const parsed = new Date(`${date}T${time}`).getTime();
+function toPickerValue(date: null | string, time: null | string) {
+  if (!date) return null;
+  const parsed = new Date(`${date}T${time ?? '00:00:00'}`).getTime();
   return Number.isNaN(parsed) ? null : parsed;
 }
 
@@ -321,11 +505,12 @@ const [Drawer, drawerApi] = useVbenDrawer({
     const recordPeriods = (record?.periods ?? []).map((period) => {
       periodKey += 1;
       return {
+        dayPart: period.dayPart ?? DayPart.FullDay,
         fromDate: toPickerValue(period.fromDate, '00:00:00'),
-        fromTime: toPickerValue(period.fromDate, period.fromTime),
+        fromTime: toPickerValue(period.fromDate, period.fromTime ?? null),
         key: periodKey,
         toDate: toPickerValue(period.toDate, '00:00:00'),
-        toTime: toPickerValue(period.toDate, period.toTime),
+        toTime: toPickerValue(period.toDate, period.toTime ?? null),
       };
     });
 
@@ -383,19 +568,29 @@ const title = computed(() => (model.id ? 'Sửa đơn' : 'Tạo đơn mới'));
         v-if="model.employeeRequestReasonId !== null"
         class="mb-4 flex flex-wrap items-center gap-2 text-sm"
       >
-        <span class="text-gray-500">Ngày nghỉ theo lý do này:</span>
+        <span class="text-gray-500">Thời gian này:</span>
         <PaidStatusBadge v-if="selectedPolicy" :paid="selectedPolicy.paid" />
         <NTag v-else :bordered="false" size="small" type="warning">
           Chưa cấu hình chính sách
         </NTag>
-        <span v-if="selectedPolicy" class="text-gray-500">
+        <span
+          v-if="selectedPolicy && showQuotaBox && selectedPolicy.maxTime"
+          class="text-gray-500"
+        >
           hạn mức {{ selectedPolicy.maxTime }}
           {{ selectedPolicy.unit === 'Hour' ? 'giờ' : 'ngày' }}/năm
         </span>
       </div>
 
+      <NAlert v-if="effectHint" class="mb-4" type="info">
+        {{ effectHint }}
+        <div v-if="submissionHints.length > 0" class="mt-1 text-xs opacity-80">
+          Lưu ý: {{ submissionHints.join(', ') }}.
+        </div>
+      </NAlert>
+
       <NAlert
-        v-if="quota"
+        v-if="quota && showQuotaBox"
         class="mb-4"
         :type="quotaExceeded ? 'error' : 'info'"
       >
@@ -420,73 +615,97 @@ const title = computed(() => (model.id ? 'Sửa đơn' : 'Tạo đơn mới'));
         />
       </NFormItem>
 
-      <div class="mb-2 flex items-center justify-between">
-        <span class="text-sm font-medium">Thời gian nghỉ</span>
-        <NButton size="small" @click="addPeriod">
-          <template #icon><IconifyIcon icon="lucide:plus" /></template>
-          Thêm khoảng
-        </NButton>
-      </div>
-
-      <div
-        v-for="(period, index) in model.periods"
-        :key="period.key"
-        class="mb-3 rounded border border-gray-200 p-3 dark:border-gray-700"
-      >
+      <template v-if="needsPeriods">
         <div class="mb-2 flex items-center justify-between">
-          <span class="text-sm text-gray-500">Khoảng {{ index + 1 }}</span>
-          <NButton
-            circle
-            :disabled="model.periods.length <= 1"
-            quaternary
-            size="small"
-            type="error"
-            @click="removePeriod(index)"
-          >
-            <template #icon><IconifyIcon icon="lucide:trash-2" /></template>
+          <span class="text-sm font-medium">
+            {{ isSingleDate ? 'Ngày áp dụng' : 'Thời gian áp dụng' }}
+          </span>
+          <NButton v-if="allowMultiplePeriods" size="small" @click="addPeriod">
+            <template #icon><IconifyIcon icon="lucide:plus" /></template>
+            Thêm khoảng
           </NButton>
         </div>
-        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
-          <NFormItem label="Từ ngày" :show-feedback="false">
-            <NDatePicker
-              v-model:value="period.fromDate"
-              class="w-full"
-              clearable
-              format="dd/MM/yyyy"
-              type="date"
-            />
-          </NFormItem>
-          <NFormItem label="Giờ bắt đầu" :show-feedback="false">
-            <NTimePicker
-              v-model:value="period.fromTime"
-              class="w-full"
-              clearable
-              format="HH:mm"
-            />
-          </NFormItem>
-          <NFormItem label="Đến ngày" :show-feedback="false">
-            <NDatePicker
-              v-model:value="period.toDate"
-              class="w-full"
-              clearable
-              format="dd/MM/yyyy"
-              type="date"
-            />
-          </NFormItem>
-          <NFormItem label="Giờ kết thúc" :show-feedback="false">
-            <NTimePicker
-              v-model:value="period.toTime"
-              class="w-full"
-              clearable
-              format="HH:mm"
-            />
-          </NFormItem>
-        </div>
-      </div>
 
-      <NAlert v-if="periodError" class="mb-4" type="warning">
-        {{ periodError }}
-      </NAlert>
+        <div
+          v-for="(period, index) in model.periods"
+          :key="period.key"
+          class="mb-3 rounded border border-gray-200 p-3 dark:border-gray-700"
+        >
+          <div
+            v-if="allowMultiplePeriods"
+            class="mb-2 flex items-center justify-between"
+          >
+            <span class="text-sm text-gray-500">Khoảng {{ index + 1 }}</span>
+            <NButton
+              circle
+              :disabled="model.periods.length <= 1"
+              quaternary
+              size="small"
+              type="error"
+              @click="removePeriod(index)"
+            >
+              <template #icon><IconifyIcon icon="lucide:trash-2" /></template>
+            </NButton>
+          </div>
+
+          <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <NFormItem
+              :label="isSingleDate ? 'Ngày' : 'Từ ngày'"
+              :show-feedback="false"
+            >
+              <NDatePicker
+                class="w-full"
+                clearable
+                format="dd/MM/yyyy"
+                type="date"
+                :value="period.fromDate"
+                @update:value="(v) => onFromDateChange(period, v)"
+              />
+            </NFormItem>
+            <NFormItem
+              v-if="!isSingleDate"
+              label="Đến ngày"
+              :show-feedback="false"
+            >
+              <NDatePicker
+                v-model:value="period.toDate"
+                class="w-full"
+                clearable
+                format="dd/MM/yyyy"
+                type="date"
+              />
+            </NFormItem>
+            <NFormItem v-if="showDayPart" label="Buổi" :show-feedback="false">
+              <NSelect
+                v-model:value="period.dayPart"
+                :options="dayPartOptions"
+              />
+            </NFormItem>
+            <template v-if="showTime">
+              <NFormItem label="Giờ bắt đầu" :show-feedback="false">
+                <NTimePicker
+                  v-model:value="period.fromTime"
+                  class="w-full"
+                  clearable
+                  format="HH:mm"
+                />
+              </NFormItem>
+              <NFormItem label="Giờ kết thúc" :show-feedback="false">
+                <NTimePicker
+                  v-model:value="period.toTime"
+                  class="w-full"
+                  clearable
+                  format="HH:mm"
+                />
+              </NFormItem>
+            </template>
+          </div>
+        </div>
+
+        <NAlert v-if="periodError" class="mb-4" type="warning">
+          {{ periodError }}
+        </NAlert>
+      </template>
 
       <NSpace justify="end">
         <NButton @click="drawerApi.close()">Hủy</NButton>
