@@ -46,9 +46,10 @@ import {
   EmployeeRequestStatus,
   employeeRequestStatusOptions,
 } from '#/models/employee-requests/employee-request';
-import { formatDateOnly, formatDateTime, toDateOnlyString } from '#/utils/date';
+import { formatDateTime, toDateOnlyString } from '#/utils/date';
 
 import EmployeeRequestStatusBadge from '../shared/EmployeeRequestStatusBadge.vue';
+import { formatPeriod } from '../shared/formatPeriod';
 import EmployeeRequestDetail from './EmployeeRequestDetail.vue';
 import EmployeeRequestForm from './EmployeeRequestForm.vue';
 
@@ -212,9 +213,16 @@ const gridOptions: VxeGridProps<EmployeeRequestApi.Item> = {
     },
     {
       field: 'periods',
-      title: 'Thời gian nghỉ',
+      title: 'Thời gian',
       minWidth: 200,
       slots: { default: 'periodCell' },
+    },
+    {
+      align: 'right',
+      field: 'calculatedAmount',
+      title: 'Số ngày',
+      width: 100,
+      slots: { default: 'amountCell' },
     },
     { field: 'description', title: 'Mô tả', minWidth: 200 },
     {
@@ -345,10 +353,7 @@ function periodSummary(row: EmployeeRequestApi.Item) {
     return '-';
   }
 
-  const range =
-    first.fromDate === first.toDate
-      ? formatDateOnly(first.fromDate)
-      : `${formatDateOnly(first.fromDate)} - ${formatDateOnly(first.toDate)}`;
+  const range = formatPeriod(first);
 
   return periods.length > 1 ? `${range} (+${periods.length - 1})` : range;
 }
@@ -383,7 +388,7 @@ async function openDetail(row: EmployeeRequestApi.Item) {
     return;
   }
 
-  detailDrawerApi.setData({ record: response.data });
+  detailDrawerApi.setData({ policies: policies.value, record: response.data });
   detailDrawerApi.open();
 }
 
@@ -685,6 +690,14 @@ onMounted(loadDependencies);
 
       <template #periodCell="{ row }">{{ periodSummary(row) }}</template>
 
+      <template #amountCell="{ row }">
+        <span v-if="row.calculatedAmount > 0" class="tabular-nums">
+          {{ row.calculatedAmount }}
+          {{ row.amountUnit === 'Hour' ? 'giờ' : 'ngày' }}
+        </span>
+        <span v-else class="text-muted-foreground">-</span>
+      </template>
+
       <template #statusCell="{ row }">
         <EmployeeRequestStatusBadge :status="row.status" />
       </template>
@@ -715,7 +728,7 @@ onMounted(loadDependencies);
     </Grid>
 
     <FormDrawer @submit="submit" />
-    <DetailDrawer />
+    <DetailDrawer @changed="gridApi.query()" />
 
     <NModal
       v-model:show="reasonDialogOpen"

@@ -4,6 +4,7 @@ export * from './employee-requests';
 export * from './hr';
 export * from './identity';
 export * from './location';
+export * from './media';
 export * from './openiddict';
 export * from './settings';
 export * from './sms';

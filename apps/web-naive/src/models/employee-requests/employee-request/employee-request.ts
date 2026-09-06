@@ -122,9 +122,15 @@ export namespace EmployeeRequestApi {
 
   // Maps EmployeeRequestDto.
   export interface Item {
+    /** Đơn vị của calculatedAmount: 'Day' hoặc 'Hour'. */
+    amountUnit?: null | string;
     approveAt?: null | string;
     approveBy?: null | string;
+    /** Số ngày (hoặc giờ) backend đã chốt lúc tạo đơn, không tính lại về sau. */
+    calculatedAmount: number;
     creationTime: string;
+    /** Người được bàn giao công việc trong thời gian vắng mặt. */
+    delegateEmployeeId?: null | number;
     creatorName?: null | string;
     description?: null | string;
     documents?: Document[] | null;
@@ -132,6 +138,8 @@ export namespace EmployeeRequestApi {
     employeeId: number;
     employeeRequestReason?: EmployeeRequestReasonApi.Item | null;
     employeeRequestReasonId: number;
+    /** Chính sách đã áp dụng, chốt lúc tạo đơn. */
+    employeeRequestPolicyId?: null | number;
     employeeRequestType?: EmployeeRequestTypeApi.Item | null;
     employeeRequestTypeId: number;
     id: number;
