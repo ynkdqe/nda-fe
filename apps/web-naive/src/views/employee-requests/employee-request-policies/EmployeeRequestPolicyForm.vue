@@ -230,7 +230,7 @@ async function submit() {
       ? model.seniorityBonusEnabled
       : false,
     toDate: toDateOnlyString(model.toDate),
-    unit: model.unit,
+    unit: showQuota.value && model.maxTime !== null ? model.unit : null,
   };
   emit('submit', model.id ? { ...base, id: model.id } : base);
 }
@@ -349,9 +349,16 @@ const title = computed(() => (model.id ? 'Sửa chính sách' : 'Thêm chính s�
               style="width: 100%"
             /> </NFormItem
           ><NFormItem label="Đơn vị" path="unit">
-            <EmployeeRequestPolicyUnitSelect v-model:value="model.unit" />
+            <EmployeeRequestPolicyUnitSelect
+              v-model:value="model.unit"
+              :disabled="model.maxTime === null"
+            />
           </NFormItem>
         </div>
+        <p class="text-muted-foreground -mt-2 mb-4 text-xs">
+          Cả hai ô đều không bắt buộc. Bỏ trống hạn mức nghĩa là loại đơn này
+          không giới hạn số ngày — khi đó đơn vị cũng không còn ý nghĩa.
+        </p>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <NFormItem
             label="Chuyển tồn tối đa sang năm sau"

@@ -5,7 +5,7 @@ import { NSelect } from 'naive-ui';
 
 import { employeeRequestPolicyUnits } from '#/models/employee-requests/employee-request-policy';
 
-const props = defineProps<{ value?: null | string }>();
+const props = defineProps<{ disabled?: boolean; value?: null | string }>();
 const emit = defineEmits<{ 'update:value': [null | string] }>();
 
 const options = computed(() => {
@@ -20,8 +20,9 @@ const options = computed(() => {
 <template>
   <NSelect
     clearable
+    :disabled="disabled"
     :options="options"
-    placeholder="Chọn đơn vị"
+    :placeholder="disabled ? 'Không cần khi bỏ trống hạn mức' : 'Chọn đơn vị'"
     :value="value"
     @update:value="emit('update:value', $event ?? null)"
   />
