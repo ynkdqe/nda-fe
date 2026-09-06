@@ -21,8 +21,14 @@ RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
 
 COPY . .
 
+# Dung --prefer-offline chu khong phai --offline: store nam trong cache mount cua
+# BuildKit, con cache record cua buoc `pnpm fetch` lai nam trong layer image. Hai thu
+# nay bi don doc lap nhau. Khi cache mount bi duoi (gioi han dung luong, prune, hoac
+# build tren agent moi) ma layer fetch van cache-hit thi fetch bi bo qua, store rong,
+# va --offline cam tai ve -> ERR_PNPM_NO_OFFLINE_TARBALL. --prefer-offline van uu tien
+# store khi con, chi tai lai phan thieu.
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
-    pnpm install --frozen-lockfile --offline
+    pnpm install --frozen-lockfile --prefer-offline
 RUN test -f apps/${APP_NAME}/.env.${BUILD_MODE}
 RUN pnpm --filter ${PACKAGE_FILTER} exec vite build --mode ${BUILD_MODE}
 
