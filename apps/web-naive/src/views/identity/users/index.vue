@@ -348,7 +348,9 @@ async function onFormSubmit(formData: UserFormModel) {
           </template>
           Thêm mới
         </NButton>
+      </template>
 
+      <template #toolbar-tools>
         <NPopconfirm
           negative-text="Hủy"
           positive-text="Xóa cache"
@@ -356,14 +358,15 @@ async function onFormSubmit(formData: UserFormModel) {
         >
           <template #trigger>
             <NButton
-              class="ml-2"
+              circle
+              title="Xóa toàn bộ cache người dùng"
+              aria-label="Xóa toàn bộ cache người dùng"
               :disabled="removingCacheId !== null"
               :loading="removingCacheId === 'all'"
             >
               <template #icon>
-                <IconifyIcon icon="lucide:eraser" />
+                <IconifyIcon icon="lucide:database-zap" />
               </template>
-              Xóa toàn bộ cache
             </NButton>
           </template>
           Xóa cache profile của tất cả người dùng trong đơn vị này? Lần đăng
