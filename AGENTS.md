@@ -105,6 +105,17 @@ baseRequestClient.post('/auth/logout', { withCredentials: true });
 
 Không dùng `baseRequestClient` cho CRUD nghiệp vụ mới nếu không có lý do rõ ràng. Mặc định luôn dùng `requestClient`.
 
+### Upload avatar qua service riêng
+
+- `/profile` dùng `src/api/upload.ts` (`uploadProfileAvatarApi`), không gửi file tới backend nghiệp vụ.
+- `VITE_APP_UPLOAD_URL` là URL endpoint đầy đủ: dev `https://upload-dev.anhnd.me/upload`, production `https://upload.anhnd.me/upload`. Biến được chốt lúc build; restart Vite sau khi đổi env dev.
+- POST multipart field `file`, query `storage=oci`; model response nằm tại `src/models/media/upload.ts`, URL ảnh là `data.url` trong `MResult`.
+- Service truyền URL tuyệt đối từ cấu hình vào `requestClient` để dùng chung Bearer token/refresh/error interceptor (hai service dùng chung auth). Không hardcode token/domain trong component, không fallback về API nghiệp vụ khi cấu hình thiếu.
+- Gỡ header JSON mặc định bằng `Content-Type: null` cho request FormData để browser sinh multipart boundary.
+- Modal avatar chỉ upload và cập nhật URL chờ lưu ở trang profile; tuyệt đối không PUT `{ avatar }` riêng lẻ. API profile yêu cầu dữ liệu đầy đủ, gồm `name`, `concurrencyStamp` và các field form. Chỉ PUT khi người dùng lưu Hồ sơ cá nhân, kèm URL avatar chờ lưu. Không cập nhật avatar chính thức trong user store trước khi lưu profile.
+- JPEG/PNG/WebP tối đa 5 MiB là giới hạn FE. Chưa integration test profile/backend cache/CORS; không coi API profile là partial update.
+- `uploadMediaApi` trong Đơn từ vẫn dùng `/api/media/upload` theo luồng cũ; chưa chuyển trong task avatar. Không coi mọi upload đã dùng domain riêng.
+
 ### Header và tenant
 
 Không tự thêm Authorization trong từng service. Login `/connect/token` là ngoại lệ có `Content-Type: application/x-www-form-urlencoded` và có thể thêm `x-tenant-id` từ tenant người dùng nhập.

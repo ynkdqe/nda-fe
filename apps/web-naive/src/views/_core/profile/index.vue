@@ -6,6 +6,7 @@ import { useUserStore } from '@vben/stores';
 
 import { $t } from '#/locales';
 
+import ProfileAvatarUpload from './avatar-upload.vue';
 import ProfileBase from './base-setting.vue';
 import ProfileNotificationSetting from './notification-setting.vue';
 import ProfilePasswordSetting from './password-setting.vue';
@@ -14,6 +15,12 @@ import ProfileSecuritySetting from './security-setting.vue';
 const userStore = useUserStore();
 
 const tabsValue = ref<string>('basic');
+const pendingAvatar = ref<string>();
+
+function onAvatarUploaded(url: string) {
+  pendingAvatar.value = url;
+  tabsValue.value = 'basic';
+}
 
 const tabs = ref([
   {
@@ -41,8 +48,19 @@ const tabs = ref([
     :user-info="userStore.userInfo"
     :tabs="tabs"
   >
+    <template #avatar>
+      <ProfileAvatarUpload
+        :avatar="pendingAvatar"
+        @uploaded="onAvatarUploaded"
+      />
+    </template>
     <template #content>
-      <ProfileBase v-if="tabsValue === 'basic'" />
+      <div v-show="tabsValue === 'basic'">
+        <ProfileBase
+          :pending-avatar="pendingAvatar"
+          @saved="pendingAvatar = undefined"
+        />
+      </div>
       <ProfileSecuritySetting v-if="tabsValue === 'security'" />
       <ProfilePasswordSetting v-if="tabsValue === 'password'" />
       <ProfileNotificationSetting v-if="tabsValue === 'notice'" />

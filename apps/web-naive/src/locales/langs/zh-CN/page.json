@@ -719,6 +719,24 @@
     "birthday": "生日",
     "address": "地址",
     "avatar": "头像",
+    "avatarUpload": {
+      "title": "更换头像",
+      "change": "更换头像",
+      "choose": "选择图片",
+      "chooseAnother": "选择其他图片",
+      "save": "上传图片",
+      "cancel": "取消",
+      "preview": "头像预览",
+      "hint": "请选择不超过 5 MiB 的 JPEG、PNG 或 WebP 图片。上传后请保存个人资料以应用头像。",
+      "checking": "正在检查图片…",
+      "invalidType": "请选择 JPEG、PNG 或 WebP 图片。",
+      "tooLarge": "图片大小不能超过 5 MiB。",
+      "invalidImage": "无法解码所选图片，请选择其他有效图片。",
+      "invalidEndpoint": "请配置有效的 HTTPS 上传地址（VITE_APP_UPLOAD_URL）。",
+      "invalidResponse": "上传服务未返回有效的图片地址。",
+      "pendingSave": "图片已上传。请保存个人资料以应用头像。",
+      "refreshFailed": "头像已保存，但无法刷新账户信息。无需再次保存。"
+    },
     "updateSuccess": "个人信息更新成功"
   }
 }

@@ -719,6 +719,24 @@
     "birthday": "Birthday",
     "address": "Address",
     "avatar": "Avatar",
+    "avatarUpload": {
+      "title": "Change avatar",
+      "change": "Change avatar",
+      "choose": "Choose image",
+      "chooseAnother": "Choose another image",
+      "save": "Upload image",
+      "cancel": "Cancel",
+      "preview": "Avatar preview",
+      "hint": "Choose a JPEG, PNG or WebP image, up to 5 MiB. After uploading, save your profile to apply it.",
+      "checking": "Checking image…",
+      "invalidType": "Please choose a JPEG, PNG or WebP image.",
+      "tooLarge": "The image must not exceed 5 MiB.",
+      "invalidImage": "The selected image could not be decoded. Please choose another valid image.",
+      "invalidEndpoint": "Configure a valid HTTPS upload endpoint (VITE_APP_UPLOAD_URL).",
+      "invalidResponse": "The upload service did not return a valid image URL.",
+      "pendingSave": "Image uploaded but not saved to your account. Save your profile to apply it.",
+      "refreshFailed": "Your avatar was saved, but account information could not be refreshed. You do not need to save again."
+    },
     "updateSuccess": "Profile updated successfully"
   }
 }

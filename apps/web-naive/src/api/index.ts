@@ -9,3 +9,4 @@ export * from './openiddict';
 export * from './settings';
 export * from './sms';
 export * from './tenant-management';
+export * from './upload';

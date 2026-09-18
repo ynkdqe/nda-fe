@@ -66,8 +66,11 @@ export async function getUserInfoApi() {
  * 更新用户信息
  */
 export async function updateUserInfoApi(data: any) {
-  return requestClient.put('/api/account/profile', data);
+  return requestClient.put('/api/account/profile', data, {
+    responseReturn: 'body',
+  });
 }
+
 
 /**
  * Đổi mật khẩu tài khoản hiện tại

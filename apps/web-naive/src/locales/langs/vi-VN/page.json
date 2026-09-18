@@ -719,6 +719,24 @@
     "birthday": "Ngày sinh",
     "address": "Địa chỉ",
     "avatar": "Ảnh đại diện",
+    "avatarUpload": {
+      "title": "Đổi ảnh đại diện",
+      "change": "Đổi ảnh đại diện",
+      "choose": "Chọn ảnh",
+      "chooseAnother": "Chọn ảnh khác",
+      "save": "Tải ảnh lên",
+      "cancel": "Hủy",
+      "preview": "Xem trước ảnh đại diện",
+      "hint": "Chọn ảnh JPEG, PNG hoặc WebP, tối đa 5 MiB. Sau khi tải ảnh lên, hãy lưu Hồ sơ cá nhân để áp dụng.",
+      "checking": "Đang kiểm tra ảnh…",
+      "invalidType": "Vui lòng chọn ảnh JPEG, PNG hoặc WebP.",
+      "tooLarge": "Ảnh không được vượt quá 5 MiB.",
+      "invalidImage": "Không thể đọc ảnh đã chọn. Vui lòng chọn một ảnh hợp lệ khác.",
+      "invalidEndpoint": "Chưa cấu hình endpoint upload HTTPS hợp lệ (VITE_APP_UPLOAD_URL).",
+      "invalidResponse": "Dịch vụ upload không trả về URL ảnh hợp lệ.",
+      "pendingSave": "Ảnh đã tải lên nhưng chưa lưu vào tài khoản. Hãy lưu Hồ sơ cá nhân để áp dụng.",
+      "refreshFailed": "Ảnh đại diện đã được lưu nhưng chưa thể làm mới thông tin tài khoản. Không cần lưu lại."
+    },
     "updateSuccess": "Cập nhật thông tin thành công"
   }
 }

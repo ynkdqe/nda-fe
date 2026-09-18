@@ -1,19 +1,21 @@
 <script setup lang="ts">
-import type { BasicOption } from '@vben/types';
-
 import type { VbenFormSchema } from '#/adapter/form';
 
 import { computed, nextTick, onMounted, ref } from 'vue';
 
 import { ProfileBaseSetting } from '@vben/common-ui';
-import { useUserStore } from '@vben/stores';
 
 import { message } from '#/adapter/naive';
-import { updateUserInfoApi } from '#/api';
+import { getUserInfoApi, updateUserInfoApi } from '#/api';
 import { $t } from '#/locales';
 import { useAuthStore } from '#/store';
 
-const userStore = useUserStore();
+const props = defineProps<{ pendingAvatar?: string }>();
+const emit = defineEmits<{ saved: [] }>();
+
+const saving = ref(false);
+const profileReady = ref(false);
+let profileSnapshot: Record<string, unknown> = {};
 const authStore = useAuthStore();
 const profileBaseSettingRef = ref();
 
@@ -57,17 +59,27 @@ const formSchema = computed((): VbenFormSchema[] => {
 });
 
 async function handleSubmit(values: any) {
+  if (saving.value || !profileReady.value) return;
+  saving.value = true;
   try {
-    await updateUserInfoApi({ ...values });
+    const data = { ...profileSnapshot, ...values };
+    if (props.pendingAvatar !== undefined) data.avatar = props.pendingAvatar;
+    await updateUserInfoApi(data);
+    emit('saved');
     message.success($t('page.profile.updateSuccess'));
-    await authStore.fetchUserInfo();
+    profileReady.value = false;
+    const profile = await authStore.fetchUserInfo();
+    fillForm(profile);
   } catch {
     // handled by request interceptor
+  } finally {
+    saving.value = false;
   }
 }
 
 function fillForm(data: any) {
   if (!data) return;
+  profileSnapshot = { ...data };
 
   const values = {
     ...data,
@@ -78,17 +90,23 @@ function fillForm(data: any) {
     birthday: data.birthDate || null,
   };
   profileBaseSettingRef.value?.getFormApi()?.setValues(values);
+  profileReady.value = true;
 }
 
 onMounted(async () => {
   await nextTick();
-  if (userStore.userInfo) {
-    fillForm(userStore.userInfo);
+  try {
+    fillForm(await getUserInfoApi());
+  } catch {
+    // Do not submit a profile without its original concurrency stamp.
   }
 });
 </script>
 
 <template>
+  <p v-if="pendingAvatar" class="mb-4 text-sm text-primary">
+    {{ $t('page.profile.avatarUpload.pendingSave') }}
+  </p>
   <ProfileBaseSetting
     ref="profileBaseSettingRef"
     :form-schema="formSchema"

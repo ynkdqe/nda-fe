@@ -111,6 +111,21 @@ const PREFIX = '/api/hrms/employee-request-type';
 
 Không viết `http://`, `https://`, host hoặc port trong feature service.
 
+### Upload avatar riêng tại `/profile`
+
+`src/api/upload.ts` dùng `VITE_APP_UPLOAD_URL` (URL đầy đủ, chốt lúc build):
+
+- Development: `https://upload-dev.anhnd.me/upload`.
+- Production: `https://upload.anhnd.me/upload`.
+
+POST multipart field `file` với query `storage=oci`. Service dùng URL tuyệt đối từ env qua `requestClient`, tái sử dụng Bearer token/refresh vì cùng server auth; không chuyển byte ảnh qua backend nghiệp vụ, không fallback nếu thiếu cấu hình. Request override header JSON mặc định bằng `Content-Type: null` để browser sinh multipart boundary.
+
+Contract upload nằm ở `src/models/media/upload.ts`: `MResult<UploadApi.Item>`, lấy `data.url`. Modal chỉ emit URL về trang profile làm avatar chờ lưu. Không gọi PUT trong modal: `/api/account/profile` yêu cầu đầy đủ dữ liệu (`name`, `concurrencyStamp`, các field hồ sơ), không hỗ trợ cập nhật riêng `{ avatar }`. Chỉ form Hồ sơ cá nhân gọi PUT, gộp URL mới vào dữ liệu form. Chưa integration test profile/cache/CORS.
+
+UI `views/_core/profile/avatar-upload.vue` gắn vào slot `#avatar`: chọn ảnh/preview local, upload khi xác nhận, JPEG/PNG/WebP tối đa 5 MiB. URL mới được giữ tại page và truyền vào form; không sửa user store sau upload. Form giữ dữ liệu khi đổi tab; lỗi lưu profile giữ URL chờ lưu để retry không upload lại. Refresh user store chỉ sau khi lưu hồ sơ thành công.
+
+Luồng đính kèm Đơn từ vẫn dùng `uploadMediaApi` qua `/api/media/upload`, chưa được chuyển trong task avatar. Không thêm luồng upload mới qua backend nghiệp vụ khi upload service riêng đã đáp ứng contract.
+
 ### Hai request client hiện có
 
 #### `requestClient`

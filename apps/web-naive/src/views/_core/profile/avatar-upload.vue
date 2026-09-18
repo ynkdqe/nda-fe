@@ -1,141 +1,186 @@
 <script setup lang="ts">
-import type { UploadCustomRequestOptions, UploadFileInfo } from 'naive-ui';
+import { computed, onBeforeUnmount, ref } from 'vue';
 
-import { ref, watch } from 'vue';
+import { useVbenModal, VbenAvatar } from '@vben/common-ui';
+import { preferences } from '@vben/preferences';
+import { useUserStore } from '@vben/stores';
 
-import { useAccessStore } from '@vben/stores';
-import { NUpload, useMessage } from 'naive-ui';
+import { NButton } from 'naive-ui';
 
-interface Props {
-  modelValue?: string;
-}
+import { message } from '#/adapter/naive';
+import { uploadProfileAvatarApi } from '#/api';
+import { $t } from '#/locales';
 
-const props = withDefaults(defineProps<Props>(), {
-  modelValue: '',
-});
+const props = defineProps<{ avatar?: string }>();
+const emit = defineEmits<{ uploaded: [url: string] }>();
 
-const emit = defineEmits<{
-  'update:modelValue': [string];
-}>();
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+const userStore = useUserStore();
 
-const accessStore = useAccessStore();
-const naiveMessage = useMessage();
-const uploading = ref(false);
-const fileListRef = ref<UploadFileInfo[]>([]);
+const fileInput = ref<HTMLInputElement | null>(null);
+const selectedFile = ref<File | null>(null);
+const previewUrl = ref('');
+const decoding = ref(false);
+const saving = ref(false);
+const isOpen = ref(false);
+let objectUrl = '';
 
-watch(
-  () => props.modelValue,
-  (val) => {
-    if (val) {
-      fileListRef.value = [
-        {
-          id: 'avatar-current',
-          name: 'avatar',
-          status: 'finished',
-          url: val,
-        },
-      ];
-    } else {
-      fileListRef.value = [];
-    }
-  },
-  { immediate: true },
+let selectionVersion = 0;
+let disposed = false;
+
+const currentAvatar = computed(
+  () =>
+    props.avatar || userStore.userInfo?.avatar || preferences.app.defaultAvatar,
 );
 
-async function customUploadRequest({
-  file,
-  onFinish,
-  onError,
-  onProgress,
-}: UploadCustomRequestOptions) {
-  uploading.value = true;
+function resetSelection() {
+  selectionVersion += 1;
+  selectedFile.value = null;
+  previewUrl.value = '';
 
-  const uploadUrl = import.meta.env.VITE_APP_UPLOAD_URL;
-  const token = accessStore.accessToken;
+  decoding.value = false;
+  if (objectUrl) {
+    URL.revokeObjectURL(objectUrl);
+    objectUrl = '';
+  }
+  if (fileInput.value) fileInput.value.value = '';
+}
 
-  if (!uploadUrl) {
-    naiveMessage.error('VITE_APP_UPLOAD_URL chưa được cấu hình');
-    onError();
-    uploading.value = false;
+async function handleFileChange(event: Event) {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  input.value = '';
+  if (!file || saving.value || !isOpen.value || disposed) return;
+
+  resetSelection();
+  if (!ALLOWED_TYPES.has(file.type)) {
+    message.error($t('page.profile.avatarUpload.invalidType'));
+    return;
+  }
+  if (file.size > MAX_FILE_SIZE) {
+    message.error($t('page.profile.avatarUpload.tooLarge'));
     return;
   }
 
+  const version = selectionVersion;
+  decoding.value = true;
   try {
-    const formData = new FormData();
-    formData.append('file', file.file as File);
-
-    // Use XMLHttpRequest to support upload progress
-    await new Promise<void>((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', uploadUrl, true);
-      if (token) {
-        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-      }
-
-      xhr.upload.addEventListener('progress', (e) => {
-        if (e.lengthComputable) {
-          onProgress({ percent: Math.round((e.loaded * 100) / e.total) });
-        }
-      });
-
-      xhr.addEventListener('load', () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          try {
-            const response = JSON.parse(xhr.responseText);
-            const url =
-              response?.data?.url ||
-              response?.url ||
-              response?.data?.fileUrl ||
-              response?.fileUrl ||
-              response?.data?.path ||
-              response?.path ||
-              '';
-
-            if (url) {
-              emit('update:modelValue', url);
-              onFinish();
-              resolve();
-            } else {
-              reject(new Error('Upload thành công nhưng không nhận được URL'));
-            }
-          } catch {
-            reject(new Error('Không thể đọc phản hồi từ server'));
-          }
-        } else {
-          reject(new Error(`Upload thất bại: HTTP ${xhr.status}`));
-        }
-      });
-
-      xhr.addEventListener('error', () =>
-        reject(new Error('Lỗi kết nối mạng')),
-      );
-      xhr.addEventListener('abort', () => reject(new Error('Upload bị hủy')));
-
-      xhr.send(formData);
-    });
-  } catch (error: any) {
-    naiveMessage.error(error?.message || 'Upload thất bại');
-    onError();
+    const url = URL.createObjectURL(file);
+    objectUrl = url;
+    const image = new Image();
+    image.src = url;
+    await image.decode();
+    // A newer selection, close, or unmount invalidates this decode result.
+    if (version !== selectionVersion || disposed) return;
+    if (!image.naturalWidth || !image.naturalHeight) {
+      throw new Error('Invalid image dimensions');
+    }
+    selectedFile.value = file;
+    previewUrl.value = url;
+  } catch {
+    if (version !== selectionVersion || disposed) return;
+    resetSelection();
+    message.error($t('page.profile.avatarUpload.invalidImage'));
   } finally {
-    uploading.value = false;
+    if (version === selectionVersion) decoding.value = false;
   }
 }
 
-function handleChange(data: { fileList: UploadFileInfo[] }) {
-  fileListRef.value = data.fileList;
-  if (data.fileList.length === 0) {
-    emit('update:modelValue', '');
+async function handleSave() {
+  const file = selectedFile.value;
+
+  if (!file || decoding.value || saving.value || !isOpen.value || disposed) {
+    return;
+  }
+
+  saving.value = true;
+  modalApi.lock();
+  let saved = false;
+  try {
+    const avatar = await uploadProfileAvatarApi(file);
+    if (disposed) return;
+    emit('uploaded', avatar);
+    saved = true;
+    message.info($t('page.profile.avatarUpload.pendingSave'));
+  } catch {
+    // The upload service already notifies errors; keep the selection for retry.
+  } finally {
+    saving.value = false;
+    modalApi.unlock();
+    if (saved && !disposed) await modalApi.close();
   }
 }
+
+const [Modal, modalApi] = useVbenModal({
+  fullscreenButton: false,
+  onBeforeClose: () => !saving.value,
+  onConfirm: handleSave,
+  onOpenChange(open) {
+    isOpen.value = open;
+    resetSelection();
+  },
+});
+
+onBeforeUnmount(() => {
+  disposed = true;
+  resetSelection();
+});
 </script>
 
 <template>
-  <NUpload
-    :custom-request="customUploadRequest"
-    :file-list="fileListRef"
-    :max="1"
-    accept="image/png,image/jpeg,image/gif,image/webp"
-    list-type="image-card"
-    @change="handleChange"
+  <VbenAvatar
+    :src="currentAvatar"
+    :alt="$t('page.profile.avatar')"
+    class="size-20"
   />
+  <NButton size="small" :disabled="saving" @click="modalApi.open()">
+    {{ $t('page.profile.avatarUpload.change') }}
+  </NButton>
+  <Modal
+    :title="$t('page.profile.avatarUpload.title')"
+    :confirm-text="$t('page.profile.avatarUpload.save')"
+    :cancel-text="$t('page.profile.avatarUpload.cancel')"
+    :confirm-disabled="!selectedFile || decoding || saving"
+    :confirm-loading="saving"
+    :closable="!saving"
+    :close-on-click-modal="!saving"
+    :close-on-press-escape="!saving"
+    class="md:w-[440px]"
+  >
+    <div class="flex flex-col items-center gap-4">
+      <VbenAvatar
+        :src="previewUrl || currentAvatar"
+        :alt="$t('page.profile.avatarUpload.preview')"
+        class="size-40"
+      />
+      <p class="text-muted-foreground text-center text-sm">
+        {{ $t('page.profile.avatarUpload.hint') }}
+      </p>
+      <input
+        ref="fileInput"
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        :aria-label="$t('page.profile.avatarUpload.choose')"
+        :disabled="saving"
+        class="hidden"
+        @change="handleFileChange"
+      />
+      <NButton :disabled="saving" @click="fileInput?.click()">
+        {{
+          $t(
+            selectedFile
+              ? 'page.profile.avatarUpload.chooseAnother'
+              : 'page.profile.avatarUpload.choose',
+          )
+        }}
+      </NButton>
+      <p v-if="decoding" role="status" class="text-sm">
+        {{ $t('page.profile.avatarUpload.checking') }}
+      </p>
+      <p v-else-if="selectedFile" class="max-w-full break-all text-sm">
+        {{ selectedFile.name }}
+      </p>
+    </div>
+  </Modal>
 </template>
