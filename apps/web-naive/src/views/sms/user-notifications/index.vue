@@ -70,7 +70,8 @@ function mapToUiItem(item: SmsNotificationApi.NotificationItem) {
       : '',
     id: item.id ?? crypto.randomUUID?.() ?? String(Math.random()),
     // The backend filters receivers to the currently signed-in user.
-    isRead: item.notificationReceivers?.[0]?.status === NotificationStatusEnum.Read,
+    isRead:
+      item.notificationReceivers?.[0]?.status === NotificationStatusEnum.Read,
     message: item.message ?? '',
     raw: item,
     senderName: item.senderName,
