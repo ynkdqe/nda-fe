@@ -217,7 +217,8 @@
       "employeeFilter": {
         "label": "Employee",
         "placeholder": "Select an employee",
-        "hint": "Leave empty to view my attendance",
+        "collapse": "Collapse employee selector",
+        "expand": "Expand employee selector",
         "noAccount": "This employee has no linked account. Attendance cannot be displayed."
       },
       "calendar": {

@@ -217,7 +217,8 @@
       "employeeFilter": {
         "label": "Nhân viên",
         "placeholder": "Chọn nhân viên",
-        "hint": "Để trống để xem chấm công của tôi",
+        "collapse": "Thu gọn phần chọn nhân viên",
+        "expand": "Mở rộng phần chọn nhân viên",
         "noAccount": "Nhân viên chưa liên kết tài khoản, không thể xem lịch chấm công."
       },
       "calendar": {

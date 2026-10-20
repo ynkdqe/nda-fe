@@ -217,7 +217,8 @@
       "employeeFilter": {
         "label": "员工",
         "placeholder": "选择员工",
-        "hint": "留空以查看我的考勤",
+        "collapse": "收起员工选择",
+        "expand": "展开员工选择",
         "noAccount": "该员工尚未关联账户，无法查看考勤。"
       },
       "calendar": {

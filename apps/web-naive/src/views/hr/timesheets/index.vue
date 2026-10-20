@@ -8,9 +8,10 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue';
 
 import { useAccess } from '@vben/access';
 import { Page } from '@vben/common-ui';
+import { IconifyIcon } from '@vben/icons';
 import { $t } from '@vben/locales';
 
-import { NCard } from 'naive-ui';
+import { NButton, NCard } from 'naive-ui';
 
 import { message } from '#/adapter/naive';
 import {
@@ -75,7 +76,15 @@ const dataSource = ref<Awaited<ReturnType<typeof getTimesheetListApi>>>();
 const loading = ref(false);
 const selectedEmployeeId = ref<number | string>();
 const { hasAccessByCodes } = useAccess();
-const canViewAll = computed(() => hasAccessByCodes(['TimeSheet.ViewAll']));
+const canViewAll = computed(() => hasAccessByCodes(['Hrms.TimeSheet.ViewAll']));
+const employeeFilterExpanded = ref(true);
+const employeeFilterToggleLabel = computed(() =>
+  $t(
+    employeeFilterExpanded.value
+      ? 'page.hr.attendancePage.employeeFilter.collapse'
+      : 'page.hr.attendancePage.employeeFilter.expand',
+  ),
+);
 let requestSequence = 0;
 
 function selectEmployee(
@@ -213,14 +222,41 @@ onBeforeUnmount(() => {
   <Page>
     <div class="timesheet-page">
       <NCard v-if="canViewAll" :bordered="false" class="mb-4">
-        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-          <label for="attendance-employee" class="shrink-0 text-sm font-medium">
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-sm font-medium">
             {{ $t('page.hr.attendancePage.employeeFilter.label') }}
-          </label>
+          </span>
+          <NButton
+            circle
+            quaternary
+            size="small"
+            :aria-label="employeeFilterToggleLabel"
+            :title="employeeFilterToggleLabel"
+            :aria-expanded="employeeFilterExpanded"
+            aria-controls="attendance-employee-filter"
+            @click="employeeFilterExpanded = !employeeFilterExpanded"
+          >
+            <template #icon>
+              <IconifyIcon
+                :icon="
+                  employeeFilterExpanded
+                    ? 'lucide:chevron-up'
+                    : 'lucide:chevron-down'
+                "
+              />
+            </template>
+          </NButton>
+        </div>
+        <div
+          v-show="employeeFilterExpanded"
+          id="attendance-employee-filter"
+          class="mt-2"
+        >
           <EmployeeSearchSelect
             id="attendance-employee"
             class="w-full sm:w-80"
             mode="single"
+            :aria-label="$t('page.hr.attendancePage.employeeFilter.label')"
             :disabled="!canViewAll"
             :model-value="selectedEmployeeId"
             :placeholder="
@@ -228,9 +264,6 @@ onBeforeUnmount(() => {
             "
             @update:model-value="selectEmployee"
           />
-          <span class="text-sm text-muted-foreground">
-            {{ $t('page.hr.attendancePage.employeeFilter.hint') }}
-          </span>
         </div>
       </NCard>
       <div class="timesheet-layout">
