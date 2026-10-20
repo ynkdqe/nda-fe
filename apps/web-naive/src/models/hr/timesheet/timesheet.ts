@@ -42,6 +42,7 @@ export namespace TimesheetApi {
 
   export interface TimesheetListParams {
     month?: number;
+    userId?: string;
     year?: number;
   }
 

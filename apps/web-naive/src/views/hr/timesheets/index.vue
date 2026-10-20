@@ -4,17 +4,22 @@ import type {
   TimesheetStatisticItem,
 } from '#/models/hr/timesheet';
 
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, ref, watch } from 'vue';
 
+import { useAccess } from '@vben/access';
 import { Page } from '@vben/common-ui';
 import { $t } from '@vben/locales';
 
+import { NCard } from 'naive-ui';
+
 import { message } from '#/adapter/naive';
 import {
+  getEmployeeByIdApi,
   getTimesheetListApi,
   syncTimesheetsApi,
   syncTimesheetsV2Api,
 } from '#/api';
+import EmployeeSearchSelect from '#/components/EmployeeSearchSelect.vue';
 
 import TimesheetCalendar from './TimesheetCalendar.vue';
 import TimesheetMonthlyDetail from './TimesheetMonthlyDetail.vue';
@@ -68,6 +73,17 @@ const calendarValue = ref(toDateKey(currentMonth));
 const selectedDate = ref(today);
 const dataSource = ref<Awaited<ReturnType<typeof getTimesheetListApi>>>();
 const loading = ref(false);
+const selectedEmployeeId = ref<number | string>();
+const { hasAccessByCodes } = useAccess();
+const canViewAll = computed(() => hasAccessByCodes(['TimeSheet.ViewAll']));
+let requestSequence = 0;
+
+function selectEmployee(
+  value: (number | string)[] | number | string | undefined,
+) {
+  if (!canViewAll.value) return;
+  selectedEmployeeId.value = Array.isArray(value) ? undefined : value;
+}
 
 function handleSync(version: 'v1' | 'v2') {
   const period = getMonthStartPeriod(calendarValue.value);
@@ -79,17 +95,37 @@ function handleSync(version: 'v1' | 'v2') {
   message.success($t('page.hr.attendancePage.sync.success'));
 }
 
-async function fetchTimesheetData(selected?: string) {
+async function fetchTimesheetData() {
+  const sequence = ++requestSequence;
+  const target = parseDateKey(calendarValue.value);
+  const employeeId = canViewAll.value ? selectedEmployeeId.value : undefined;
   loading.value = true;
+  dataSource.value = undefined;
 
   try {
-    const target = parseDateKey(selected ?? calendarValue.value);
-    dataSource.value = await getTimesheetListApi({
+    let userId: string | undefined;
+    if (employeeId !== undefined) {
+      // EmployeeSearchSelect returns employee.id, not the linked account's userId.
+      const employee = await getEmployeeByIdApi(employeeId);
+      if (sequence !== requestSequence) return;
+      userId = employee.data?.userId?.trim() || undefined;
+      if (!userId) {
+        message.warning($t('page.hr.attendancePage.employeeFilter.noAccount'));
+        return;
+      }
+      if (!canViewAll.value) return;
+    }
+    const result = await getTimesheetListApi({
       month: target.getMonth() + 1,
       year: target.getFullYear(),
+      ...(userId ? { userId } : {}),
     });
+    // A previous employee/month request must never overwrite the current selection.
+    if (sequence === requestSequence) dataSource.value = result;
+  } catch {
+    // The request interceptor displays backend errors; keep the current view empty.
   } finally {
-    loading.value = false;
+    if (sequence === requestSequence) loading.value = false;
   }
 }
 
@@ -155,17 +191,48 @@ const statistics = computed<TimesheetStatisticItem[]>(() => {
   ];
 });
 
-onMounted(() => fetchTimesheetData(calendarValue.value));
+watch(
+  [calendarValue, selectedEmployeeId, canViewAll],
+  ([month, employeeId, allowed]) => {
+    if (!allowed && employeeId !== undefined) {
+      selectedEmployeeId.value = undefined;
+      return;
+    }
+    selectedDate.value = month === toDateKey(currentMonth) ? today : month;
+    void fetchTimesheetData();
+  },
+  { immediate: true },
+);
 
-watch(calendarValue, (value) => {
-  selectedDate.value = value;
-  fetchTimesheetData(value);
+onBeforeUnmount(() => {
+  requestSequence += 1;
 });
 </script>
 
 <template>
   <Page>
     <div class="timesheet-page">
+      <NCard v-if="canViewAll" :bordered="false" class="mb-4">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+          <label for="attendance-employee" class="shrink-0 text-sm font-medium">
+            {{ $t('page.hr.attendancePage.employeeFilter.label') }}
+          </label>
+          <EmployeeSearchSelect
+            id="attendance-employee"
+            class="w-full sm:w-80"
+            mode="single"
+            :disabled="!canViewAll"
+            :model-value="selectedEmployeeId"
+            :placeholder="
+              $t('page.hr.attendancePage.employeeFilter.placeholder')
+            "
+            @update:model-value="selectEmployee"
+          />
+          <span class="text-sm text-muted-foreground">
+            {{ $t('page.hr.attendancePage.employeeFilter.hint') }}
+          </span>
+        </div>
+      </NCard>
       <div class="timesheet-layout">
         <TimesheetCalendar
           v-model:model-value="calendarValue"

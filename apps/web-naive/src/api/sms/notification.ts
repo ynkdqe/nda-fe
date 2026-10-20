@@ -94,7 +94,7 @@ export async function fetchNotificationList(
   params: SmsNotificationApi.NotificationListParams,
 ) {
   return requestClient.get<
-    SmsNotificationApi.NotificationListResult<SmsNotificationApi.NotificationUserItem>
+    SmsNotificationApi.NotificationListResult<SmsNotificationApi.NotificationItem>
   >('/api/sms/notification', {
     params,
     responseReturn: 'body',

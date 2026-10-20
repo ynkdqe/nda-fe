@@ -42,7 +42,7 @@ type UiNotification = {
   id: string;
   isRead: boolean;
   message: string;
-  raw: SmsNotificationApi.NotificationUserItem;
+  raw: SmsNotificationApi.NotificationItem;
   senderName?: null | string;
   title: string;
 };
@@ -62,14 +62,15 @@ const query = reactive({
   status: undefined as number | string | undefined,
 });
 
-function mapToUiItem(item: SmsNotificationApi.NotificationUserItem) {
+function mapToUiItem(item: SmsNotificationApi.NotificationItem) {
   return {
     avatar: item.icon || undefined,
     date: item.creationTime
       ? (formatDate(item.creationTime, 'DD-MM-YYYY HH:mm:ss') as string) || ''
       : '',
     id: item.id ?? crypto.randomUUID?.() ?? String(Math.random()),
-    isRead: item.status === NotificationStatusEnum.Read,
+    // The backend filters receivers to the currently signed-in user.
+    isRead: item.notificationReceivers?.[0]?.status === NotificationStatusEnum.Read,
     message: item.message ?? '',
     raw: item,
     senderName: item.senderName,
