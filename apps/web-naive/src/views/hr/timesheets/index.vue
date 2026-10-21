@@ -74,6 +74,7 @@ const calendarValue = ref(toDateKey(currentMonth));
 const selectedDate = ref(today);
 const dataSource = ref<Awaited<ReturnType<typeof getTimesheetListApi>>>();
 const loading = ref(false);
+const syncing = ref(false);
 const selectedEmployeeId = ref<number | string>();
 const { hasAccessByCodes } = useAccess();
 const canViewAll = computed(() => hasAccessByCodes(['Hrms.TimeSheet.ViewAll']));
@@ -94,14 +95,47 @@ function selectEmployee(
   selectedEmployeeId.value = Array.isArray(value) ? undefined : value;
 }
 
-function handleSync(version: 'v1' | 'v2') {
-  const period = getMonthStartPeriod(calendarValue.value);
-  const request = version === 'v1' ? syncTimesheetsApi : syncTimesheetsV2Api;
+async function handleSync(version: 'v1' | 'v2') {
+  if (syncing.value) return;
+  const month = calendarValue.value;
+  const employeeId = selectedEmployeeId.value;
+  if (employeeId !== undefined && !canViewAll.value) return;
 
-  request(period).catch(() => {
-    message.error($t('page.hr.attendancePage.sync.error'));
-  });
-  message.success($t('page.hr.attendancePage.sync.success'));
+  syncing.value = true;
+  try {
+    const period = getMonthStartPeriod(month);
+    if (version === 'v2') {
+      let userId: string | undefined;
+      if (employeeId !== undefined) {
+        const employee = await getEmployeeByIdApi(employeeId);
+        // Do not start a sync for an outdated selection or after permission changes.
+        if (
+          employeeId !== selectedEmployeeId.value ||
+          month !== calendarValue.value ||
+          !canViewAll.value
+        )
+          return;
+        userId = employee.data?.userId?.trim() || undefined;
+        if (!userId) {
+          message.warning(
+            $t('page.hr.attendancePage.employeeFilter.noAccount'),
+          );
+          return;
+        }
+      }
+      await syncTimesheetsV2Api({
+        period: period.replaceAll('/', '-'),
+        ...(userId ? { userId } : {}),
+      });
+    } else {
+      await syncTimesheetsApi(period);
+    }
+    message.success($t('page.hr.attendancePage.sync.success'));
+  } catch {
+    // Request errors are already displayed by the shared interceptor.
+  } finally {
+    syncing.value = false;
+  }
 }
 
 async function fetchTimesheetData() {
@@ -279,6 +313,7 @@ onBeforeUnmount(() => {
           :month-label="formatMonthLabel(calendarValue)"
           :overview="overviewMetrics"
           :statistics="statistics"
+          :syncing="syncing"
           @sync="handleSync"
         />
       </div>

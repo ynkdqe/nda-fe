@@ -46,6 +46,11 @@ export namespace TimesheetApi {
     year?: number;
   }
 
+  export interface SyncV2Params {
+    period: string;
+    userId?: string;
+  }
+
   export type TimesheetListResult = MResult<
     TimesheetItem[],
     TimesheetDataExtend

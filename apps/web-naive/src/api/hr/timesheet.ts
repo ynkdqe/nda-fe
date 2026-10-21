@@ -21,9 +21,9 @@ export function syncTimesheetsApi(period: string) {
   });
 }
 
-export function syncTimesheetsV2Api(period: string) {
+export function syncTimesheetsV2Api(params: TimesheetApi.SyncV2Params) {
   return requestClient.post('/api/timesheets/gg-sync-v2', undefined, {
-    params: { period },
+    params,
     responseReturn: 'body',
   });
 }

@@ -23,6 +23,7 @@ const props = defineProps<{
   monthLabel: string;
   overview: TimesheetOverviewItem[];
   statistics: TimesheetStatisticItem[];
+  syncing?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -74,12 +75,20 @@ const normalizedOverview = computed(() => {
         <NPopconfirm
           :negative-text="$t('page.hr.attendancePage.sync.cancel')"
           :positive-text="$t('page.hr.attendancePage.sync.confirm')"
+          :positive-button-props="{ disabled: syncing, loading: syncing }"
           @positive-click="() => emit('sync', 'v2')"
         >
           <template #trigger>
             <NTooltip trigger="hover">
               <template #trigger>
-                <NButton circle quaternary size="small" type="primary">
+                <NButton
+                  circle
+                  quaternary
+                  size="small"
+                  type="primary"
+                  :disabled="syncing"
+                  :loading="syncing"
+                >
                   <template #icon>
                     <IconifyIcon icon="lucide:refresh-ccw" />
                   </template>
