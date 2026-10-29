@@ -11,6 +11,16 @@ export function getAnalyticUserCountApi() {
   );
 }
 
+export function getOciOutboundApi(
+  params: AnalyticApi.OciOutboundParams,
+  signal?: AbortSignal,
+) {
+  return requestClient.get<AnalyticApi.OciOutboundResponse>(
+    '/api/analytic/oci/outbound',
+    { params, responseReturn: 'body', signal },
+  );
+}
+
 export async function getAnalyticApi() {
   return requestClient.get<AnalyticApi.AnalyticResult>('/api/analytic', {
     responseReturn: 'body',

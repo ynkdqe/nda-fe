@@ -26,7 +26,12 @@
       },
       "tabs": {
         "trafficTrends": "Traffic Trends",
-        "monthlyVisits": "Monthly Visits"
+        "monthlyVisits": "Monthly Outbound Traffic"
+      },
+      "outbound": {
+        "tenant": "Oracle tenant",
+        "month": "Month",
+        "empty": "No data for the selected month"
       },
       "cards": {
         "visitCount": "Visit Count",

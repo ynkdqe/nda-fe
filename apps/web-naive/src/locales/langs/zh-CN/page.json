@@ -26,7 +26,12 @@
       },
       "tabs": {
         "trafficTrends": "流量趋势",
-        "monthlyVisits": "月访问量"
+        "monthlyVisits": "每月出站流量"
+      },
+      "outbound": {
+        "tenant": "Oracle 租户",
+        "month": "月份",
+        "empty": "所选月份暂无数据"
       },
       "cards": {
         "visitCount": "访问数量",

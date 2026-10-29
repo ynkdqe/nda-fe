@@ -26,7 +26,12 @@
       },
       "tabs": {
         "trafficTrends": "Xu hướng lưu lượng",
-        "monthlyVisits": "Lượt truy cập theo tháng"
+        "monthlyVisits": "Lưu lượng đi ra theo tháng"
+      },
+      "outbound": {
+        "tenant": "Tenant Oracle",
+        "month": "Tháng",
+        "empty": "Không có dữ liệu trong tháng đã chọn"
       },
       "cards": {
         "visitCount": "Số lượt truy cập",
