@@ -235,7 +235,8 @@
         }
       },
       "status": {
-        "lateOrEarly": "迟到/早退"
+        "lateOrEarly": "迟到/早退",
+        "missing": "缺勤记录"
       },
       "summary": {
         "actualWorkdays": "实际出勤天数",

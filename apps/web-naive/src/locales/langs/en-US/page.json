@@ -235,7 +235,8 @@
         }
       },
       "status": {
-        "lateOrEarly": "Late/Early leave"
+        "lateOrEarly": "Late/Early leave",
+        "missing": "Missing attendance"
       },
       "summary": {
         "actualWorkdays": "Actual workdays",

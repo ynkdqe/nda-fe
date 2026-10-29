@@ -235,7 +235,8 @@
         }
       },
       "status": {
-        "lateOrEarly": "Đi muộn/về sớm"
+        "lateOrEarly": "Đi muộn/về sớm",
+        "missing": "Thiếu công"
       },
       "summary": {
         "actualWorkdays": "Ngày công thực tế",

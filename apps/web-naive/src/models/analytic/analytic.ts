@@ -13,8 +13,15 @@ export namespace AnalyticApi {
   }
 
   export interface AnalyticResultData {
-    details?: null | AnalyticDetail[];
+    details?: AnalyticDetail[] | null;
   }
 
   export type AnalyticResult = MResult<AnalyticResultData>;
+
+  export interface UserCount {
+    totalUsers: number;
+    currentTenantUsers: number;
+  }
+
+  export type UserCountResult = MResult<UserCount>;
 }

@@ -103,7 +103,10 @@ const calendarData = computed(() => {
       badges.push({ text: 'Vắng', type: 'danger' });
     } else if (record.isMissing) {
       entryType = 'missing';
-      badges.push({ text: 'Thiếu công', type: 'danger' });
+      badges.push({
+        text: $t('page.hr.attendancePage.status.missing'),
+        type: 'danger',
+      });
     } else if (record.isLate) {
       entryType = 'late';
       badges.push({

@@ -19,7 +19,7 @@ import {
 } from '@vben/icons';
 import { $t } from '@vben/locales';
 
-import { getAnalyticApi } from '#/api';
+import { getAnalyticApi, getAnalyticUserCountApi } from '#/api';
 
 import AnalyticsTrends from './analytics-trends.vue';
 import AnalyticsVisitsData from './analytics-visits-data.vue';
@@ -30,6 +30,17 @@ import AnalyticsVisits from './analytics-visits.vue';
 const analyticData = ref<AnalyticApi.AnalyticResultData | null>(null);
 const analyticError = ref<unknown>(null);
 const analyticLoading = ref(false);
+const userCount = ref<AnalyticApi.UserCount | null>(null);
+
+async function loadUserCount() {
+  try {
+    const response = await getAnalyticUserCountApi();
+    userCount.value = response.data ?? null;
+  } catch {
+    // The shared interceptor displays the backend error.
+    userCount.value = null;
+  }
+}
 
 async function loadAnalyticData() {
   analyticLoading.value = true;
@@ -47,6 +58,7 @@ async function loadAnalyticData() {
 
 onMounted(() => {
   void loadAnalyticData();
+  void loadUserCount();
 });
 
 function getAnalyticDetail(type: AnalyticApi.AnalyticDetailType) {
@@ -89,8 +101,8 @@ const overviewItems = computed<AnalysisOverviewItem[]>(() => [
     icon: SvgCardIcon,
     title: $t('page.dashboard.analyticsPage.overview.users'),
     totalTitle: $t('page.dashboard.analyticsPage.overview.totalUsers'),
-    totalValue: 120_000,
-    value: 2000,
+    totalValue: userCount.value?.totalUsers ?? 0,
+    value: userCount.value?.currentTenantUsers ?? 0,
   },
   {
     icon: SvgCakeIcon,
