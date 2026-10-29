@@ -30,6 +30,7 @@
       },
       "outbound": {
         "tenant": "Tenant Oracle",
+                "total": "Tổng lưu lượng",
         "month": "Tháng",
         "empty": "Không có dữ liệu trong tháng đã chọn"
       },

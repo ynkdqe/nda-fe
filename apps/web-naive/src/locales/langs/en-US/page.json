@@ -30,6 +30,7 @@
       },
       "outbound": {
         "tenant": "Oracle tenant",
+                "total": "Total traffic",
         "month": "Month",
         "empty": "No data for the selected month"
       },

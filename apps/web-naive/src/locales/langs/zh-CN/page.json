@@ -30,6 +30,7 @@
       },
       "outbound": {
         "tenant": "Oracle 租户",
+                "total": "总流量",
         "month": "月份",
         "empty": "所选月份暂无数据"
       },
