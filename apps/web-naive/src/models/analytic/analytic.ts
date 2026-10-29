@@ -26,7 +26,8 @@ export namespace AnalyticApi {
   export type UserCountResult = MResult<UserCount>;
 
   export interface OciOutboundParams {
-    month: string;
+    month: number;
+    year: number;
     etenant: 'mrdua9x' | 'nguyettun97' | 'ynkdqe';
   }
 

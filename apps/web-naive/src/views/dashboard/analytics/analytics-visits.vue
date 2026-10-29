@@ -5,10 +5,11 @@ import type { AnalyticApi } from '#/models/analytic';
 
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
+import { IconifyIcon } from '@vben/icons';
 import { $t } from '@vben/locales';
 import { EchartsUI, useEcharts } from '@vben/plugins/echarts';
 
-import { NDatePicker, NEmpty, NFormItem, NSelect, NSpin } from 'naive-ui';
+import { NButton, NDatePicker, NEmpty, NFormItem, NPopover, NSelect, NSpin } from 'naive-ui';
 
 import { getOciOutboundApi } from '#/api';
 
@@ -83,7 +84,11 @@ async function loadOutbound() {
   response.value = null;
   try {
     const result = await getOciOutboundApi(
-      { etenant: tenant.value, month: month.value },
+      {
+        etenant: tenant.value,
+        month: Number(month.value.slice(5, 7)),
+        year: Number(month.value.slice(0, 4)),
+      },
       request.signal,
     );
     if (!request.signal.aborted) response.value = result;
@@ -103,18 +108,55 @@ onBeforeUnmount(() => controller?.abort());
 
 <template>
   <div>
-    <div class="flex flex-wrap gap-x-4">
-      <NFormItem :label="$t('page.dashboard.analyticsPage.outbound.tenant')">
-        <NSelect v-model:value="tenant" :options="tenantOptions" class="w-52" />
-      </NFormItem>
-      <NFormItem :label="$t('page.dashboard.analyticsPage.outbound.month')">
-        <NDatePicker
-          v-model:formatted-value="month"
-          type="month"
-          value-format="yyyy-MM"
-          :clearable="false"
-        />
-      </NFormItem>
+    <div class="flex items-center justify-end gap-2">
+      <span class="text-muted-foreground text-xs">{{ tenant }} · {{ month }}</span>
+      <NPopover trigger="click" placement="bottom-end">
+        <template #trigger>
+          <NButton
+            quaternary
+            circle
+            size="small"
+            :aria-label="$t('page.dashboard.analyticsPage.outbound.tenant')"
+            :title="$t('page.dashboard.analyticsPage.outbound.tenant')"
+          >
+            <template #icon>
+              <IconifyIcon icon="lucide:users" />
+            </template>
+          </NButton>
+        </template>
+        <NFormItem
+          :label="$t('page.dashboard.analyticsPage.outbound.tenant')"
+          :show-feedback="false"
+        >
+          <NSelect v-model:value="tenant" :options="tenantOptions" class="w-52" />
+        </NFormItem>
+      </NPopover>
+      <NPopover trigger="click" placement="bottom-end">
+        <template #trigger>
+          <NButton
+            quaternary
+            circle
+            size="small"
+            :aria-label="$t('page.dashboard.analyticsPage.outbound.month')"
+            :title="$t('page.dashboard.analyticsPage.outbound.month')"
+          >
+            <template #icon>
+              <IconifyIcon icon="lucide:calendar-days" />
+            </template>
+          </NButton>
+        </template>
+        <NFormItem
+          :label="$t('page.dashboard.analyticsPage.outbound.month')"
+          :show-feedback="false"
+        >
+          <NDatePicker
+            v-model:formatted-value="month"
+            type="month"
+            value-format="yyyy-MM"
+            :clearable="false"
+          />
+        </NFormItem>
+      </NPopover>
     </div>
     <NSpin :show="loading">
       <NEmpty
