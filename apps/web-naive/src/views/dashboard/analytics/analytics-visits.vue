@@ -56,14 +56,15 @@ function renderChart() {
     legend: { show: groups.size > 1 },
     tooltip: { trigger: 'axis' },
     xAxis: { data: dates, name: 'UTC', type: 'category' },
-    yAxis: units.length > 0
-      ? units.map((unit, index) => ({
-          name: unit,
-          offset: index > 1 ? (index - 1) * 60 : 0,
-          splitNumber: 4,
-          type: 'value' as const,
-        }))
-      : [{ type: 'value' as const }],
+    yAxis:
+      units.length > 0
+        ? units.map((unit, index) => ({
+            name: unit,
+            offset: index > 1 ? (index - 1) * 60 : 0,
+            splitNumber: 4,
+            type: 'value' as const,
+          }))
+        : [{ type: 'value' as const }],
     series: [...groups.values()].map((group) => ({
       barMaxWidth: 40,
       data: dates.map((date) => group.values.get(date) ?? null),
