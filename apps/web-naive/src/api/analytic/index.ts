@@ -21,6 +21,16 @@ export function getOciOutboundApi(
   );
 }
 
+export function getOciHourlyChartApi(
+  params: AnalyticApi.OciHourlyChartParams,
+  signal?: AbortSignal,
+) {
+  return requestClient.get<AnalyticApi.OciHourlyChartResponse>(
+    '/api/analytic/oci/outbound/hourly-chart',
+    { params, responseReturn: 'body', signal },
+  );
+}
+
 export async function getAnalyticApi() {
   return requestClient.get<AnalyticApi.AnalyticResult>('/api/analytic', {
     responseReturn: 'body',

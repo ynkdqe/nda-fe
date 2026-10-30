@@ -31,6 +31,35 @@ export namespace AnalyticApi {
     etenant: 'mrdua9x' | 'nguyettun97' | 'ynkdqe';
   }
 
+  export type OciHourlyChartParams = Pick<OciOutboundParams, 'etenant'>;
+
+  export interface OciHourlyCategoryAxis {
+    type: 'category';
+    data: string[];
+  }
+
+  export interface OciHourlyValueAxis {
+    type: 'value';
+  }
+
+  export interface OciHourlySeries {
+    name: string;
+    data: (null | number)[];
+    datesUtc: string[];
+    type: 'line';
+    smooth: boolean;
+    areaStyle: Record<string, never>;
+  }
+
+  export interface OciHourlyChartResponse {
+    xAxis: OciHourlyCategoryAxis;
+    yAxis: OciHourlyValueAxis;
+    series: OciHourlySeries[];
+    skuPartNumber: string;
+    unit: string;
+    timeZone: string;
+  }
+
   export interface OciUsageTotal {
     skuPartNumber: string;
     unit: string;

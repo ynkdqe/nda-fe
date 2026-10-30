@@ -42,7 +42,8 @@
       "chart": {
         "monthLabel": "Month {0}",
         "visits": "Visits",
-        "trend": "Trend"
+        "trend": "Trend",
+                "empty": "No traffic data available"
       },
       "platform": {
         "web": "Web",

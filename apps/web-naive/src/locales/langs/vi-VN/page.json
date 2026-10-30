@@ -42,7 +42,8 @@
       "chart": {
         "monthLabel": "Tháng {0}",
         "visits": "Lượt truy cập",
-        "trend": "Xu hướng"
+        "trend": "Xu hướng",
+                "empty": "Không có dữ liệu lưu lượng"
       },
       "platform": {
         "web": "Web",

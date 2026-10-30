@@ -42,7 +42,8 @@
       "chart": {
         "monthLabel": "{0}月",
         "visits": "访问",
-        "trend": "趋势"
+        "trend": "趋势",
+                "empty": "暂无流量数据"
       },
       "platform": {
         "web": "网页",
