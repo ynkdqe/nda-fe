@@ -30,7 +30,9 @@ let controller: AbortController | undefined;
 const hasData = computed(() => {
   const result = response.value;
   return (result?.xAxis?.data ?? []).some((_, index) =>
-    (result?.series ?? []).some((series) => Number.isFinite(series.data?.[index])),
+    (result?.series ?? []).some((series) =>
+      Number.isFinite(series.data?.[index]),
+    ),
   );
 });
 
@@ -56,7 +58,8 @@ function renderChart() {
       data: labels.map((_, index) => {
         const value = series.data?.[index];
         return {
-          value: typeof value === 'number' && Number.isFinite(value) ? value : null,
+          value:
+            typeof value === 'number' && Number.isFinite(value) ? value : null,
           datesUtc: series.datesUtc?.[index],
         };
       }),
@@ -103,7 +106,9 @@ onBeforeUnmount(() => controller?.abort());
           :key="option.value"
           type="button"
           class="flex items-center gap-1 rounded px-1 py-1 text-xs transition-opacity hover:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-          :class="tenant === option.value ? 'font-semibold opacity-100' : 'opacity-50'"
+          :class="
+            tenant === option.value ? 'font-semibold opacity-100' : 'opacity-50'
+          "
           :aria-pressed="tenant === option.value"
           @click="tenant = option.value"
         >
@@ -116,7 +121,8 @@ onBeforeUnmount(() => controller?.abort());
         </button>
       </div>
       <span v-if="response" class="text-muted-foreground text-xs">
-        {{ response.skuPartNumber }} · {{ response.unit }} · {{ response.timeZone }}
+        {{ response.skuPartNumber }} · {{ response.unit }} ·
+        {{ response.timeZone }}
       </span>
     </div>
     <NSpin :show="loading">
