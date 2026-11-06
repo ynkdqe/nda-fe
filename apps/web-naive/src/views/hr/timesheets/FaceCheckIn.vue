@@ -9,7 +9,15 @@ import { useVbenModal } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
 import { $t } from '@vben/locales';
 
-import { NButton, NCard, NCheckbox, NDropdown, NResult, NSpin } from 'naive-ui';
+import {
+  NButton,
+  NCard,
+  NCheckbox,
+  NDropdown,
+  NProgress,
+  NResult,
+  NSpin,
+} from 'naive-ui';
 
 import { message } from '#/adapter/naive';
 import { faceCheckInApi, getFaceAttendanceStatusApi } from '#/api';
@@ -421,13 +429,35 @@ onBeforeUnmount(() => {
         :description="outcome.success ? undefined : outcome.message"
         size="small"
       >
-        <template v-if="outcome.success" #footer>
+        <template
+          v-if="outcome.data?.eventTime || outcome.data?.scorePercent != null"
+          #footer
+        >
           <div class="face-check-in__result">
             <div v-if="outcome.data?.eventTime">
               {{ t('time') }}: <b>{{ formatTime(outcome.data.eventTime) }}</b>
             </div>
-            <div v-if="outcome.data?.scorePercent != null">
-              {{ t('score') }}: <b>{{ outcome.data.scorePercent }}%</b>
+            <!-- Có cả khi không khớp (NotMatch) để user biết còn thiếu bao nhiêu -->
+            <div
+              v-if="outcome.data?.scorePercent != null"
+              class="face-check-in__score"
+            >
+              <span>
+                {{ t('score') }}:
+                <b :class="outcome.success ? 'text-success' : 'text-destructive'">
+                  {{ outcome.data.scorePercent }}%
+                </b>
+                <span class="face-check-in__pass">
+                  ({{ t('passAt', [String(outcome.data.passPercent ?? 85)]) }})
+                </span>
+              </span>
+              <NProgress
+                type="line"
+                :percentage="outcome.data.scorePercent"
+                :status="outcome.success ? 'success' : 'error'"
+                :show-indicator="false"
+                class="w-56"
+              />
             </div>
           </div>
         </template>
@@ -589,6 +619,18 @@ onBeforeUnmount(() => {
   flex-direction: column;
   gap: 4px;
   align-items: center;
+}
+
+.face-check-in__score {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.face-check-in__pass {
+  font-size: 12px;
+  opacity: 0.65;
 }
 
 .face-check-in__footer {

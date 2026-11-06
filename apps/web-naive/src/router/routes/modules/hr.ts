@@ -12,6 +12,7 @@ const hrPermissions = [
   'Hrms.Workshift',
   'Hrms.WorkSchedule',
   'Hrms.Holiday',
+  'Hrms.FaceAttendance.Manage',
 ];
 
 const routes: RouteRecordRaw[] = [
@@ -33,6 +34,17 @@ const routes: RouteRecordRaw[] = [
           authority: ['Hrms.Spreedsheet'],
           icon: 'lucide:calendar-check',
           title: $t('page.hr.attendance'),
+          keepAlive: true,
+        },
+      },
+      {
+        name: 'HrFaceIds',
+        path: '/hr/face-ids',
+        component: () => import('#/views/hr/face-ids/index.vue'),
+        meta: {
+          authority: ['Hrms.FaceAttendance.Manage'],
+          icon: 'lucide:scan-face',
+          title: $t('page.hr.faceIds'),
           keepAlive: true,
         },
       },
