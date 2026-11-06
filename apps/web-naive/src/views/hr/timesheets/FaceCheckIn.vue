@@ -510,8 +510,8 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: center;
   width: 100%;
-  aspect-ratio: 3 / 4;
   max-height: 60vh;
+  aspect-ratio: 3 / 4;
   margin: 0 auto;
   overflow: hidden;
   background: #000;
