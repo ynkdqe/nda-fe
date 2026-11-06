@@ -1,6 +1,7 @@
 export * from './contract';
 export * from './contract-type';
 export * from './employee';
+export * from './face-attendance';
 export * from './holiday';
 export * from './timesheet';
 export * from './timesheet-cutoff';

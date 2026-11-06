@@ -22,6 +22,7 @@ import {
 } from '#/api';
 import EmployeeSearchSelect from '#/components/EmployeeSearchSelect.vue';
 
+import FaceCheckIn from './FaceCheckIn.vue';
 import TimesheetCalendar from './TimesheetCalendar.vue';
 import TimesheetMonthlyDetail from './TimesheetMonthlyDetail.vue';
 
@@ -247,14 +248,34 @@ watch(
   { immediate: true },
 );
 
+// Backend tính lại timesheet bất đồng bộ (CAP) sau khi chấm công -> tải lại sau vài giây.
+const TIMESHEET_REFRESH_DELAY = 3000;
+let refreshTimer: ReturnType<typeof setTimeout> | undefined;
+
+function handleCheckedIn() {
+  if (refreshTimer) clearTimeout(refreshTimer);
+  refreshTimer = setTimeout(() => {
+    refreshTimer = undefined;
+    // Chỉ tải lại khi đang xem lịch của chính mình ở tháng hiện tại
+    if (
+      selectedEmployeeId.value === undefined &&
+      calendarValue.value === toDateKey(currentMonth)
+    ) {
+      void fetchTimesheetData();
+    }
+  }, TIMESHEET_REFRESH_DELAY);
+}
+
 onBeforeUnmount(() => {
   requestSequence += 1;
+  if (refreshTimer) clearTimeout(refreshTimer);
 });
 </script>
 
 <template>
   <Page>
     <div class="timesheet-page">
+      <FaceCheckIn class="mb-4" @checked-in="handleCheckedIn" />
       <NCard v-if="canViewAll" :bordered="false" class="mb-4">
         <div class="flex items-center justify-between gap-2">
           <span class="text-sm font-medium">
