@@ -35,10 +35,7 @@ import {
   FACE_ATTEMPT_RESULTS,
   FACE_ATTEMPT_TYPES,
 } from '#/models/hr/face-attendance';
-import {
-  FACE_SOURCE_MAX_BYTES,
-  resizeFaceImageFile,
-} from '#/utils/face-image';
+import { FACE_SOURCE_MAX_BYTES, resizeFaceImageFile } from '#/utils/face-image';
 
 const emit = defineEmits<{ changed: [] }>();
 
@@ -88,63 +85,62 @@ const title = computed(() =>
     : t('detailTitle'),
 );
 
-const attemptColumns = computed<DataTableColumns<FaceAttendanceApi.AttemptItem>>(
-  () => [
-    {
-      key: 'imageUrl',
-      render: (row) =>
-        row.imageUrl
-          ? h(NImage, {
-              height: 48,
-              objectFit: 'cover',
-              src: row.imageUrl,
-              width: 36,
-            })
-          : '-',
-      title: t('columns.image'),
-      width: 60,
-    },
-    {
-      key: 'creationTime',
-      render: (row) => formatDateTime(row.creationTime),
-      title: t('columns.time'),
-      width: 160,
-    },
-    {
-      key: 'type',
-      render: (row) =>
-        t(`types.${FACE_ATTEMPT_TYPES[row.type] ?? 'Verify'}`),
-      title: t('columns.type'),
-      width: 100,
-    },
-    {
-      key: 'result',
-      render: (row) =>
-        h(
-          NTag,
-          { bordered: false, size: 'small', type: resultTagType(row.result) },
-          () => t(`results.${resultCode(row.result)}`),
-        ),
-      title: t('columns.result'),
-      width: 140,
-    },
-    {
-      key: 'scorePercent',
-      render: (row) =>
-        row.scorePercent == null
-          ? '-'
-          : `${row.scorePercent}% (${row.score?.toFixed(3) ?? '-'})`,
-      title: t('columns.score'),
-      width: 130,
-    },
-    {
-      ellipsis: { tooltip: true },
-      key: 'deviceId',
-      render: (row) => row.deviceId ?? '-',
-      title: t('columns.device'),
-    },
-  ],
-);
+const attemptColumns = computed<
+  DataTableColumns<FaceAttendanceApi.AttemptItem>
+>(() => [
+  {
+    key: 'imageUrl',
+    render: (row) =>
+      row.imageUrl
+        ? h(NImage, {
+            height: 48,
+            objectFit: 'cover',
+            src: row.imageUrl,
+            width: 36,
+          })
+        : '-',
+    title: t('columns.image'),
+    width: 60,
+  },
+  {
+    key: 'creationTime',
+    render: (row) => formatDateTime(row.creationTime),
+    title: t('columns.time'),
+    width: 160,
+  },
+  {
+    key: 'type',
+    render: (row) => t(`types.${FACE_ATTEMPT_TYPES[row.type] ?? 'Verify'}`),
+    title: t('columns.type'),
+    width: 100,
+  },
+  {
+    key: 'result',
+    render: (row) =>
+      h(
+        NTag,
+        { bordered: false, size: 'small', type: resultTagType(row.result) },
+        () => t(`results.${resultCode(row.result)}`),
+      ),
+    title: t('columns.result'),
+    width: 140,
+  },
+  {
+    key: 'scorePercent',
+    render: (row) =>
+      row.scorePercent == null
+        ? '-'
+        : `${row.scorePercent}% (${row.score?.toFixed(3) ?? '-'})`,
+    title: t('columns.score'),
+    width: 130,
+  },
+  {
+    ellipsis: { tooltip: true },
+    key: 'deviceId',
+    render: (row) => row.deviceId ?? '-',
+    title: t('columns.device'),
+  },
+]);
 
 async function loadDetail() {
   const id = employeeId.value;
@@ -275,7 +271,9 @@ defineExpose({ drawerApi });
             />
             <div v-else class="face-detail__placeholder">
               <IconifyIcon icon="lucide:scan-face" class="size-12" />
-              <span>{{ detail.enrolled ? t('noImage') : t('notEnrolled') }}</span>
+              <span>{{
+                detail.enrolled ? t('noImage') : t('notEnrolled')
+              }}</span>
             </div>
           </div>
 
@@ -376,8 +374,12 @@ defineExpose({ drawerApi });
                 :disabled="enrolling"
                 @click="fileInput?.click()"
               >
-                <template #icon><IconifyIcon icon="lucide:image-up" /></template>
-                {{ enrollBlob ? t('enroll.chooseAnother') : t('enroll.choose') }}
+                <template #icon
+                  ><IconifyIcon icon="lucide:image-up"
+                /></template>
+                {{
+                  enrollBlob ? t('enroll.chooseAnother') : t('enroll.choose')
+                }}
               </NButton>
               <NCheckbox v-if="enrollBlob" v-model:checked="consent">
                 {{ t('enroll.consent') }}

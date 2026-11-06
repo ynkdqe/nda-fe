@@ -444,7 +444,9 @@ onBeforeUnmount(() => {
             >
               <span>
                 {{ t('score') }}:
-                <b :class="outcome.success ? 'text-success' : 'text-destructive'">
+                <b
+                  :class="outcome.success ? 'text-success' : 'text-destructive'"
+                >
                   {{ outcome.data.scorePercent }}%
                 </b>
                 <span class="face-check-in__pass">

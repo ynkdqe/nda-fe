@@ -204,11 +204,7 @@ async function handleChanged() {
           height="48"
           class="face-id-thumb"
         />
-        <IconifyIcon
-          v-else
-          icon="lucide:scan-face"
-          class="size-6 opacity-40"
-        />
+        <IconifyIcon v-else icon="lucide:scan-face" class="size-6 opacity-40" />
       </template>
 
       <template #statusCell="{ row }">
