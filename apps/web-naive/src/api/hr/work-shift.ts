@@ -43,3 +43,21 @@ export async function deleteWorkShiftApi(id: number | string) {
     responseReturn: 'body',
   });
 }
+
+export async function getWorkShiftAssignmentsApi(id: number | string) {
+  return requestClient.get<WorkShiftApi.AssignmentsResult>(
+    `/api/hrms/workshifts/${id}/employee-assignments`,
+    { responseReturn: 'body' },
+  );
+}
+
+export async function updateWorkShiftAssignmentsApi(
+  id: number | string,
+  data: WorkShiftApi.AssignmentUpdateInput,
+) {
+  return requestClient.put<WorkShiftApi.AssignmentUpdateResult>(
+    `/api/hrms/workshifts/${id}/employee-assignments`,
+    data,
+    { responseReturn: 'body' },
+  );
+}

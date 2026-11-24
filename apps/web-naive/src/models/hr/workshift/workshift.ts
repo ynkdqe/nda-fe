@@ -26,6 +26,26 @@ export namespace WorkShiftApi {
   export type WorkShiftListResult = MResult<WorkShiftItem[]>;
 
   export type WorkShiftDetailResult = MResult<WorkShiftItem>;
+
+  export interface AssignmentEmployee {
+    employeeCode: null | string;
+    id: number;
+    isAssigned: boolean;
+    name: string;
+  }
+
+  export interface Assignments {
+    canRemove: boolean;
+    employees: AssignmentEmployee[];
+  }
+
+  export interface AssignmentUpdateInput {
+    assignEmployeeIds: number[];
+    removeEmployeeIds: number[];
+  }
+
+  export type AssignmentsResult = MResult<Assignments>;
+  export type AssignmentUpdateResult = MResult<unknown>;
 }
 
 export interface WorkShiftFormModel {

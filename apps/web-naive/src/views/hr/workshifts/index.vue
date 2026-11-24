@@ -22,6 +22,7 @@ import {
 } from '#/api';
 import { $t } from '#/locales';
 
+import WorkShiftAssignmentModal from './WorkShiftAssignmentModal.vue';
 import WorkShiftForm from './WorkShiftForm.vue';
 
 const DEFAULT_PAGE_SIZE = 10;
@@ -49,6 +50,7 @@ function showNoPermissionMessage() {
   message.warning($t('page.common.noPermissionAction'));
 }
 
+const assignmentShift = ref<null | WorkShiftApi.WorkShiftItem>(null);
 const currentEditId = ref<null | number | string>(null);
 
 function normalizeFormValues(formValues?: Record<string, any>) {
@@ -139,7 +141,7 @@ const gridOptions: VxeGridProps<WorkShiftApi.WorkShiftItem> = {
       fixed: 'right',
       slots: { default: 'actions' },
       title: 'Hành động',
-      width: 120,
+      width: 180,
     },
   ],
   keepSource: true,
@@ -280,6 +282,14 @@ async function handleFormSubmit(payload: Record<string, any>) {
 
       <template #actions="{ row }">
         <NSpace justify="center" :size="4">
+          <NButton
+            size="small"
+            :disabled="!canUpdateWorkShift"
+            @click="assignmentShift = row"
+          >
+            Phân ca
+          </NButton>
+
           <NTooltip trigger="hover">
             <template #trigger>
               <NButton
@@ -328,5 +338,10 @@ async function handleFormSubmit(payload: Record<string, any>) {
     </Grid>
 
     <Drawer @submit="handleFormSubmit" />
+    <WorkShiftAssignmentModal
+      v-if="assignmentShift"
+      :shift="assignmentShift"
+      @close="assignmentShift = null"
+    />
   </Page>
 </template>
