@@ -50,13 +50,11 @@ function getMonthStartPeriod(value: string) {
   return `${date.getFullYear()}/${pad(date.getMonth() + 1)}/01`;
 }
 
-
 const currentMonth = new Date(
   new Date().getFullYear(),
   new Date().getMonth(),
   1,
 );
-
 
 const today = toDateKey(new Date());
 const calendarValue = ref(toDateKey(currentMonth));
@@ -314,7 +312,6 @@ onBeforeUnmount(() => {
           v-model:model-value="calendarValue"
           v-model:selected-date="selectedDate"
           :loading="loading"
-
           :timesheet-data="dataSource?.data ?? []"
         />
         <TimesheetMonthlyDetail
