@@ -145,7 +145,10 @@ const calendarData = computed(() => {
           entries: isHoliday
             ? [
                 {
-                  label: holidayLabel,
+                  label:
+                    record.holiday?.isPaid === true
+                      ? record.holiday.name?.trim() || holidayLabel
+                      : '',
                   note: record.holiday?.description ?? record.description ?? '',
                   timeRange: '',
                   type: 'holiday',
@@ -339,7 +342,7 @@ function badgeClass(type?: string) {
                 {{ entry.timeRange }}
               </div>
               <div
-                v-if="entry.type !== 'holiday'"
+                v-if="entry.label"
                 class="calendar-entry__label"
               >
                 {{ entry.label }}
