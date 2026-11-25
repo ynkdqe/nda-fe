@@ -50,25 +50,13 @@ function getMonthStartPeriod(value: string) {
   return `${date.getFullYear()}/${pad(date.getMonth() + 1)}/01`;
 }
 
-function addMonths(value: Date, offset: number) {
-  const date = new Date(value);
-  date.setMonth(date.getMonth() + offset, 1);
-  return date;
-}
 
 const currentMonth = new Date(
   new Date().getFullYear(),
   new Date().getMonth(),
   1,
 );
-const allowedMonths = Array.from({ length: 6 }, (_, index) => {
-  const date = addMonths(currentMonth, -index);
-  const value = toDateKey(date);
 
-  return { value };
-});
-const minAllowedMonth = allowedMonths.at(-1)?.value;
-const maxAllowedMonth = allowedMonths[0]?.value;
 
 const today = toDateKey(new Date());
 const calendarValue = ref(toDateKey(currentMonth));
@@ -326,8 +314,7 @@ onBeforeUnmount(() => {
           v-model:model-value="calendarValue"
           v-model:selected-date="selectedDate"
           :loading="loading"
-          :max-month="maxAllowedMonth"
-          :min-month="minAllowedMonth"
+
           :timesheet-data="dataSource?.data ?? []"
         />
         <TimesheetMonthlyDetail
