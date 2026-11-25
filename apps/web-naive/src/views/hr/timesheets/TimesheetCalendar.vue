@@ -341,10 +341,7 @@ function badgeClass(type?: string) {
               <div v-if="entry.timeRange" class="calendar-entry__time">
                 {{ entry.timeRange }}
               </div>
-              <div
-                v-if="entry.label"
-                class="calendar-entry__label"
-              >
+              <div v-if="entry.label" class="calendar-entry__label">
                 {{ entry.label }}
               </div>
               <div v-if="entry.note" class="calendar-entry__note">
