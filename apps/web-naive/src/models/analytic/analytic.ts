@@ -52,11 +52,12 @@ export namespace AnalyticApi {
   }
 
   export interface OciHourlyChartResponse {
+    granularity?: 'DAILY' | 'HOURLY';
     xAxis: OciHourlyCategoryAxis;
     yAxis: OciHourlyValueAxis;
     series: OciHourlySeries[];
-    skuPartNumber: string;
-    unit: string;
+    skuPartNumber: null | string;
+    unit: null | string;
     timeZone: string;
   }
 

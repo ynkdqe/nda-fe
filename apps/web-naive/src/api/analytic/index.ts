@@ -27,7 +27,7 @@ export function getOciHourlyChartApi(
 ) {
   return requestClient.get<AnalyticApi.OciHourlyChartResponse>(
     '/api/analytic/oci/outbound/hourly-chart',
-    { params, responseReturn: 'body', signal },
+    { params, responseReturn: 'body', signal, timeout: 50_000 },
   );
 }
 

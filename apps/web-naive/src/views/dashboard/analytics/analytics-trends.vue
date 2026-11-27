@@ -121,7 +121,13 @@ onBeforeUnmount(() => controller?.abort());
         </button>
       </div>
       <span v-if="response" class="text-muted-foreground text-xs">
-        {{ response.skuPartNumber }} · {{ response.unit }} ·
+        <template v-if="response.granularity === 'DAILY'">
+          {{ $t('page.dashboard.analyticsPage.outbound.dailyFallback') }} ·
+        </template>
+        <template v-if="response.skuPartNumber">
+          {{ response.skuPartNumber }} ·
+        </template>
+        <template v-if="response.unit">{{ response.unit }} · </template>
         {{ response.timeZone }}
       </span>
     </div>
