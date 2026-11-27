@@ -29,7 +29,8 @@
         "monthlyVisits": "Monthly Outbound Traffic"
       },
       "outbound": {
-        "dailyFallback": "Daily (last 7 days)",
+        "today": "Today",
+        "yesterday": "Yesterday",
         "tenant": "Oracle tenant",
                 "total": "Total traffic",
         "month": "Month",

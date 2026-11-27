@@ -49,8 +49,8 @@ function renderChart() {
       data: labels,
     },
     yAxis: { type: 'value', name: result?.unit ?? '', splitNumber: 4 },
-    series: (result?.series ?? []).map((series) => ({
-      name: series.name,
+    series: (result?.series ?? []).map((series, index) => ({
+      name: `${$t(index === 0 ? 'page.dashboard.analyticsPage.outbound.today' : 'page.dashboard.analyticsPage.outbound.yesterday')} · ${series.name}`,
       type: 'line' as const,
       smooth: series.smooth,
       areaStyle: {},
@@ -78,7 +78,9 @@ async function loadHourlyChart() {
       { etenant: tenant.value },
       request.signal,
     );
-    if (!request.signal.aborted) response.value = result;
+    if (!request.signal.aborted && result.granularity !== 'DAILY') {
+      response.value = result;
+    }
   } catch {
     // The shared request interceptor displays API errors.
   } finally {
@@ -121,9 +123,6 @@ onBeforeUnmount(() => controller?.abort());
         </button>
       </div>
       <span v-if="response" class="text-muted-foreground text-xs">
-        <template v-if="response.granularity === 'DAILY'">
-          {{ $t('page.dashboard.analyticsPage.outbound.dailyFallback') }} ·
-        </template>
         <template v-if="response.skuPartNumber">
           {{ response.skuPartNumber }} ·
         </template>

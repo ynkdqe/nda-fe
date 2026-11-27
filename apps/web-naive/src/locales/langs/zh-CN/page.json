@@ -29,7 +29,8 @@
         "monthlyVisits": "每月出站流量"
       },
       "outbound": {
-        "dailyFallback": "按日（最近 7 天）",
+        "today": "今天",
+        "yesterday": "昨天",
         "tenant": "Oracle 租户",
                 "total": "总流量",
         "month": "月份",

@@ -29,7 +29,8 @@
         "monthlyVisits": "Lưu lượng đi ra theo tháng"
       },
       "outbound": {
-        "dailyFallback": "Theo ngày (7 ngày gần nhất)",
+        "today": "Hôm nay",
+        "yesterday": "Hôm qua",
         "tenant": "Tenant Oracle",
                 "total": "Tổng lưu lượng",
         "month": "Tháng",
